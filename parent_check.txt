@@ -1,0 +1,31 @@
+parent#astherus children:7 totalTvl:1063M gecko:-
+parent#uniswap children:4 totalTvl:3099M gecko:-
+parent#pancakeswap children:9 totalTvl:1978M gecko:-
+parent#curve-finance children:3 totalTvl:2039M gecko:-
+parent#jupiter children:9 totalTvl:2832M gecko:jupiter-exchange-solana
+parent#gmx children:4 totalTvl:261M gecko:-
+parent#hyperliquid children:4 totalTvl:4624M gecko:-
+parent#aevo children:2 totalTvl:22M gecko:-
+parent#dydx children:2 totalTvl:173M gecko:-
+parent#raydium children:3 totalTvl:1048M gecko:-
+parent#orca children:2 totalTvl:263M gecko:-
+parent#sushiswap NO CHILDREN
+parent#balancer children:4 totalTvl:174M gecko:-
+parent#aerodrome children:3 totalTvl:362M gecko:-
+parent#velodrome children:3 totalTvl:43M gecko:-
+parent#trader-joe children:8 totalTvl:53M gecko:-
+parent#quickswap children:6 totalTvl:441M gecko:quickswap
+parent#camelot children:2 totalTvl:38M gecko:-
+parent#deBridge NO CHILDREN
+parent#stargate NO CHILDREN
+parent#across NO CHILDREN
+parent#synapse NO CHILDREN
+parent#hop-protocol NO CHILDREN
+parent#kamino NO CHILDREN
+parent#osmosis NO CHILDREN
+parent#drift children:3 totalTvl:569M gecko:-
+parent#orderly-network children:3 totalTvl:16M gecko:-
+parent#vertex-protocol NO CHILDREN
+parent#thena children:4 totalTvl:8M gecko:thena
+parent#mux-protocol children:2 totalTvl:9M gecko:-
+parent#level-finance children:2 totalTvl:0M gecko:-

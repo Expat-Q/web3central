@@ -1,0 +1,54 @@
+Protocols WITH data: 53
+Hyperliquid | TVL:4620M | Mcap:— | Price:$28.9645 | FDV:— | Vol:7241.8M
+Uniswap | TVL:3099M | Mcap:— | Price:$3.9286 | FDV:— | Vol:2169.8M
+Jupiter | TVL:2832M | Mcap:— | Price:$0.1579 | FDV:— | Vol:358.9M
+Curve | TVL:2035M | Mcap:— | Price:$0.2557 | FDV:— | Vol:220.3M
+Kamino Finance | TVL:1988M | Mcap:— | Price:— | FDV:— | Vol:—
+PancakeSwap | TVL:1977M | Mcap:— | Price:$1.3142 | FDV:— | Vol:1189.1M
+Aster | TVL:1063M | Mcap:— | Price:$0.0007 | FDV:— | Vol:3554.4M
+Raydium | TVL:1048M | Mcap:— | Price:$0.6220 | FDV:— | Vol:292.3M
+Lighter | TVL:880M | Mcap:— | Price:$1.4636 | FDV:— | Vol:3781.8M
+Drift Finance | TVL:568M | Mcap:— | Price:$0.0849 | FDV:— | Vol:104.8M
+QuickSwap | TVL:441M | Mcap:— | Price:$0.0100 | FDV:— | Vol:61.9M
+Aerodrome | TVL:362M | Mcap:— | Price:$0.3680 | FDV:— | Vol:412.2M
+Orca | TVL:263M | Mcap:— | Price:$0.9104 | FDV:— | Vol:357.2M
+GMX | TVL:261M | Mcap:— | Price:$6.8425 | FDV:— | Vol:207.5M
+Connext | TVL:205M | Mcap:— | Price:— | FDV:— | Vol:—
+Balancer | TVL:174M | Mcap:— | Price:$0.1409 | FDV:— | Vol:232.0M
+dYdX | TVL:173M | Mcap:— | Price:$0.0979 | FDV:— | Vol:154.3M
+VVS Finance | TVL:142M | Mcap:— | Price:$0.0000 | FDV:— | Vol:1.2M
+Axelar | TVL:139M | Mcap:— | Price:$0.0573 | FDV:— | Vol:—
+Stargate | TVL:137M | Mcap:— | Price:— | FDV:— | Vol:—
+SushiSwap | TVL:67M | Mcap:— | Price:$0.2095 | FDV:— | Vol:3.7M
+Trader Joe | TVL:53M | Mcap:— | Price:$0.0375 | FDV:— | Vol:62.0M
+Velodrome | TVL:43M | Mcap:— | Price:$0.0168 | FDV:— | Vol:17.3M
+Camelot | TVL:38M | Mcap:— | Price:$76.5919 | FDV:— | Vol:7.0M
+Across | TVL:37M | Mcap:— | Price:$0.0347 | FDV:— | Vol:—
+Allbridge | TVL:28M | Mcap:— | Price:— | FDV:— | Vol:2.1M
+Aevo | TVL:22M | Mcap:— | Price:$0.0234 | FDV:— | Vol:2.0M
+deBridge | TVL:19M | Mcap:— | Price:$0.0155 | FDV:— | Vol:—
+Synapse | TVL:17M | Mcap:— | Price:$0.0487 | FDV:— | Vol:—
+Yield Yak | TVL:17M | Mcap:— | Price:$100.2293 | FDV:— | Vol:—
+Osmosis | TVL:16M | Mcap:— | Price:$0.0354 | FDV:— | Vol:5.5M
+Orderly Network | TVL:16M | Mcap:— | Price:$0.0560 | FDV:— | Vol:53.2M
+Biswap | TVL:11M | Mcap:— | Price:$0.0019 | FDV:— | Vol:0.2M
+MUX Protocol | TVL:9M | Mcap:— | Price:— | FDV:— | Vol:0.5M
+Thena | TVL:8M | Mcap:— | Price:$0.2626 | FDV:— | Vol:1.6M
+Hop Protocol | TVL:4M | Mcap:— | Price:$0.0007 | FDV:— | Vol:—
+Carbon | TVL:3M | Mcap:— | Price:— | FDV:— | Vol:0.1M
+SynFutures | TVL:3M | Mcap:— | Price:$0.0058 | FDV:— | Vol:154.4M
+1inch | TVL:3M | Mcap:— | Price:$0.0956 | FDV:— | Vol:—
+Meson | TVL:1M | Mcap:— | Price:$0.0038 | FDV:— | Vol:—
+SpookySwap | TVL:1M | Mcap:— | Price:$0.0155 | FDV:— | Vol:0.2M
+ShadeSwap | TVL:1M | Mcap:— | Price:— | FDV:— | Vol:—
+Mdex | TVL:1M | Mcap:— | Price:— | FDV:— | Vol:0.0M
+LayerZero | TVL:0 | Mcap:— | Price:$1.5343 | FDV:— | Vol:—
+Polyhedra Network | TVL:0 | Mcap:— | Price:$0.0238 | FDV:— | Vol:—
+CowSwap | TVL:0 | Mcap:— | Price:$0.2222 | FDV:— | Vol:—
+Perpetual Protocol | TVL:0M | Mcap:— | Price:$0.0190 | FDV:— | Vol:—
+RabbitX | TVL:0M | Mcap:— | Price:— | FDV:— | Vol:—
+Kwenta | TVL:0 | Mcap:— | Price:$6.4089 | FDV:— | Vol:—
+Level Finance | TVL:0M | Mcap:— | Price:— | FDV:— | Vol:—
+Vertex | TVL:0 | Mcap:— | Price:$0.0001 | FDV:— | Vol:—
+ZKX | TVL:0M | Mcap:— | Price:— | FDV:— | Vol:—
+Kaito | TVL:0 | Mcap:— | Price:$0.3226 | FDV:— | Vol:—

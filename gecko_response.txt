@@ -1,0 +1,38 @@
+{
+  "astherus": {
+    "usd": 0.00065385,
+    "usd_market_cap": 653850.821684258,
+    "usd_24h_vol": 128662.88634223098,
+    "usd_24h_change": 2.951653247413738
+  },
+  "curve-dao-token": {
+    "usd": 0.253729,
+    "usd_market_cap": 376526346.7050745,
+    "usd_24h_vol": 64466702.38574441,
+    "usd_24h_change": 2.2429947053818395
+  },
+  "hyperliquid": {
+    "usd": 28.8,
+    "usd_market_cap": 6895888954.109655,
+    "usd_24h_vol": 346130690.5939382,
+    "usd_24h_change": 2.133857489601763
+  },
+  "jupiter-exchange-solana": {
+    "usd": 0.157219,
+    "usd_market_cap": 551486750.9080191,
+    "usd_24h_vol": 34360527.22618509,
+    "usd_24h_change": 2.338956538971343
+  },
+  "pancakeswap-token": {
+    "usd": 1.31,
+    "usd_market_cap": 433157661.2571891,
+    "usd_24h_vol": 49271041.94387467,
+    "usd_24h_change": -0.39549821048614825
+  },
+  "uniswap": {
+    "usd": 3.9,
+    "usd_market_cap": 2478123371.764265,
+    "usd_24h_vol": 504406448.88970345,
+    "usd_24h_change": 4.252415118471645
+  }
+}

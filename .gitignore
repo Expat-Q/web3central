@@ -1,0 +1,22 @@
+.vercel
+node_modules/
+
+# Environment variables — NEVER commit secrets
+backend/.env
+
+# Build output
+build/
+dist/
+
+# Editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

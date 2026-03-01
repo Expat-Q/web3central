@@ -1,0 +1,2447 @@
+module.exports = {
+  tooltipExplanations: {
+    "Perps DEX": "Perpetuals Decentralized Exchange - A type of DEX that allows traders to take leveraged long or short positions on assets without needing to own them, similar to traditional futures trading but without expiration dates.",
+    Interoperability: "The ability of different blockchain networks to communicate and transfer value between each other seamlessly, enabling assets and data to move across chains.",
+    AMM: "Automated Market Maker - A type of decentralized exchange that uses mathematical formulas to price assets and facilitate trades without traditional order books.",
+    "Liquidity Pool": "A collection of funds locked in a smart contract that provides liquidity for trading pairs on decentralized exchanges.",
+    "Yield Farming": "The practice of staking or locking up cryptocurrencies to earn rewards or interest, typically in the form of additional tokens.",
+    Stablecoin: "A cryptocurrency designed to maintain a stable value relative to another asset, usually a fiat currency like the US dollar.",
+    MEV: "Maximal Extractable Value - The maximum value that can be extracted from block production in addition to the standard block reward and gas fees.",
+    Bridge: "A protocol that enables the transfer of assets or data between different blockchain networks.",
+    DAO: "Decentralized Autonomous Organization - An organization represented by rules encoded as a computer program that is transparent, controlled by organization members and not influenced by a central government.",
+    NFT: "Non-Fungible Token - A unique digital asset that represents ownership of a specific item or piece of content, such as art, music, or videos."
+  },
+  interoperability: [
+    {
+      id: "layerzero",
+      name: "LayerZero",
+      url: "https://layerzero.network",
+      description: "Lightweight omnichain messaging protocol enabling cross-chain applications.",
+      category: "bridge",
+      tags: [
+        "Messaging",
+        "Interoperability",
+        "Omnichain"
+      ],
+      builder: {
+        name: "LayerZero Labs",
+        handle: "@LayerZero_Labs",
+        twitter: "https://twitter.com/LayerZero_Labs",
+        github: "https://github.com/LayerZero-Labs"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
+      recentlyAdded: false,
+      monthlyUsers: "120,000+",
+      popularWith: [
+        "Ethereum builders",
+        "Multi-chain developers"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Leading the charge in omnichain interoperability solutions"
+    },
+    {
+      id: "wormhole",
+      name: "Wormhole",
+      url: "https://wormholenetwork.com",
+      description: "Cross-chain messaging and asset transfer protocol connecting major blockchains.",
+      category: "bridge",
+      tags: [
+        "Messaging",
+        "Multi-chain",
+        "Infrastructure"
+      ],
+      builder: {
+        name: "Wormhole Foundation",
+        handle: "@wormhole",
+        twitter: "https://twitter.com/wormhole",
+        github: "https://github.com/wormhole-foundation"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "98,000+",
+      popularWith: [
+        "Solana builders",
+        "Cross-chain developers"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Key player in cross-chain asset transfers and messaging"
+    },
+    {
+      id: "axelar",
+      name: "Axelar",
+      url: "https://axelar.network",
+      description: "Secure cross-chain communication network powered by PoS validators.",
+      category: "bridge",
+      tags: [
+        "Interoperability",
+        "PoS",
+        "Messaging"
+      ],
+      builder: {
+        name: "Axelar Network",
+        handle: "@axelarcore",
+        twitter: "https://twitter.com/axelarcore",
+        github: "https://github.com/axelarnetwork"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "75,000+",
+      popularWith: [
+        "Cosmos ecosystem",
+        "DeFi protocols"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Secure cross-chain communication with PoS validation"
+    },
+    {
+      id: "stargate",
+      name: "Stargate",
+      url: "https://stargate.finance",
+      description: "Liquidity transport protocol for native cross-chain asset transfers.",
+      category: "bridge",
+      llamaSlug: "stargate-finance",
+      tags: [
+        "Liquidity",
+        "Omnichain",
+        "LayerZero"
+      ],
+      builder: {
+        name: "LayerZero",
+        handle: "@StargateFinance",
+        twitter: "https://twitter.com/StargateFinance",
+        github: "https://github.com/stargate-protocol"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "85,000+",
+      popularWith: [
+        "Arbitrum users",
+        "Optimism builders"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Popular for native asset transfers across chains"
+    },
+    {
+      id: "relay",
+      name: "Relay",
+      url: "https://relay.link",
+      description: "Cross-chain bridge enabling seamless token transfers and liquidity routing.",
+      category: "interoperability",
+      tags: [
+        "Cross-chain",
+        "Bridge",
+        "Protocol"
+      ],
+      builder: {
+        name: "Relay Team",
+        handle: "@relay_link",
+        twitter: "https://twitter.com/relay_link",
+        github: "https://github.com/relay"
+      },
+      status: "active",
+      verified: true,
+      rating: 4.7,
+      reviews: 128,
+      communityScore: 92,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "42,000+",
+      popularWith: [
+        "NFT traders",
+        "Cross-chain liquidity providers"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Growing adoption for NFT and token transfers"
+    },
+    {
+      id: "hyperlane",
+      name: "Hyperlane",
+      url: "https://hyperlane.xyz",
+      description: "Permissionless and modular cross-chain messaging protocol.",
+      category: "bridge",
+      tags: [
+        "Messaging",
+        "Permissionless",
+        "Modular"
+      ],
+      builder: {
+        name: "Hyperlane",
+        handle: "@hyperlane_xyz",
+        twitter: "https://twitter.com/hyperlane_xyz",
+        github: "https://github.com/hyperlane-xyz"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "38,000+",
+      popularWith: [
+        "Modular developers",
+        "Permissionless protocols"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Permissionless approach to cross-chain messaging"
+    },
+    {
+      id: "debridge",
+      name: "deBridge",
+      url: "https://debridge.finance",
+      description: "Decentralized interoperability and cross-chain messaging protocol.",
+      category: "bridge",
+      tags: [
+        "Messaging",
+        "Liquidity",
+        "Cross-chain"
+      ],
+      builder: {
+        name: "deBridge Finance",
+        handle: "@deBridgeFinance",
+        twitter: "https://twitter.com/deBridgeFinance",
+        github: "https://github.com/debridge-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "29,000+",
+      popularWith: [
+        "Ethereum users",
+        "Liquidity providers"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Focus on liquidity and cross-chain messaging"
+    },
+    {
+      id: "connext",
+      name: "Connext",
+      url: "https://connext.network",
+      description: "Composable interoperability protocol for cross-chain liquidity and messaging.",
+      category: "bridge",
+      tags: [
+        "Composable",
+        "Ethereum",
+        "Interop"
+      ],
+      builder: {
+        name: "Connext",
+        handle: "@connextnetwork",
+        twitter: "https://twitter.com/connextnetwork",
+        github: "https://github.com/connext"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "32,000+",
+      popularWith: [
+        "Ethereum builders",
+        "Composability enthusiasts"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Composable approach to cross-chain liquidity"
+    },
+    {
+      id: "hop",
+      name: "Hop Protocol",
+      url: "https://hop.exchange",
+      description: "Rollup-to-rollup bridge optimized for Ethereum L2s.",
+      category: "bridge",
+      tags: [
+        "L2",
+        "Ethereum",
+        "Rollups"
+      ],
+      builder: {
+        name: "Hop Protocol",
+        handle: "@HopProtocol",
+        twitter: "https://twitter.com/HopProtocol",
+        github: "https://github.com/hop-protocol"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "27,000+",
+      popularWith: [
+        "Optimism users",
+        "Arbitrum traders"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Specialized in rollup-to-rollup transfers"
+    },
+    {
+      id: "across",
+      name: "Across",
+      url: "https://across.to",
+      description: "Optimistic bridge focused on capital-efficient transfers.",
+      category: "bridge",
+      tags: [
+        "Optimistic",
+        "Liquidity",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Across Protocol",
+        handle: "@AcrossProtocol",
+        twitter: "https://twitter.com/AcrossProtocol",
+        github: "https://github.com/across-protocol"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "35,000+",
+      popularWith: [
+        "Capital efficiency seekers",
+        "Ethereum users"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Optimistic approach to capital-efficient transfers"
+    },
+    {
+      id: "synapse",
+      name: "Synapse",
+      url: "https://synapseprotocol.com",
+      description: "Cross-chain bridge and AMM for token swaps.",
+      category: "bridge",
+      tags: [
+        "AMM",
+        "Liquidity",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "Synapse Protocol",
+        handle: "@SynapseProtocol",
+        twitter: "https://twitter.com/SynapseProtocol",
+        github: "https://github.com/synapseprotocol"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "22,000+",
+      popularWith: [
+        "Multi-chain traders",
+        "AMM users"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Combines bridging with AMM functionality"
+    },
+    {
+      id: "orbiter",
+      name: "Orbiter Finance",
+      url: "https://orbiter.finance",
+      description: "Decentralized bridge for native asset transfers between L2s.",
+      category: "bridge",
+      tags: [
+        "L2",
+        "Ethereum",
+        "Rollups"
+      ],
+      builder: {
+        name: "Orbiter Finance",
+        handle: "@Orbiter_Finance",
+        twitter: "https://twitter.com/Orbiter_Finance",
+        github: "https://github.com/orbiter-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "19,000+",
+      popularWith: [
+        "L2 users",
+        "Rollup traders"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Focused on native asset transfers between L2s"
+    },
+    {
+      id: "layerswap",
+      name: "LayerSwap",
+      url: "https://layerswap.io",
+      description: "Bridge for transferring assets between CEXs and L2s.",
+      category: "bridge",
+      tags: [
+        "CEX",
+        "L2",
+        "Ethereum"
+      ],
+      builder: {
+        name: "LayerSwap",
+        handle: "@layerswap",
+        twitter: "https://twitter.com/layerswap",
+        github: "https://github.com/layerswap"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "25,000+",
+      popularWith: [
+        "CEX users",
+        "L2 adopters"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Connects centralized exchanges with L2s"
+    },
+    {
+      id: "allbridge",
+      name: "Allbridge",
+      url: "https://allbridge.io",
+      description: "Simple and reliable bridge for cross-chain asset transfers.",
+      category: "bridge",
+      tags: [
+        "Stablecoins",
+        "Multi-chain",
+        "Interop"
+      ],
+      builder: {
+        name: "Allbridge",
+        handle: "@Allbridge_io",
+        twitter: "https://twitter.com/Allbridge_io",
+        github: "https://github.com/allbridge-io"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "18,000+",
+      popularWith: [
+        "Stablecoin traders",
+        "Multi-chain users"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Reliable cross-chain asset transfers"
+    },
+    {
+      id: "polyhedra",
+      name: "Polyhedra Network",
+      url: "https://polyhedra.network",
+      description: "Zero-knowledge interoperability infrastructure powering zkBridge.",
+      category: "bridge",
+      tags: [
+        "ZK",
+        "Interop",
+        "Infrastructure"
+      ],
+      builder: {
+        name: "Polyhedra Network",
+        handle: "@PolyhedraZK",
+        twitter: "https://twitter.com/PolyhedraZK",
+        github: "https://github.com/polyhedra-network"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "12,000+",
+      popularWith: [
+        "ZK enthusiasts",
+        "Privacy-focused devs"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Zero-knowledge approach to interoperability"
+    },
+    {
+      id: "meson",
+      name: "Meson",
+      url: "https://meson.network",
+      description: "Stablecoin-focused cross-chain swap protocol.",
+      category: "bridge",
+      tags: [
+        "Stablecoins",
+        "Liquidity",
+        "Cross-chain"
+      ],
+      builder: {
+        name: "Meson Network",
+        handle: "@mesonnetwork",
+        twitter: "https://twitter.com/mesonnetwork",
+        github: "https://github.com/meson-fi"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Stablecoin traders",
+        "Arbitrageurs"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Specialized in stablecoin cross-chain swaps"
+    },
+    {
+      id: "gaszip",
+      name: "Gas.zip",
+      url: "https://gas.zip",
+      description: "Cross-chain gas abstraction protocol simplifying multi-chain interactions.",
+      category: "interoperability",
+      tags: [
+        "Cross-chain",
+        "Gas",
+        "Protocol"
+      ],
+      builder: {
+        name: "Gas.zip Team",
+        handle: "@gaszip",
+        twitter: "https://twitter.com/gaszip",
+        github: "https://github.com/gaszip"
+      },
+      status: "experimental",
+      verified: false,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "8,000+",
+      popularWith: [
+        "Multi-chain devs",
+        "Gas optimizers"
+      ],
+      narrative: "Bridges gaining mindshare",
+      narrativeDescription: "Innovative gas abstraction solution"
+    }
+  ],
+  dex: [
+    {
+      id: "uniswap",
+      name: "Uniswap",
+      url: "https://uniswap.org",
+      description: "Leading decentralized exchange with concentrated liquidity pools.",
+      category: "dex",
+      llamaSlug: "uniswap-v3",
+      tags: [
+        "AMM",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Uniswap Labs",
+        handle: "@Uniswap",
+        twitter: "https://twitter.com/Uniswap",
+        github: "https://github.com/Uniswap"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
+      recentlyAdded: false,
+      monthlyUsers: "250,000+",
+      popularWith: [
+        "Ethereum traders",
+        "DeFi natives"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Foundation for DeFi liquidity and trading"
+    },
+    {
+      id: "pancakeswap",
+      name: "PancakeSwap",
+      url: "https://pancakeswap.finance",
+      description: "Leading BNB Chain DEX offering swaps, farming, and staking.",
+      category: "dex",
+      llamaSlug: "pancakeswap-v3",
+      tags: [
+        "AMM",
+        "BSC",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "PancakeSwap",
+        handle: "@PancakeSwap",
+        twitter: "https://twitter.com/PancakeSwap",
+        github: "https://github.com/pancakeswap"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "180,000+",
+      popularWith: [
+        "BSC community",
+        "Yield farmers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Dominant DEX on BNB Chain with diverse offerings"
+    },
+    {
+      id: "sushi",
+      name: "SushiSwap",
+      url: "https://www.sushi.com",
+      description: "Community-driven multi-chain DEX with liquidity incentives.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "Sushi Team",
+        handle: "@sushiswap",
+        twitter: "https://twitter.com/sushiswap",
+        github: "https://github.com/sushiswap"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "95,000+",
+      popularWith: [
+        "Multi-chain traders",
+        "Liquidity providers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Community-owned DEX with cross-chain presence"
+    },
+    {
+      id: "curve",
+      name: "Curve",
+      url: "https://curve.fi",
+      description: "DEX optimized for low-slippage stablecoin and pegged-asset swaps.",
+      category: "dex",
+      llamaSlug: "curve-dex",
+      tags: [
+        "AMM",
+        "Stablecoins",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Curve Finance",
+        handle: "@CurveFinance",
+        twitter: "https://twitter.com/CurveFinance",
+        github: "https://github.com/curvefi"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "120,000+",
+      popularWith: [
+        "Stablecoin traders",
+        "Yield optimizers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Specialized in stablecoin and low-slippage trading"
+    },
+    {
+      id: "balancer",
+      name: "Balancer",
+      url: "https://balancer.fi",
+      description: "Automated market maker supporting multi-token liquidity pools.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Ethereum",
+        "Liquidity"
+      ],
+      builder: {
+        name: "Balancer Labs",
+        handle: "@BalancerLabs",
+        twitter: "https://twitter.com/BalancerLabs",
+        github: "https://github.com/balancer"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "65,000+",
+      popularWith: [
+        "Portfolio managers",
+        "Liquidity providers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Flexible AMM with customizable pools"
+    },
+    {
+      id: "1inch",
+      name: "1inch",
+      url: "https://1inch.io",
+      description: "DEX aggregator sourcing liquidity across many protocols.",
+      category: "dex",
+      tags: [
+        "Aggregator",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "1inch Network",
+        handle: "@1inch",
+        twitter: "https://twitter.com/1inch",
+        github: "https://github.com/1inch"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "85,000+",
+      popularWith: [
+        "Multi-chain traders",
+        "Aggregator users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Leading DEX aggregator with wide liquidity coverage"
+    },
+    {
+      id: "0x",
+      name: "0x",
+      url: "https://0x.org",
+      description: "Protocol for decentralized exchange infrastructure and smart contracts.",
+      category: "dex",
+      tags: [
+        "Infrastructure",
+        "Ethereum"
+      ],
+      builder: {
+        name: "0x Labs",
+        handle: "@0xProject",
+        twitter: "https://twitter.com/0xProject",
+        github: "https://github.com/0xProject"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "70,000+",
+      popularWith: [
+        "Protocol developers",
+        "Ethereum builders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Infrastructure layer for decentralized exchanges"
+    },
+    {
+      id: "cowswap",
+      name: "CowSwap",
+      url: "https://cow.fi",
+      description: "DEX using batch auctions to minimize MEV and optimize execution.",
+      category: "dex",
+      tags: [
+        "Aggregator",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Gnosis",
+        handle: "@GnosisChain",
+        twitter: "https://twitter.com/GnosisChain",
+        github: "https://github.com/gnosis"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "35,000+",
+      popularWith: [
+        "MEV-aware traders",
+        "Ethereum users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "MEV-minimizing exchange with batch auction model"
+    },
+    {
+      id: "jupiter",
+      name: "Jupiter",
+      url: "https://jup.ag",
+      description: "Solana’s top DEX aggregator for optimized token swaps.",
+      category: "dex",
+      tags: [
+        "Aggregator",
+        "Solana"
+      ],
+      builder: {
+        name: "Jupiter",
+        handle: "@JupiterExchange",
+        twitter: "https://twitter.com/JupiterExchange",
+        github: "https://github.com/jup-ag"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "150,000+",
+      popularWith: [
+        "Solana traders",
+        "Aggregator users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Leading DEX aggregator on Solana"
+    },
+    {
+      id: "raydium",
+      name: "Raydium",
+      url: "https://raydium.io",
+      description: "Solana-based AMM integrated with Serum order books.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Solana"
+      ],
+      builder: {
+        name: "Raydium Team",
+        handle: "@RaydiumProtocol",
+        twitter: "https://twitter.com/RaydiumProtocol",
+        github: "https://github.com/raydium"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "90,000+",
+      popularWith: [
+        "Solana AMM traders",
+        "Serum users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Integrated AMM with Serum order books on Solana"
+    },
+    {
+      id: "orca",
+      name: "Orca",
+      url: "https://www.orca.so",
+      description: "Solana DEX focusing on capital-efficient swapping.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Solana"
+      ],
+      builder: {
+        name: "Orca",
+        handle: "@orca_so",
+        twitter: "https://twitter.com/orca_so",
+        github: "https://github.com/orca-so"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "60,000+",
+      popularWith: [
+        "Solana traders",
+        "Capital efficiency seekers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Capital-efficient AMM on Solana"
+    },
+    {
+      id: "dydx",
+      name: "dYdX",
+      url: "https://dydx.exchange",
+      description: "Decentralized exchange supporting spot, perpetuals, and margin trading.",
+      category: "dex",
+      tags: [
+        "Perps",
+        "Ethereum"
+      ],
+      builder: {
+        name: "dYdX Team",
+        handle: "@dydxprotocol",
+        twitter: "https://twitter.com/dydxprotocol",
+        github: "https://github.com/dydxprotocol"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
+      recentlyAdded: false,
+      monthlyUsers: "110,000+",
+      popularWith: [
+        "Perps traders",
+        "Professional traders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Leading perpetuals exchange with orderbook model"
+    },
+    {
+      id: "synfutures",
+      name: "SynFutures",
+      url: "https://synfutures.com",
+      description: "Decentralized exchange and full-stack financial infrastructure.",
+      category: "dex",
+      tags: [
+        "Perps",
+        "Ethereum",
+        "Protocol"
+      ],
+      builder: {
+        name: "SynFutures",
+        handle: "@SynFutures",
+        twitter: "https://twitter.com/SynFutures",
+        github: "https://github.com/synfutures"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "25,000+",
+      popularWith: [
+        "Futures traders",
+        "Ethereum builders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Full-stack financial infrastructure for derivatives"
+    },
+    {
+      id: "slingshot",
+      name: "Slingshot",
+      url: "https://slingshot.finance",
+      description: "Ethereum-based swapping protocol with fee-free trades.",
+      category: "dex",
+      tags: [
+        "Swap",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Slingshot",
+        handle: "@SlingshotXYZ",
+        twitter: "https://twitter.com/SlingshotXYZ",
+        github: "https://github.com/slingshotfi"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "18,000+",
+      popularWith: [
+        "Ethereum traders",
+        "Fee-conscious users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Fee-free swapping protocol on Ethereum"
+    },
+    {
+      id: "velodrome",
+      name: "Velodrome",
+      url: "https://velodrome.finance",
+      description: "Optimism-native AMM with vote-escrowed tokenomics.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Optimism"
+      ],
+      builder: {
+        name: "Velodrome Team",
+        handle: "@VelodromeFinance",
+        twitter: "https://twitter.com/VelodromeFinance",
+        github: "https://github.com/velodrome-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "45,000+",
+      popularWith: [
+        "Optimism users",
+        "Vote-escrow enthusiasts"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Vote-escrow tokenomics on Optimism"
+    },
+    {
+      id: "matcha",
+      name: "Matcha",
+      url: "https://matcha.xyz",
+      description: "User-friendly DEX aggregator powered by 0x protocol.",
+      category: "dex",
+      tags: [
+        "Aggregator",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "Matcha",
+        handle: "@Matcha_xyz",
+        twitter: "https://twitter.com/Matcha_xyz",
+        github: "https://github.com/matcha"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "40,000+",
+      popularWith: [
+        "Beginner traders",
+        "Multi-chain users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "User-friendly aggregator built on 0x protocol"
+    },
+    {
+      id: "kamino-finance",
+      name: "Kamino Finance",
+      url: "https://kamino.finance",
+      description: "Solana-focused DEX with automated concentrated liquidity.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Solana"
+      ],
+      builder: {
+        name: "Kamino Team",
+        handle: "@kamino_finance",
+        twitter: "https://twitter.com/kamino_finance",
+        github: "https://github.com/kamino-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Solana liquidity providers",
+        "Yield farmers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Automated concentrated liquidity on Solana"
+    },
+    {
+      id: "yield-yak",
+      name: "Yield Yak",
+      url: "https://yieldyak.com",
+      description: "Avalanche yield optimizer and DEX aggregator.",
+      category: "dex",
+      tags: [
+        "Aggregator",
+        "Avalanche"
+      ],
+      builder: {
+        name: "Yield Yak Team",
+        handle: "@YieldYakApp",
+        twitter: "https://twitter.com/YieldYakApp",
+        github: "https://github.com/yieldyak"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "32,000+",
+      popularWith: [
+        "Avalanche users",
+        "Yield optimizers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Yield optimization and aggregation on Avalanche"
+    },
+    {
+      id: "carbon",
+      name: "Carbon",
+      url: "https://carbon.network",
+      description: "On-chain trading protocol for limit and range orders.",
+      category: "dex",
+      tags: [
+        "Limit Orders",
+        "Multi-chain"
+      ],
+      builder: {
+        name: "Carbon Team",
+        handle: "@CarbonNetwork",
+        twitter: "https://twitter.com/CarbonNetwork",
+        github: "https://github.com/carbon-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "20,000+",
+      popularWith: [
+        "Limit order traders",
+        "Multi-chain devs"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Advanced order types and trading mechanisms"
+    },
+    {
+      id: "traderjoe",
+      name: "Trader Joe",
+      url: "https://traderjoexyz.com",
+      description: "DEX and DeFi hub native to Avalanche.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Avalanche",
+        "Liquidity"
+      ],
+      builder: {
+        name: "Trader Joe",
+        handle: "@traderjoe_xyz",
+        twitter: "https://twitter.com/traderjoe_xyz",
+        github: "https://github.com/traderjoe-xyz"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "38,000+",
+      popularWith: [
+        "Avalanche community",
+        "Liquidity providers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Native DEX and DeFi hub on Avalanche"
+    },
+    {
+      id: "quickswap",
+      name: "QuickSwap",
+      url: "https://quickswap.exchange",
+      description: "Polygon-native DEX offering fast and low-cost swaps.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Polygon",
+        "Ethereum"
+      ],
+      builder: {
+        name: "QuickSwap",
+        handle: "@QuickswapDEX",
+        twitter: "https://twitter.com/QuickswapDEX",
+        github: "https://github.com/QuickSwap"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "30,000+",
+      popularWith: [
+        "Polygon users",
+        "Cost-conscious traders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Fast and low-cost swaps on Polygon"
+    },
+    {
+      id: "spookyswap",
+      name: "SpookySwap",
+      url: "https://spooky.fi",
+      description: "Community-driven DEX on Fantom.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Fantom",
+        "DEX"
+      ],
+      builder: {
+        name: "SpookySwap",
+        handle: "@SpookySwap",
+        twitter: "https://twitter.com/SpookySwap",
+        github: "https://github.com/SpookySwap"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "22,000+",
+      popularWith: [
+        "Fantom community",
+        "Community-driven DEX users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Community-driven DEX on Fantom"
+    },
+    {
+      id: "thena",
+      name: "Thena",
+      url: "https://thena.fi",
+      description: "ve(3,3)-based DEX on BNB Chain.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "BSC",
+        "veTokenomics"
+      ],
+      builder: {
+        name: "Thena Finance",
+        handle: "@ThenaFi_",
+        twitter: "https://twitter.com/ThenaFi_",
+        github: "https://github.com/ThenaFi"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "28,000+",
+      popularWith: [
+        "BSC ve(3,3) enthusiasts",
+        "Liquidity providers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "ve(3,3) tokenomics implementation on BNB Chain"
+    },
+    {
+      id: "camelot",
+      name: "Camelot",
+      url: "https://camelot.exchange",
+      description: "Arbitrum-native DEX with protocol-aligned liquidity.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Arbitrum",
+        "Liquidity"
+      ],
+      builder: {
+        name: "Camelot",
+        handle: "@CamelotDEX",
+        twitter: "https://twitter.com/CamelotDEX",
+        github: "https://github.com/CamelotLabs"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "35,000+",
+      popularWith: [
+        "Arbitrum users",
+        "Protocol-aligned liquidity seekers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Protocol-aligned liquidity on Arbitrum"
+    },
+    {
+      id: "aerodrome",
+      name: "Aerodrome",
+      url: "https://aerodrome.finance",
+      description: "Base-native DEX built on ve-tokenomics.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Base",
+        "veTokenomics"
+      ],
+      builder: {
+        name: "Aerodrome",
+        handle: "@aerodromefi",
+        twitter: "https://twitter.com/aerodromefi",
+        github: "https://github.com/aerodrome"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "26,000+",
+      popularWith: [
+        "Base chain users",
+        "veTokenomics enthusiasts"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "ve-tokenomics implementation on Base chain"
+    },
+    {
+      id: "velodrome",
+      name: "Velodrome",
+      url: "https://velodrome.finance",
+      description: "Optimism’s liquidity hub using ve(3,3) mechanics.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Optimism",
+        "veTokenomics"
+      ],
+      builder: {
+        name: "Velodrome",
+        handle: "@VelodromeFi",
+        twitter: "https://twitter.com/VelodromeFi",
+        github: "https://github.com/velodrome-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "42,000+",
+      popularWith: [
+        "Optimism users",
+        "ve(3,3) mechanics enthusiasts"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Liquidity hub with ve(3,3) mechanics on Optimism"
+    },
+    {
+      id: "osmosis",
+      name: "Osmosis",
+      url: "https://osmosis.zone",
+      description: "Leading Cosmos AMM with sovereign appchain design.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Cosmos",
+        "IBC"
+      ],
+      builder: {
+        name: "Osmosis Labs",
+        handle: "@osmosiszone",
+        twitter: "https://twitter.com/osmosiszone",
+        github: "https://github.com/osmosis-labs"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "33,000+",
+      popularWith: [
+        "Cosmos ecosystem",
+        "IBC traders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Leading AMM in the Cosmos ecosystem"
+    },
+    {
+      id: "shade-swap",
+      name: "ShadeSwap",
+      url: "https://shadeprotocol.io",
+      description: "Privacy-preserving DEX built on Secret Network.",
+      category: "dex",
+      tags: [
+        "Privacy",
+        "Cosmos",
+        "DEX"
+      ],
+      builder: {
+        name: "Shade Protocol",
+        handle: "@shadeprotocol",
+        twitter: "https://twitter.com/shadeprotocol",
+        github: "https://github.com/securesecrets"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "12,000+",
+      popularWith: [
+        "Privacy-focused traders",
+        "Secret Network users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Privacy-preserving DEX on Secret Network"
+    },
+    {
+      id: "vvs",
+      name: "VVS Finance",
+      url: "https://vvs.finance",
+      description: "User-friendly DEX built on Cronos.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Cronos",
+        "DEX"
+      ],
+      builder: {
+        name: "VVS Finance",
+        handle: "@VVS_finance",
+        twitter: "https://twitter.com/VVS_finance",
+        github: "https://github.com/vvs-finance"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "18,000+",
+      popularWith: [
+        "Cronos users",
+        "User-friendly DEX seekers"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "User-friendly DEX on Cronos chain"
+    },
+    {
+      id: "biswap",
+      name: "Biswap",
+      url: "https://biswap.org",
+      description: "Low-fee decentralized exchange on BNB Chain.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "BSC",
+        "DEX"
+      ],
+      builder: {
+        name: "Biswap",
+        handle: "@Biswap_DEX",
+        twitter: "https://twitter.com/Biswap_DEX",
+        github: "https://github.com/biswap-org"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "24,000+",
+      popularWith: [
+        "BSC users",
+        "Low-fee traders"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Low-fee exchange on BNB Chain"
+    },
+    {
+      id: "mdex",
+      name: "Mdex",
+      url: "https://mdex.com",
+      description: "Multi-chain DEX supporting BSC, HECO, and Ethereum.",
+      category: "dex",
+      tags: [
+        "AMM",
+        "Multi-chain",
+        "DEX"
+      ],
+      builder: {
+        name: "Mdex",
+        handle: "@MdexTech",
+        twitter: "https://twitter.com/MdexTech",
+        github: "https://github.com/mdexSwap"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Multi-chain traders",
+        "BSC users"
+      ],
+      narrative: "Perps replacing spot DEXs",
+      narrativeDescription: "Multi-chain DEX with broad ecosystem support"
+    },
+    {
+      id: "test-tool",
+      name: "Test Tool",
+      url: "https://test.com",
+      description: "A test tool for testing purposes",
+      category: "dex",
+      tags: [
+        "Test",
+        "Demo"
+      ],
+      builder: {
+        name: "Test Builder",
+        handle: "@testbuilder",
+        twitter: "https://twitter.com/testbuilder",
+        github: "https://github.com/testbuilder"
+      }
+    }
+  ],
+  infofi: [
+    {
+      id: "kaito",
+      name: "Kaito",
+      url: "https://kaito.ai",
+      description: "AI-powered search and intelligence for Web3 research.",
+      category: "infofi",
+      tags: [
+        "Analytics",
+        "AI",
+        "Protocol"
+      ],
+      builder: {
+        name: "Kaito Team",
+        handle: "@kaito_ai",
+        twitter: "https://twitter.com/kaito_ai",
+        github: "https://github.com/kaito"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "45,000+",
+      popularWith: [
+        "Researchers",
+        "AI enthusiasts"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "AI-powered research tools transforming Web3 information discovery"
+    },
+    {
+      id: "wallchain",
+      name: "Wallchain",
+      url: "https://quacks.app/?ref=ExpatQ3",
+      description: "MEV protection and cashback system integrated across DeFi.",
+      category: "infofi",
+      tags: [
+        "MEV",
+        "Protection",
+        "Protocol"
+      ],
+      builder: {
+        name: "Wallchain Team",
+        handle: "@wallchain",
+        twitter: "https://twitter.com/wallchain",
+        github: "https://github.com/wallchain"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "28,000+",
+      popularWith: [
+        "MEV-aware traders",
+        "DeFi users"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "MEV protection solutions gaining adoption in DeFi"
+    },
+    {
+      id: "xeet",
+      name: "Xeet",
+      url: "https://www.xeet.ai/refer/ExpatQ3",
+      description: "Aggregated insights and dashboards for onchain ecosystems.",
+      category: "infofi",
+      tags: [
+        "Analytics",
+        "Dashboard",
+        "Protocol"
+      ],
+      builder: {
+        name: "Xeet Team",
+        handle: "@xeet_ai",
+        twitter: "https://twitter.com/xeet_ai",
+        github: "https://github.com/xeet"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "22,000+",
+      popularWith: [
+        "Data analysts",
+        "Protocol teams"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Dashboard solutions for onchain ecosystem monitoring"
+    },
+    {
+      id: "bantr",
+      name: "Bantr",
+      url: "https://bantr.fun?ic=CJ540R5",
+      description: "Community-driven alpha sharing and sentiment analysis platform.",
+      category: "infofi",
+      tags: [
+        "Sentiment",
+        "Alpha",
+        "Protocol"
+      ],
+      builder: {
+        name: "Bantr Team",
+        handle: "@bantr_xyz",
+        twitter: "https://twitter.com/bantr_xyz",
+        github: "https://github.com/bantr"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "18,000+",
+      popularWith: [
+        "Alpha hunters",
+        "Community members"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Community-driven alpha sharing platforms emerging"
+    },
+    {
+      id: "galxe",
+      name: "Galxe Starboard",
+      url: "https://galxe.com",
+      description: "Web3 social and quest-based analytics for communities.",
+      category: "infofi",
+      tags: [
+        "Social",
+        "Quest",
+        "Protocol"
+      ],
+      builder: {
+        name: "Galxe Team",
+        handle: "@Galxe",
+        twitter: "https://twitter.com/Galxe",
+        github: "https://github.com/galxe"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "35,000+",
+      popularWith: [
+        "Community builders",
+        "Quest participants"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Quest-based community engagement platforms growing"
+    },
+    {
+      id: "cookie",
+      name: "Cookie",
+      url: "https://cookie.fun",
+      description: "Onchain data exploration and DeFi portfolio visualizer.",
+      category: "infofi",
+      tags: [
+        "Portfolio",
+        "Visualization",
+        "Protocol"
+      ],
+      builder: {
+        name: "Cookie Team",
+        handle: "@cookie_fun",
+        twitter: "https://twitter.com/cookie_fun",
+        github: "https://github.com/cookie"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Portfolio managers",
+        "Data visualizers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Portfolio visualization tools for DeFi users"
+    }
+  ],
+  web3Chat: [
+    {
+      id: "hyperliquid",
+      name: "Hyperliquid",
+      url: "https://hyperliquid.xyz",
+      description: "High-performance onchain perpetuals exchange with its own L1.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Orderbook",
+        "L1"
+      ],
+      builder: {
+        name: "Hyperliquid Labs",
+        handle: "@HyperliquidX",
+        twitter: "https://twitter.com/HyperliquidX",
+        github: "https://github.com/hyperliquid-dex"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "dydx",
+      name: "dYdX",
+      url: "https://dydx.trade",
+      description: "Decentralized perpetuals exchange with deep liquidity and advanced trading.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Orderbook",
+        "Cosmos"
+      ],
+      builder: {
+        name: "dYdX Trading",
+        handle: "@dYdX",
+        twitter: "https://twitter.com/dYdX",
+        github: "https://github.com/dydxprotocol"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "gmx",
+      name: "GMX",
+      url: "https://gmx.io",
+      description: "Leading decentralized perpetuals exchange using a multi-asset liquidity pool.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Arbitrum",
+        "Avalanche"
+      ],
+      builder: {
+        name: "GMX",
+        handle: "@GMX_IO",
+        twitter: "https://twitter.com/GMX_IO",
+        github: "https://github.com/gmx-io"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "aevo",
+      name: "Aevo",
+      url: "https://aevo.xyz",
+      description: "High-speed derivatives DEX offering perps and options.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Options",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Aevo",
+        handle: "@aevoxyz",
+        twitter: "https://twitter.com/aevoxyz",
+        github: "https://github.com/aevoxyz"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "vertex",
+      name: "Vertex",
+      url: "https://vertexprotocol.com",
+      description: "Cross-margined perpetuals DEX with an integrated spot market.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Spot",
+        "Arbitrum"
+      ],
+      builder: {
+        name: "Vertex Protocol",
+        handle: "@vertex_protocol",
+        twitter: "https://twitter.com/vertex_protocol",
+        github: "https://github.com/vertex-protocol"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "kwenta",
+      name: "Kwenta",
+      url: "https://kwenta.io",
+      description: "Synthetix-powered decentralized perpetuals trading platform.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Optimism",
+        "Synthetix"
+      ],
+      builder: {
+        name: "Kwenta",
+        handle: "@kwenta_io",
+        twitter: "https://twitter.com/kwenta_io",
+        github: "https://github.com/Kwenta"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "perpetual-protocol",
+      name: "Perpetual Protocol",
+      url: "https://perp.com",
+      description: "vAMM-based perpetual futures exchange on Ethereum L2s.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "AMM",
+        "Optimism"
+      ],
+      builder: {
+        name: "Perpetual Protocol",
+        handle: "@perpprotocol",
+        twitter: "https://twitter.com/perpprotocol",
+        github: "https://github.com/perpetual-protocol"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "mux",
+      name: "MUX Protocol",
+      url: "https://mux.network",
+      description: "High-leverage perpetuals DEX with cross-margin trading.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Liquidity Pool",
+        "Arbitrum"
+      ],
+      builder: {
+        name: "MUX",
+        handle: "@MUXProtocol",
+        twitter: "https://twitter.com/MUXProtocol",
+        github: "https://github.com/mux-network"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "level-finance",
+      name: "Level Finance",
+      url: "https://level.finance",
+      description: "Decentralized perpetuals exchange with multi-asset liquidity.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "BSC",
+        "Liquidity"
+      ],
+      builder: {
+        name: "Level Finance",
+        handle: "@Level__Finance",
+        twitter: "https://twitter.com/Level__Finance",
+        github: "https://github.com/level-fi"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "rabbitx",
+      name: "RabbitX",
+      url: "https://rabbitx.io",
+      description: "Orderbook-based perpetuals DEX built with StarkEx.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Orderbook",
+        "StarkEx"
+      ],
+      builder: {
+        name: "RabbitX",
+        handle: "@rabbitx_io",
+        twitter: "https://twitter.com/rabbitx_io",
+        github: "https://github.com/rabbitx-io"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "lighter",
+      name: "Lighter",
+      url: "https://lighter.xyz",
+      description: "Fully onchain orderbook-based perpetuals exchange.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Orderbook",
+        "Onchain"
+      ],
+      builder: {
+        name: "Lighter",
+        handle: "@lighter_xyz",
+        twitter: "https://twitter.com/lighter_xyz",
+        github: "https://github.com/lighterxyz"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "aster",
+      name: "Aster",
+      url: "https://aster.xyz",
+      description: "Decentralized perpetuals trading platform focused on UX.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "DEX",
+        "Ethereum"
+      ],
+      builder: {
+        name: "Aster",
+        handle: "@AsterDex",
+        twitter: "https://twitter.com/AsterDex",
+        github: "https://github.com/asterdex"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "rollbit-perps",
+      name: "Rollbit Perps",
+      url: "https://rollbit.com",
+      description: "Crypto-native perpetuals platform expanding onchain derivatives.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Derivatives",
+        "Hybrid"
+      ],
+      builder: {
+        name: "Rollbit",
+        handle: "@Rollbitcom",
+        twitter: "https://twitter.com/Rollbitcom",
+        github: "https://github.com/rollbit"
+      },
+      status: "active",
+      verified: false
+    },
+    {
+      id: "zkx",
+      name: "ZKX",
+      url: "https://zkx.fi",
+      description: "Permissionless perpetuals exchange built on Starknet.",
+      category: "perps",
+      tags: [
+        "Perps",
+        "Starknet",
+        "ZK"
+      ],
+      builder: {
+        name: "ZKX",
+        handle: "@ZKXprotocol",
+        twitter: "https://twitter.com/ZKXprotocol",
+        github: "https://github.com/zkxprotocol"
+      },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "orderly",
+      name: "Orderly Network",
+      url: "https://orderly.network",
+      description: "Composable perps and spot liquidity layer built on NEAR.",
+      category: "web3Chat",
+      tags: [
+        "Perps",
+        "Spot",
+        "Protocol"
+      ],
+      builder: {
+        name: "Orderly Network Team",
+        handle: "@OrderlyNetwork",
+        twitter: "https://twitter.com/OrderlyNetwork",
+        github: "https://github.com/orderly"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "12,000+",
+      popularWith: [
+        "NEAR ecosystem",
+        "Liquidity providers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Composable liquidity layers gaining traction"
+    },
+    {
+      id: "drift",
+      name: "Drift Finance",
+      url: "https://drift.trade",
+      description: "Solana-based decentralized perpetual exchange.",
+      category: "web3Chat",
+      tags: [
+        "Perps",
+        "Solana",
+        "Protocol"
+      ],
+      builder: {
+        name: "Drift Team",
+        handle: "@DriftTrade",
+        twitter: "https://twitter.com/DriftTrade",
+        github: "https://github.com/drift"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "25,000+",
+      popularWith: [
+        "Solana traders",
+        "Perps users"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "High-performance perpetuals exchanges on Solana"
+    }
+  ],
+  onchainAutonomy: [
+    {
+      id: "elsa",
+      name: "Elsa",
+      url: "https://elsa.network",
+      description: "Framework for onchain task automation and contract scheduling.",
+      category: "onchainAutonomy",
+      tags: [
+        "Automation",
+        "Framework",
+        "Protocol"
+      ],
+      builder: {
+        name: "Elsa Team",
+        handle: "@elsa_network",
+        twitter: "https://twitter.com/elsa_network",
+        github: "https://github.com/elsa"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "8,000+",
+      popularWith: [
+        "Automation enthusiasts",
+        "Smart contract devs"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Onchain automation frameworks gaining adoption"
+    },
+    {
+      id: "warden",
+      name: "Warden Protocol",
+      url: "https://wardenprotocol.org",
+      description: "Composable permission layer for autonomous onchain operations.",
+      category: "onchainAutonomy",
+      tags: [
+        "Automation",
+        "Protocol",
+        "Permissions"
+      ],
+      builder: {
+        name: "Warden Protocol Team",
+        handle: "@wardenprotocol",
+        twitter: "https://twitter.com/wardenprotocol",
+        github: "https://github.com/warden"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Permission systems",
+        "Protocol teams"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Composable permission layers for autonomous operations"
+    },
+    {
+      id: "magicnewton",
+      name: "Magic Newton",
+      url: "https://magicnewton.xyz",
+      description: "Automation engine enabling smart triggers and AI agents onchain.",
+      category: "onchainAutonomy",
+      tags: [
+        "Automation",
+        "AI",
+        "Protocol"
+      ],
+      builder: {
+        name: "Magic Newton Team",
+        handle: "@magicnewton",
+        twitter: "https://twitter.com/magicnewton",
+        github: "https://github.com/magicnewton"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "10,000+",
+      popularWith: [
+        "AI agents",
+        "Trigger systems"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "AI-powered automation engines emerging"
+    }
+  ],
+  communityTools: [
+    {
+      id: "antidrain",
+      name: "Anti Drain Tool by @zun2025",
+      url: "https://antidrain.dev",
+      description: "Security tool protecting users from malicious drain transactions.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Security",
+        "Protection"
+      ],
+      builder: {
+        name: "Zun2025",
+        handle: "@zun2025",
+        twitter: "https://twitter.com/zun2025",
+        github: "https://github.com/zun2025"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "12,000+",
+      popularWith: [
+        "Security conscious users",
+        "Wallet protectors"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Community-built security tools gaining adoption"
+    },
+    {
+      id: "polywhales",
+      name: "Poly Whales Tracker by @zun2025",
+      url: "https://polywhalestracker.xyz",
+      description: "a tool that monitors all the bets placed on @Polymarketfrom top performing traders.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Tracking",
+        "Analytics"
+      ],
+      builder: {
+        name: "Zun2025",
+        handle: "@zun2025",
+        twitter: "https://twitter.com/zun2025",
+        github: "https://github.com/zun2025"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "8,000+",
+      popularWith: [
+        "Whale watchers",
+        "Market analysts"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Whale tracking tools for market analysis"
+    },
+    {
+      id: "revokedelegation",
+      name: "Revoke Delegation Tool by @zun2025",
+      url: "https://x.com/Zun2025/status/1958437433508274411",
+      description: "Revoke smart contract approvals to secure your wallet.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Security",
+        "Wallet"
+      ],
+      builder: {
+        name: "Zun2025",
+        handle: "@zun2025",
+        twitter: "https://twitter.com/zun2025",
+        github: "https://github.com/zun2025"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "10,000+",
+      popularWith: [
+        "Wallet security",
+        "Approval managers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Approval revocation tools for wallet security"
+    },
+    {
+      id: "tenderly",
+      name: "Tenderly",
+      url: "https://tenderly.co",
+      description: "If you are experimenting with any calldata and not sure about the outcome because the event will happen in the future, you can force Tenderly in such a way that it gives you the result as if it is happening in the future.",
+      category: "communityTools",
+      tags: [
+        "Developer",
+        "Debugging",
+        "Simulation"
+      ],
+      builder: {
+        name: "Tenderly Team",
+        handle: "@TenderlyApp",
+        twitter: "https://twitter.com/TenderlyApp",
+        github: "https://github.com/tenderly"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
+      recentlyAdded: false,
+      monthlyUsers: "50,000+",
+      popularWith: [
+        "Smart contract devs",
+        "Debuggers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Developer tooling for smart contract simulation"
+    },
+    {
+      id: "assetrecovery",
+      name: "Undrained Asset Recovery from a compromised wallet",
+      url: "https://github.com/zunxbt/asset-recovery-tool",
+      description: "Helps users recover assets from compromised wallets.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Security",
+        "Recovery"
+      ],
+      builder: {
+        name: "ZunxBT",
+        handle: "@zunxbt",
+        twitter: "https://twitter.com/zunxbt",
+        github: "https://github.com/zunxbt"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "7,000+",
+      popularWith: [
+        "Compromised wallet users",
+        "Asset recovery"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Asset recovery tools for compromised wallets"
+    },
+    {
+      id: "web3toolkits",
+      name: "Web3 Toolkits by 0xMoei",
+      url: "https://0xmoei.xyz/toolkit",
+      description: "Utility suite for builders and explorers in Web3.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Utilities",
+        "Builder"
+      ],
+      builder: {
+        name: "0xMoei",
+        handle: "@0xMoei",
+        twitter: "https://twitter.com/0xMoei",
+        github: "https://github.com/0xMoei"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "9,000+",
+      popularWith: [
+        "Web3 builders",
+        "Toolkit users"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Utility toolkits for Web3 builders and explorers"
+    },
+    {
+      id: "gomtu",
+      name: "Gomtu",
+      url: "https://gomtu.xyz",
+      description: "Decentralized social engagement and community coordination tool.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Social",
+        "Coordination"
+      ],
+      builder: {
+        name: "Gomtu Team",
+        handle: "@gomtu",
+        twitter: "https://twitter.com/gomtu",
+        github: "https://github.com/gomtu"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "6,000+",
+      popularWith: [
+        "Community coordinators",
+        "Social engagers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Decentralized social engagement platforms"
+    },
+    {
+      id: "lunarstrategy",
+      name: "Lunar Strategy",
+      url: "https://lunarstrategy.com",
+      description: "Marketing and growth agency for Web3 and blockchain startups.",
+      category: "communityTools",
+      tags: [
+        "Marketing",
+        "Growth",
+        "Agency"
+      ],
+      builder: {
+        name: "Lunar Strategy Team",
+        handle: "@lunarstrategy",
+        twitter: "https://twitter.com/lunarstrategy",
+        github: ""
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Web3 startups",
+        "Growth hackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Marketing and growth agencies for Web3 startups"
+    },
+    {
+      id: "kaitoradar",
+      name: "Kaito Radar",
+      url: "https://chromewebstore.google.com/detail/kaito-radar/ipghckihdimmbgfcpgnjekfljdoahlba?hl=en-US&utm_source=ext_sidebar",
+      description: "Data dashboard tracking trends and narratives in crypto.",
+      category: "communityTools",
+      tags: [
+        "Analytics",
+        "Dashboard",
+        "Trends"
+      ],
+      builder: {
+        name: "Kaito Team",
+        handle: "@kaito_ai",
+        twitter: "https://twitter.com/kaito_ai",
+        github: "https://github.com/kaito"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "20,000+",
+      popularWith: [
+        "Trend watchers",
+        "Narrative trackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Data dashboards for tracking crypto trends and narratives"
+    },
+    {
+      id: "blixeditor",
+      name: "Blix Editor",
+      url: "https://blix.so",
+      description: "AI-powered content and publishing tool for Web3 creators.",
+      category: "communityTools",
+      tags: [
+        "Content",
+        "AI",
+        "Publishing"
+      ],
+      builder: {
+        name: "Blix Team",
+        handle: "@blix_so",
+        twitter: "https://twitter.com/blix_so",
+        github: "https://github.com/blix"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "11,000+",
+      popularWith: [
+        "Content creators",
+        "Web3 publishers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "AI-powered content tools for Web3 creators"
+    }
+  ],
+  vibeCoding: [
+    {
+      id: "wardencounter",
+      name: "Warden protocol WM Counter",
+      url: "https://warden-counter.vercel.app/",
+      description: "Discover how many times you've said WM. The warden protocol CT slang",
+      category: "vibeCoding",
+      tags: [
+        "Fun",
+        "Meme",
+        "Counter"
+      ],
+      builder: {
+        name: "Community Builder",
+        handle: "@community_builder",
+        twitter: "",
+        github: ""
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "5,000+",
+      popularWith: [
+        "Meme enthusiasts",
+        "Warden protocol fans"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Meme-based engagement tools in Web3"
+    },
+    {
+      id: "lancaquiz",
+      name: "Lanca Quiz by @adedir",
+      url: "https://concero-lanca-quiz.vercel.app",
+      description: "Web3 quiz platform designed for community engagement.",
+      category: "vibeCoding",
+      tags: [
+        "Fun",
+        "Education",
+        "Quiz"
+      ],
+      builder: {
+        name: "Adedir",
+        handle: "@adedir",
+        twitter: "https://twitter.com/adedir",
+        github: "https://github.com/adedir"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "7,000+",
+      popularWith: [
+        "Quiz takers",
+        "Community learners"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Gamified learning platforms for Web3 education"
+    },
+    {
+      id: "wardenquiz",
+      name: "Warden Protocol Quiz App",
+      url: "https://warden-quiz.vercel.app/",
+      description: "Gamified learning experience built by @ExpatQ3. Test your knowlege about Warden Protocol, automation, and onchain coordination through interactive quizzes.",
+      category: "vibeCoding",
+      tags: [
+        "Fun",
+        "Education",
+        "Gamification"
+      ],
+      builder: {
+        name: "ExpatQ3",
+        handle: "@ExpatQ3",
+        twitter: "https://twitter.com/ExpatQ3",
+        github: "https://github.com/expatq3"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "8,000+",
+      popularWith: [
+        "Warden protocol learners",
+        "Gamification fans"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Protocol-specific quiz apps for onchain learning"
+    },
+    {
+      id: "sentientquiz",
+      name: "Sentient AGI Quiz App",
+      url: "https://sentient-quiz-umber.vercel.app/",
+      description: "Gamified learning experience built by @ExpatQ3. Test your knowlege about @sentientAGI open-source AGI system, automation, and onchain coordination through interactive quizzes.",
+      category: "vibeCoding",
+      tags: [
+        "Fun",
+        "Education",
+        "Gamification"
+      ],
+      builder: {
+        name: "ExpatQ3",
+        handle: "@ExpatQ3",
+        twitter: "https://twitter.com/ExpatQ3",
+        github: "https://github.com/expatq3"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "6,000+",
+      popularWith: [
+        "AGI enthusiasts",
+        "AI learners"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "AI and AGI learning platforms in Web3"
+    }
+  ]
+};

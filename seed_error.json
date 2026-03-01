@@ -1,0 +1,6 @@
+[dotenv@17.2.3] injecting env (3) from backend\.env -- tip: ≡ƒùé∩╕Å backup and recover secrets: https://dotenvx.com/ops
+Error with data import: {
+  "errorLabelSet": {},
+  "beforeHandshake": false,
+  "connectionGeneration": 0
+}

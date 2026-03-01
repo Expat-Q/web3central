@@ -1,0 +1,25 @@
+{
+  "title": "Featured Community Project",
+  "description": "Highlighting innovative projects from our community",
+  "projects": [],
+  "builderSpotlight": {
+    "name": "Zun20",
+    "role": "Security Researcher & Tool Builder",
+    "description": "Creator of multiple security tools including Anti Drain Tool and Poly Whales Tracker. Known for building practical tools that protect users and provide valuable insights.",
+    "twitter": "https://twitter.com/zun2025",
+    "github": "https://github.com/zun2025",
+    "rating": 4.9,
+    "featuredTools": [
+      {
+        "initial": "AD",
+        "name": "Anti Drain Tool",
+        "description": "Security tool protecting users from malicious drain transactions"
+      },
+      {
+        "initial": "PW",
+        "name": "Poly Whales Tracker",
+        "description": "Tracks bets placed on Polymarket by top performing traders"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "coins": {
+    "coingecko:uniswap": {
+      "price": 3.923932774981614,
+      "symbol": "UNI",
+      "timestamp": 1772117099,
+      "confidence": 0.99
+    },
+    "coingecko:astherus": {
+      "price": 0.0006530871529395926,
+      "symbol": "ASTHERUS",
+      "timestamp": 1772110740,
+      "confidence": 0.99
+    },
+    "coingecko:hyperliquid": {
+      "price": 28.977507308521,
+      "symbol": "HYPE",
+      "timestamp": 1772117099,
+      "confidence": 0.99
+    }
+  }
+}

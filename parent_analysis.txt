@@ -1,0 +1,33 @@
+Protocols with gecko_id (no parent):2132
+Child protocols:1827
+---Aster sub-protocols---
+aster-bridge parent:parent#astherus tvl:676M mcap:0 gecko:-
+aster-asbnb parent:parent#astherus tvl:167M mcap:0 gecko:-
+aster-usdf parent:parent#astherus tvl:148M mcap:0 gecko:-
+blasterswap-v2 parent:parent#blasterswap tvl:0M mcap:0 gecko:-
+aster-asbtc parent:parent#astherus tvl:0M mcap:0 gecko:-
+bao-masterchef-v1 parent:parent#bao-finance tvl:0M mcap:7373.355715031034 gecko:bao-finance
+paraluni-masterchef parent:parent#paraluni tvl:0M mcap:0 gecko:-
+blasterswap-v3 parent:parent#blasterswap tvl:0M mcap:0 gecko:-
+blasterswap-vaults parent:parent#blasterswap tvl:0M mcap:0 gecko:-
+asteroneo parent:NONE tvl:0M mcap:0 gecko:-
+asteria-finance parent:NONE tvl:0M mcap:0 gecko:-
+blaster-dex parent:NONE tvl:0M mcap:0 gecko:-
+defi-master parent:NONE tvl:0M mcap:0 gecko:-
+farcaster-sofi parent:parent#farcaster tvl:0 mcap:0 gecko:-
+z-protocol-masterchef parent:parent#z-protocol tvl:0 mcap:0 gecko:-
+aster-perps parent:parent#astherus tvl:0 mcap:0 gecko:-
+aster-spot parent:parent#astherus tvl:0 mcap:0 gecko:-
+---Parent protocols with mcap/gecko---
+uniswap: NOT FOUND as parent
+pancakeswap: NOT FOUND as parent
+curve: NOT FOUND as parent
+jupiter: NOT FOUND as parent
+gmx: NOT FOUND as parent
+hyperliquid: NOT FOUND as parent
+aevo: NOT FOUND as parent
+dydx: NOT FOUND as parent
+1inch mcap:135M fdv:0 gecko:1inch tvl:3M
+raydium: NOT FOUND as parent
+orca: NOT FOUND as parent
+sushi: NOT FOUND as parent
