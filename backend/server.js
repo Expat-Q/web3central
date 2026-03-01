@@ -54,6 +54,7 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',')
   : [
     'http://localhost:3000',
+    'https://web3central.vercel.app',
     'https://web3central-4ye286qqp-expatqs-projects.vercel.app'
   ];
 
@@ -61,10 +62,15 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (server-to-server, curl, mobile apps)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
+
+    // Check if origin matches allowed list or is a vercel.app subdomain
+    const isAllowed = allowedOrigins.indexOf(origin) !== -1 ||
+      origin.endsWith('.vercel.app');
+
+    if (isAllowed) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true
 }));
@@ -95,9 +101,7 @@ app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err.message);
   res.status(err.status || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : err.message
+    message: err.message // Temporarily showing error message in prod for debugging
   });
 });
 
