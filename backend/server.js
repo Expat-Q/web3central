@@ -79,6 +79,17 @@ app.use(cors({
 app.use(express.json({ limit: '10kb' }));
 
 // --------------- API Routes ---------------
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Backend is live',
+    version: '1.0.2',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
 app.use('/api/tools', toolsRouter);
 app.use('/api/community-spotlight', communitySpotlightRouter);
 app.use('/api/auth', authRouter);
