@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
+const mongoose = require('mongoose');
 
 // Load environment variables FIRST — before anything else
 dotenv.config({ path: path.join(__dirname, '.env') });
