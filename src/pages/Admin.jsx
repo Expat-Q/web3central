@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ShieldAlert, Users, LayoutDashboard, Database, Activity,
-  CheckCircle, Trash2, Plus, X, Lock
+  CheckCircle, Trash2, Plus, X, Lock, ExternalLink
 } from 'lucide-react';
 import {
   fetchStatsOverview, fetchToolsData, deleteTool, createTool,
-  generateAiQuiz, createAcademyLesson
+  generateAiQuiz, createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight
 } from '../services/apiService';
 
 const ADMIN_PASSWORD = '213478';
@@ -30,6 +30,8 @@ export default function Admin() {
   // Dashboard State
   const [stats, setStats] = useState(null);
   const [toolsList, setToolsList] = useState([]);
+  const [spotlightData, setSpotlightData] = useState(null);
+  const [updatingSpotlight, setUpdatingSpotlight] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   // Add Tool State
@@ -64,13 +66,19 @@ export default function Admin() {
     if (!isUnlocked) return;
     const loadData = async () => {
       try {
-        const [statsData, toolsData] = await Promise.all([
-          fetchStatsOverview(),
-          fetchToolsData()
+        const [statsData, toolsData, spotlightRes] = await Promise.all([
+          fetchStatsOverview().catch(() => ({ users: 0, activeTools: 0, pendingTools: 0 })),
+          fetchToolsData().catch(() => ({})),
+          fetchCommunitySpotlight().catch(() => ({ builderSpotlight: { name: '', role: '', description: '', twitter: '', xProfileImageUrl: '' } }))
         ]);
         setStats(statsData);
-        const flatTools = Object.values(toolsData).flat();
+        // toolsData might be an object grouped by category. Filter out 'tooltipExplanations' if present!
+        const toolsArrays = Object.entries(toolsData)
+          .filter(([key]) => key !== 'tooltipExplanations')
+          .map(([_, val]) => val);
+        const flatTools = toolsArrays.flat();
         setToolsList(flatTools);
+        setSpotlightData(spotlightRes);
       } catch (error) {
         console.error("Failed to load admin stats", error);
       } finally {
@@ -130,6 +138,18 @@ export default function Admin() {
       alert('Failed to add tool. Make sure you are logged in as admin.');
     }
     setAddingTool(false);
+  };
+
+  const handleSpotlightUpdate = async (e) => {
+    e.preventDefault();
+    setUpdatingSpotlight(true);
+    try {
+      await updateCommunitySpotlight(spotlightData);
+      alert('Builder Spotlight updated successfully!');
+    } catch (err) {
+      alert('Failed to update Spotlight.');
+    }
+    setUpdatingSpotlight(false);
   };
 
   // Academy handlers
@@ -293,25 +313,39 @@ export default function Admin() {
               ) : (
                 <ul className="divide-y divide-slate-100">
                   {toolsList.map(tool => (
-                    <li key={tool.id || tool._id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
-                          {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                    <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
+                            {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                              <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                                {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
+                              </span>
+                              {tool.status === 'pending' && (
+                                <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Pending Review</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
-                          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                            {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
-                          </span>
+                        <button
+                          onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
+                          title="Remove Tool"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                      <div className="pl-14 pr-2">
+                        <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
+                        <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                          <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
+                          {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Remove Tool"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </li>
                   ))}
                 </ul>
@@ -499,6 +533,47 @@ export default function Admin() {
             )}
           </div>
         </div>
+
+        {/* Builder Spotlight Editor */}
+        {spotlightData && spotlightData.builderSpotlight && (
+          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mt-8">
+            <div className="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Users size={20} className="text-indigo-500" />
+                Edit Builder Spotlight
+              </h2>
+            </div>
+            <form onSubmit={handleSpotlightUpdate} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Builder Name</label>
+                  <input type="text" value={spotlightData.builderSpotlight.name || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, name: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Role</label>
+                  <input type="text" value={spotlightData.builderSpotlight.role || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, role: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Twitter URL</label>
+                  <input type="text" value={spotlightData.builderSpotlight.twitter || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, twitter: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Avatar Image URL</label>
+                  <input type="text" value={spotlightData.builderSpotlight.xProfileImageUrl || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, xProfileImageUrl: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Biography / Description</label>
+                <textarea rows={3} value={spotlightData.builderSpotlight.description || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, description: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium custom-scrollbar" />
+              </div>
+              <button disabled={updatingSpotlight} type="submit" className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
+                {updatingSpotlight ? 'Saving Spotlight...' : 'Publish Spotlight Update'}
+              </button>
+            </form>
+          </div>
+        )}
 
       </div>
     </div>

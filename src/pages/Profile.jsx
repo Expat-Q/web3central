@@ -101,8 +101,9 @@ export default function Profile() {
         setSaving(true);
         try {
             const updatedUser = await updateProfile(editForm);
-            // Optimistically update the page
+            // Optimistically update the page and localStorage
             if (updatedUser.user) {
+                localStorage.setItem('user', JSON.stringify(updatedUser.user));
                 window.location.reload();
             }
         } catch (error) {
@@ -373,18 +374,29 @@ export default function Profile() {
                                                 <ToolLogo tool={tool} />
                                             </div>
                                             <div className="min-w-0">
-                                                <h4 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors text-sm">{tool.name}</h4>
+                                                <h4 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors text-sm flex items-center gap-1.5">
+                                                    {tool.name}
+                                                    {tool.verified && (
+                                                        <span title="Verified Protocol">
+                                                            <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </span>
+                                                    )}
+                                                </h4>
                                                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{tool.category}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 mt-auto">
                                             <SafeLink
                                                 url={tool.url}
-                                                verified={tool.verified}
+                                                verified={false}
                                                 hideDomain={true}
-                                                className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center gap-2 hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider"
+                                                className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider relative group/link"
                                             >
-                                                Launch <ExternalLink size={12} />
+                                                <div className="flex flex-row items-center justify-center gap-2 w-full absolute inset-0">
+                                                    Launch <ExternalLink size={14} className="opacity-70 group-hover/link:opacity-100" />
+                                                </div>
                                             </SafeLink>
                                             <button
                                                 onClick={() => toggleBookmark(tool)}
