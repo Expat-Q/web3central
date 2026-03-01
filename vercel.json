@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/api/index.js"
+            "destination": "https://web3central.onrender.com/api/$1"
         }
     ]
 }

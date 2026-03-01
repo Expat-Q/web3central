@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-    ? '/api'
-    : (process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api'
+    : '/api';
 
 export default function ClaudeBot() {
     const [isOpen, setIsOpen] = useState(false);

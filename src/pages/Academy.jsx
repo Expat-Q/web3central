@@ -35,7 +35,8 @@ export default function Academy() {
     useEffect(() => {
         const fetchLessons = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/academy/lessons');
+                const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+                const res = await fetch(`${baseUrl}/academy/lessons`);
                 const data = await res.json();
                 if (data.success) {
                     setLessons(data.data);

@@ -69,9 +69,9 @@ export default function SubmitTool() {
 
     try {
       const token = localStorage.getItem('token');
-      const API_BASE_URL = process.env.NODE_ENV === 'production'
-        ? '/api'
-        : (process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
+      const API_BASE_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api'
+        : '/api';
 
       const response = await fetch(`${API_BASE_URL}/tools/submit`, {
         method: "POST",

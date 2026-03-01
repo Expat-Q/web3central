@@ -21,7 +21,11 @@ export default function RatingModal({ tool, onClose, onRatingSubmitted }) {
         setError('');
 
         try {
-            const res = await fetch(`http://localhost:5000/api/ratings/${tool.id}`, {
+            const API_BASE_URL = window.location.hostname === 'localhost'
+                ? 'http://localhost:5000/api'
+                : '/api';
+
+            const res = await fetch(`${API_BASE_URL}/ratings/${tool.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

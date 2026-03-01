@@ -52,7 +52,10 @@ app.use('/api/auth', authLimiter);
 // CORS — restrict to known frontend origins
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',')
-  : ['http://localhost:3000'];
+  : [
+    'http://localhost:3000',
+    'https://web3central-4ye286qqp-expatqs-projects.vercel.app'
+  ];
 
 app.use(cors({
   origin: function (origin, callback) {
