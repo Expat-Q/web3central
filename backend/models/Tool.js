@@ -35,7 +35,7 @@ const ToolSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['active', 'experimental', 'disabled', 'pending'],
+        enum: ['active', 'experimental', 'disabled', 'pending', 'rejected'],
         default: 'active'
     },
     verified: {

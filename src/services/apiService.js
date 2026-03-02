@@ -97,6 +97,30 @@ export const deleteTool = async (category, toolId) => {
   }
 };
 
+// Review a tool (Admin)
+export const reviewTool = async (category, toolId, actionData) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch(`${API_BASE_URL}/tools/${category}/${toolId}/review`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(actionData) // { action: 'accept' | 'reject', reason: string }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error reviewing tool:', error);
+    throw error;
+  }
+};
+
 // Create a tool in a category (admin)
 export const createTool = async (category, toolData) => {
   const token = localStorage.getItem('token');

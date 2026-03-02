@@ -172,6 +172,89 @@ router.post('/:category', protect, admin, async (req, res) => {
   }
 });
 
+// PUT review a submitted tool
+router.put('/:category/:id/review', protect, admin, async (req, res) => {
+  try {
+    const { category, id } = req.params;
+    const { action, reason } = req.body; // action: 'accept' or 'reject'
+
+    const tool = await Tool.findOne({ id }).populate('submitter', 'name email');
+    if (!tool) {
+      return res.status(404).json({ error: 'Tool not found' });
+    }
+
+    if (action === 'accept') {
+      tool.status = 'active';
+    } else if (action === 'reject') {
+      tool.status = 'rejected';
+    } else {
+      return res.status(400).json({ error: 'Invalid action. Use accept or reject.' });
+    }
+
+    await tool.save();
+
+    // Send notification email to the submitter if their email is available
+    if (tool.submitter && tool.submitter.email && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+          }
+        });
+
+        const subject = action === 'accept' ? `🎉 Your tool ${tool.name} has been approved!` : `Update on your tool submission: ${tool.name}`;
+
+        let htmlBody = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #1e293b, #312e81); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+              <h2 style="color: white; margin: 0;">Tool Submission Status Update</h2>
+            </div>
+            <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-radius: 0 0 16px 16px;">
+              <p>Hi ${tool.submitter.name},</p>
+        `;
+
+        if (action === 'accept') {
+          htmlBody += `
+              <p>Great news! Your submission for <strong>${tool.name}</strong> has been reviewed and approved by our moderation team.</p>
+              <p>It is now live on the platform under the ${tool.category} category.</p>
+              <div style="margin-top: 20px; text-align: center;">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">View the Hub</a>
+              </div>
+          `;
+        } else {
+          htmlBody += `
+              <p>Thank you for submitting <strong>${tool.name}</strong> to our platform.</p>
+              <p>Unfortunately, your submission has been declined at this time. ${reason ? `<br><br><strong>Reason:</strong> ${reason}` : ''}</p>
+              <p>If you have any questions or have updated your protocol, you are welcome to submit again in the future.</p>
+          `;
+        }
+
+        htmlBody += `
+            </div>
+          </div>
+        `;
+
+        await transporter.sendMail({
+          from: `"Web3Central" <${process.env.SMTP_USER}>`,
+          to: tool.submitter.email,
+          subject: subject,
+          html: htmlBody
+        });
+        console.log(`Review notification sent to ${tool.submitter.email}`);
+      } catch (emailErr) {
+        console.error("Failed to send review notification email:", emailErr.message);
+      }
+    }
+
+    res.json({ message: `Tool ${action}ed successfully`, tool });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // PUT (update) a tool
 router.put('/:category/:id', protect, admin, async (req, res) => {
   try {

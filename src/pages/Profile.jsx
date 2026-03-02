@@ -332,7 +332,7 @@ export default function Profile() {
                                                     <div className="min-w-0 pr-4">
                                                         <h4 className="font-bold text-gray-900 truncate group-hover:text-sky-600 transition-colors">{tool.name}</h4>
                                                         <div className="flex items-center gap-2 mt-1">
-                                                            <span className={`w-2 h-2 rounded-full ${tool.status === 'active' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                                                            <span className={`w-2 h-2 rounded-full ${tool.status === 'active' ? 'bg-emerald-500' : tool.status === 'rejected' ? 'bg-red-500' : 'bg-amber-500'}`}></span>
                                                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tool.status}</span>
                                                         </div>
                                                     </div>

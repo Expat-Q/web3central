@@ -6,7 +6,8 @@ import {
 } from 'lucide-react';
 import {
   fetchStatsOverview, fetchToolsData, deleteTool, createTool,
-  generateAiQuiz, createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight
+  generateAiQuiz, createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight,
+  reviewTool
 } from '../services/apiService';
 
 const ADMIN_PASSWORD = '213478';
@@ -110,6 +111,22 @@ export default function Admin() {
       setStats(prev => ({ ...prev, activeTools: (prev.activeTools || 1) - 1 }));
     } catch (error) {
       alert('Failed to delete tool');
+    }
+  };
+
+  // Review tool handler (Accept/Reject)
+  const handleReviewTool = async (category, id, name, action) => {
+    if (!window.confirm(`Are you sure you want to ${action} "${name}"?`)) return;
+    try {
+      await reviewTool(category, id, { action });
+      setToolsList(prev => prev.map(t => (t.id || t._id) === id ? { ...t, status: action === 'accept' ? 'active' : 'rejected' } : t));
+      setStats(prev => ({
+        ...prev,
+        activeTools: action === 'accept' ? (prev.activeTools || 0) + 1 : prev.activeTools,
+        pendingTools: Math.max((prev.pendingTools || 1) - 1, 0)
+      }));
+    } catch (error) {
+      alert(`Failed to ${action} tool`);
     }
   };
 
@@ -236,6 +253,10 @@ export default function Admin() {
     );
   }
 
+  // ── COMPUTED LISTS ──
+  const activeTools = toolsList.filter(t => t.status === 'active' || t.status === 'experimental');
+  const pendingTools = toolsList.filter(t => t.status === 'pending');
+
   // ── DASHBOARD ──
   return (
     <div className="min-h-screen bg-slate-50 pt-28 pb-12">
@@ -300,11 +321,11 @@ export default function Admin() {
                 Manage Active Tools
               </h2>
               <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                {toolsList.length} tools
+                {activeTools.length} tools
               </span>
             </div>
             <div className="p-0 overflow-y-auto custom-scrollbar flex-1">
-              {toolsList.length === 0 ? (
+              {activeTools.length === 0 ? (
                 <div className="p-12 text-center flex flex-col items-center">
                   <CheckCircle size={48} className="text-emerald-400 mb-4" />
                   <h3 className="text-lg font-bold text-slate-800">No tools yet</h3>
@@ -312,7 +333,7 @@ export default function Admin() {
                 </div>
               ) : (
                 <ul className="divide-y divide-slate-100">
-                  {toolsList.map(tool => (
+                  {activeTools.map(tool => (
                     <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-4">
@@ -325,9 +346,6 @@ export default function Admin() {
                               <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
                                 {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
                               </span>
-                              {tool.status === 'pending' && (
-                                <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Pending Review</span>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -441,6 +459,84 @@ export default function Admin() {
                 {addingTool ? 'Adding...' : 'Add Tool to Platform'}
               </button>
             </form>
+          </div>
+        </div>
+
+        {/* Pending Submissions */}
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-8">
+          <div className="p-6 border-b border-slate-100 bg-amber-50/50 flex justify-between items-center shrink-0">
+            <h2 className="text-xl font-bold text-amber-900 flex items-center gap-2">
+              <Activity size={20} className="text-amber-600" />
+              Pending Submissions
+            </h2>
+            <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+              {pendingTools.length} awaiting review
+            </span>
+          </div>
+          <div className="p-0 overflow-y-auto custom-scrollbar max-h-[600px]">
+            {pendingTools.length === 0 ? (
+              <div className="p-12 text-center flex flex-col items-center">
+                <CheckCircle size={48} className="text-slate-300 mb-4" />
+                <h3 className="text-lg font-bold text-slate-600">All caught up</h3>
+                <p className="text-slate-500 text-sm mt-1">No pending tool submissions to review.</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {pendingTools.map(tool => (
+                  <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
+                          {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                              {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
+                            </span>
+                            <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                      <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
+                          <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
+                          {tool.url ? (
+                            <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
+                              {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
+                            </a>
+                          ) : (
+                            <span className="text-slate-400 italic">No URL provided</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
