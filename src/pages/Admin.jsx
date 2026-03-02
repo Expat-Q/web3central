@@ -50,7 +50,7 @@ export default function Admin() {
   // Academy Suite State
   const [lessonForm, setLessonForm] = useState({
     title: '', description: '', duration: '', xpReward: 100,
-    level: 'Beginner', order: 1, content: ''
+    level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations'
   });
   const [quizPreview, setQuizPreview] = useState(null);
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
@@ -187,14 +187,17 @@ export default function Admin() {
     if (!lessonForm.title || !lessonForm.content || !quizPreview) return alert("Complete all fields and generate a quiz first.");
     setPublishing(true);
     try {
+      const slug = lessonForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const payload = {
         ...lessonForm,
+        contentMarkdown: lessonForm.content,
         quiz: quizPreview,
-        slug: lessonForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        slug,
+        id: slug
       };
       await createAcademyLesson(payload);
       alert("Lesson Published Successfully!");
-      setLessonForm({ title: '', description: '', duration: '', xpReward: 100, level: 'Beginner', order: 1, content: '' });
+      setLessonForm({ title: '', description: '', duration: '', xpReward: 100, level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations' });
       setQuizPreview(null);
     } catch (e) {
       alert("Error publishing lesson");
@@ -560,7 +563,15 @@ export default function Admin() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Module</label>
+                <select value={lessonForm.module} onChange={e => setLessonForm({ ...lessonForm, module: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
+                  <option>Web3 Foundations</option>
+                  <option>DeFi Architecture</option>
+                  <option>Smart Contract Security</option>
+                </select>
+              </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Duration</label>
                 <input type="text" value={lessonForm.duration} onChange={e => setLessonForm({ ...lessonForm, duration: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="10 min" />
