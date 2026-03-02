@@ -161,11 +161,13 @@ export const fetchCommunitySpotlight = async () => {
 
 // Update community spotlight
 export const updateCommunitySpotlight = async (spotlightData) => {
+  const token = localStorage.getItem('token');
   try {
     const response = await fetch(`${API_BASE_URL}/community-spotlight`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(spotlightData),
     });
