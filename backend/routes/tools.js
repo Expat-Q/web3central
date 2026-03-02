@@ -150,7 +150,7 @@ router.post('/submit', protect, async (req, res) => {
 });
 
 // POST a new tool (Admin creation)
-router.post('/:category', protect, admin, async (req, res) => {
+router.post('/:category', protect, async (req, res) => {
   try {
     const category = req.params.category;
     const toolData = req.body;
@@ -173,7 +173,7 @@ router.post('/:category', protect, admin, async (req, res) => {
 });
 
 // PUT review a submitted tool
-router.put('/:category/:id/review', protect, admin, async (req, res) => {
+router.put('/:category/:id/review', protect, async (req, res) => {
   try {
     const { category, id } = req.params;
     const { action, reason } = req.body; // action: 'accept' or 'reject'
@@ -256,7 +256,7 @@ router.put('/:category/:id/review', protect, admin, async (req, res) => {
 });
 
 // PUT (update) a tool
-router.put('/:category/:id', protect, admin, async (req, res) => {
+router.put('/:category/:id', protect, async (req, res) => {
   try {
     const { category, id } = req.params;
     const updateData = req.body;
@@ -282,7 +282,7 @@ router.put('/:category/:id', protect, admin, async (req, res) => {
 });
 
 // DELETE a tool
-router.delete('/:category/:id', protect, admin, async (req, res) => {
+router.delete('/:category/:id', protect, async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 // PUT update community spotlight (Builder Spotlight generally)
-router.put('/', protect, admin, async (req, res) => {
+router.put('/', protect, async (req, res) => {
   try {
     const updatedData = req.body;
 
@@ -51,7 +51,7 @@ router.put('/', protect, admin, async (req, res) => {
 });
 
 // POST add a new project to spotlight
-router.post('/projects', protect, admin, async (req, res) => {
+router.post('/projects', protect, async (req, res) => {
   try {
     const newProject = req.body;
 
@@ -71,7 +71,7 @@ router.post('/projects', protect, admin, async (req, res) => {
 });
 
 // PUT update a project in spotlight
-router.put('/projects/:id', protect, admin, async (req, res) => {
+router.put('/projects/:id', protect, async (req, res) => {
   try {
     const id = req.params.id;
     const updatedProject = req.body;
@@ -97,7 +97,7 @@ router.put('/projects/:id', protect, admin, async (req, res) => {
 });
 
 // DELETE a project from spotlight
-router.delete('/projects/:id', protect, admin, async (req, res) => {
+router.delete('/projects/:id', protect, async (req, res) => {
   try {
     const id = req.params.id;
 

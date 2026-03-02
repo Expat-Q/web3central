@@ -19,7 +19,7 @@ router.get('/lessons', async (req, res) => {
 // @desc    Create a new lesson
 // @route   POST /api/academy
 // @access  Private/Admin
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, async (req, res) => {
     try {
         const newLesson = await Lesson.create(req.body);
         res.status(201).json({ success: true, data: newLesson });
