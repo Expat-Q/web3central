@@ -77,7 +77,7 @@ async function callGemini(messages) {
     }
 
     const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -93,10 +93,15 @@ async function callGemini(messages) {
 
     if (!response.ok) {
         const errBody = await response.text();
+        console.error(`[Gemini] HTTP ${response.status}:`, errBody);
         throw new Error(`Gemini API error ${response.status}: ${errBody}`);
     }
 
     const data = await response.json();
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        console.error('[Gemini] Unexpected response:', JSON.stringify(data));
+        throw new Error('Gemini returned an empty response');
+    }
     return data.candidates[0].content.parts[0].text;
 }
 
@@ -126,12 +131,12 @@ router.post('/', async (req, res) => {
             try {
                 reply = await callGrok(sanitized);
             } catch (grokErr) {
-                console.error('Both AI providers failed.');
+                console.error('[Chat] Both AI providers failed.');
                 console.error('  Gemini:', geminiErr.message);
                 console.error('  Grok:', grokErr.message);
                 return res.status(503).json({
                     success: false,
-                    message: 'AI service temporarily unavailable. Please try again later.'
+                    message: `AI service unavailable. Reason: ${geminiErr.message.slice(0, 150)}`
                 });
             }
         }
