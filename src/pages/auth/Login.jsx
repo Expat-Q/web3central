@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { FcGoogle } from 'react-icons/fc';
 import { FaDiscord, FaTwitter } from 'react-icons/fa';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
     const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export default function Login() {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { login, oauthLogin } = useAuth();
     const navigate = useNavigate();
@@ -116,6 +118,7 @@ export default function Login() {
                                 onChange={handleChange}
                                 className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold focus:outline-none focus:border-purple-500 transition-all placeholder:text-gray-300"
                                 placeholder="architect@web3central.io"
+                                autoComplete="email"
                             />
                         </div>
 
@@ -126,15 +129,25 @@ export default function Login() {
                                     Reset Password
                                 </Link>
                             </div>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold focus:outline-none focus:border-purple-500 transition-all placeholder:text-gray-300"
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    required
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold focus:outline-none focus:border-purple-500 transition-all placeholder:text-gray-300 pr-12"
+                                    placeholder="••••••••"
+                                    autoComplete="current-password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
 
                         <button

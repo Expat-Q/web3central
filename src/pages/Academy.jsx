@@ -61,17 +61,17 @@ export default function Academy() {
                     </div>
                     <h1 className="text-3xl font-black text-gray-900 mb-3">Academy Access</h1>
                     <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                        Sign in to access Web3 courses, lessons, and curated learning resources — all in one place.
+                        Sign in to access Web3 courses, lessons, and curated learning resources all in one place.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <button
-                            onClick={() => navigate('/auth')}
+                            onClick={() => navigate('/login')}
                             className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all text-sm shadow-lg"
                         >
                             Sign In to Continue
                         </button>
                         <button
-                            onClick={() => navigate('/auth?mode=register')}
+                            onClick={() => navigate('/signup')}
                             className="px-8 py-4 bg-purple-50 text-purple-700 font-bold rounded-2xl border border-purple-100 hover:bg-purple-100 transition-all text-sm"
                         >
                             Create Account

@@ -223,7 +223,11 @@ export default function Profile() {
                                     <Edit3 size={16} /> Edit Profile
                                 </button>
                                 <button
-                                    onClick={logout}
+                                    onClick={() => {
+                                        if (window.confirm('Are you sure you want to terminate your session and log out?')) {
+                                            logout();
+                                        }
+                                    }}
                                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 font-bold text-xs uppercase tracking-widest transition-all shadow-sm"
                                 >
                                     <LogOut size={16} /> Terminate

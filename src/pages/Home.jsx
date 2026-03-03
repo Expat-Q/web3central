@@ -137,7 +137,7 @@ export default function Home() {
     : [];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen overflow-x-hidden">
       {/* 1st Section: Navbar (Handled by component, adding spacing) */}
       <div className="h-28 md:h-32" />
 
