@@ -6,6 +6,14 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'
     : '/api';
 
+const STARTER_PROMPTS = [
+    "What is a DEX and how does it work?",
+    "Explain smart contract security risks",
+    "What are the best L2 solutions right now?",
+    "How does cross-chain bridging work?",
+    "What is DeFi liquidity provision?"
+];
+
 export default function ClaudeBot() {
     const [isOpen, setIsOpen] = useState(false);
     const [isFullScreen, setIsFullScreen] = useState(false);
@@ -13,11 +21,12 @@ export default function ClaudeBot() {
         {
             id: 1,
             role: 'assistant',
-            content: "Hey builder 👋 I'm your Web3 AI assistant powered by Grok & Gemini. Ask me anything about DeFi, smart contracts, blockchain architecture, or Web3 tooling.",
+            content: "Hey builder 👋 I'm your Web3 AI assistant. Ask me anything about DeFi, smart contracts, blockchain architecture, or Web3 tooling.",
         }
     ]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [lastProvider, setLastProvider] = useState(null);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -28,14 +37,13 @@ export default function ClaudeBot() {
         scrollToBottom();
     }, [messages, isTyping, isOpen, isFullScreen]);
 
-    const handleSendMessage = async (e) => {
-        e?.preventDefault();
-        if (!inputValue.trim() || isTyping) return;
+    const sendMessage = async (text) => {
+        if (!text?.trim() || isTyping) return;
 
         const newUserMessage = {
             id: Date.now(),
             role: 'user',
-            content: inputValue.trim()
+            content: text.trim()
         };
 
         setMessages(prev => [...prev, newUserMessage]);
@@ -43,7 +51,6 @@ export default function ClaudeBot() {
         setIsTyping(true);
 
         try {
-            // Build conversation history for the API (exclude the initial greeting)
             const conversationHistory = [...messages.filter(m => m.id !== 1), newUserMessage]
                 .map(m => ({ role: m.role, content: m.content }));
 
@@ -56,10 +63,12 @@ export default function ClaudeBot() {
             const data = await response.json();
 
             if (data.success) {
+                setLastProvider(data.provider || 'gemini');
                 setMessages(prev => [...prev, {
                     id: Date.now(),
                     role: 'assistant',
-                    content: data.reply
+                    content: data.reply,
+                    provider: data.provider
                 }]);
             } else {
                 setMessages(prev => [...prev, {
@@ -77,6 +86,11 @@ export default function ClaudeBot() {
         } finally {
             setIsTyping(false);
         }
+    };
+
+    const handleSendMessage = (e) => {
+        e?.preventDefault();
+        sendMessage(inputValue);
     };
 
     const handleKeyDown = (e) => {
@@ -198,9 +212,29 @@ export default function ClaudeBot() {
                                         <div className="whitespace-pre-wrap break-words">
                                             {msg.role === 'assistant' ? formatMessage(msg.content) : msg.content}
                                         </div>
+                                        {msg.provider && (
+                                            <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+                                                via {msg.provider === 'grok' ? 'Grok' : 'Gemini'}
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}
+
+                            {/* Starter prompt chips — shown only on fresh conversation */}
+                            {messages.length === 1 && !isTyping && (
+                                <div className="flex flex-wrap gap-2 mt-2 pl-9">
+                                    {STARTER_PROMPTS.map(prompt => (
+                                        <button
+                                            key={prompt}
+                                            onClick={() => sendMessage(prompt)}
+                                            className="text-[11px] font-medium px-3 py-1.5 bg-white border border-purple-100 text-purple-700 rounded-full hover:bg-purple-50 hover:border-purple-300 transition-all shadow-sm"
+                                        >
+                                            {prompt}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             {isTyping && (
                                 <motion.div

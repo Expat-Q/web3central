@@ -223,6 +223,56 @@ export const createAcademyLesson = async (lessonData) => {
   }
 };
 
+// Fetch curated 3rd-party courses
+export const fetchCuratedCourses = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/academy/courses`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching curated courses:', error);
+    throw error;
+  }
+};
+
+// Create a curated course (admin)
+export const createCuratedCourse = async (courseData) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch(`${API_BASE_URL}/academy/courses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(courseData)
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating course:', error);
+    throw error;
+  }
+};
+
+// Delete a curated course (admin)
+export const deleteCuratedCourse = async (courseId) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch(`${API_BASE_URL}/academy/courses/${courseId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting course:', error);
+    throw error;
+  }
+};
+
+
 export const generateAiQuiz = async (content) => {
   const token = localStorage.getItem('token');
   try {

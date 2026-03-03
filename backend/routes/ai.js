@@ -6,7 +6,7 @@ const router = express.Router();
 // @desc    Generate a 5-question logic quiz based on markdown content
 // @route   POST /api/ai/generate-quiz
 // @access  Private/Admin
-router.post('/generate-quiz', protect, admin, async (req, res) => {
+router.post('/generate-quiz', protect, async (req, res) => {
     try {
         const { content } = req.body;
 

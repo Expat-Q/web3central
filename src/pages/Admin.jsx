@@ -7,7 +7,7 @@ import {
 import {
   fetchStatsOverview, fetchToolsData, deleteTool, createTool,
   generateAiQuiz, createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight,
-  reviewTool
+  reviewTool, fetchCuratedCourses, createCuratedCourse, deleteCuratedCourse
 } from '../services/apiService';
 
 const ADMIN_PASSWORD = '213478';
@@ -56,6 +56,14 @@ export default function Admin() {
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
+  // Curated Courses State
+  const [curatedCourses, setCuratedCourses] = useState([]);
+  const [savingCourse, setSavingCourse] = useState(false);
+  const [newCourse, setNewCourse] = useState({
+    title: '', description: '', url: '', platform: 'Anthropic',
+    thumbnail: '', level: 'Beginner', isFree: true, tags: ''
+  });
+
   // Check localStorage for previous unlock
   useEffect(() => {
     const unlocked = sessionStorage.getItem('admin_unlocked');
@@ -67,19 +75,19 @@ export default function Admin() {
     if (!isUnlocked) return;
     const loadData = async () => {
       try {
-        const [statsData, toolsData, spotlightRes] = await Promise.all([
+        const [statsData, toolsData, spotlightRes, coursesData] = await Promise.all([
           fetchStatsOverview().catch(() => ({ users: 0, activeTools: 0, pendingTools: 0 })),
           fetchToolsData().catch(() => ({})),
-          fetchCommunitySpotlight().catch(() => ({ builderSpotlight: { name: '', role: '', description: '', twitter: '', xProfileImageUrl: '' } }))
+          fetchCommunitySpotlight().catch(() => ({ builderSpotlight: { name: '', role: '', description: '', twitter: '', xProfileImageUrl: '' } })),
+          fetchCuratedCourses().catch(() => [])
         ]);
         setStats(statsData);
-        // toolsData might be an object grouped by category. Filter out 'tooltipExplanations' if present!
         const toolsArrays = Object.entries(toolsData)
           .filter(([key]) => key !== 'tooltipExplanations')
           .map(([_, val]) => val);
-        const flatTools = toolsArrays.flat();
-        setToolsList(flatTools);
+        setToolsList(toolsArrays.flat());
         setSpotlightData(spotlightRes);
+        setCuratedCourses(coursesData);
       } catch (error) {
         console.error("Failed to load admin stats", error);
       } finally {
@@ -155,6 +163,36 @@ export default function Admin() {
       alert('Failed to add tool. Make sure you are logged in as admin.');
     }
     setAddingTool(false);
+  };
+
+  // Curated Course handlers
+  const handleAddCourse = async (e) => {
+    e.preventDefault();
+    if (!newCourse.title || !newCourse.url) return alert('Title and URL are required');
+    setSavingCourse(true);
+    try {
+      const payload = {
+        ...newCourse,
+        tags: newCourse.tags ? newCourse.tags.split(',').map(t => t.trim()).filter(Boolean) : []
+      };
+      const result = await createCuratedCourse(payload);
+      setCuratedCourses(prev => [result.data, ...prev]);
+      setNewCourse({ title: '', description: '', url: '', platform: 'Anthropic', thumbnail: '', level: 'Beginner', isFree: true, tags: '' });
+      alert('Course added successfully!');
+    } catch (err) {
+      alert('Failed to add course. Make sure you are logged in.');
+    }
+    setSavingCourse(false);
+  };
+
+  const handleDeleteCourse = async (id, title) => {
+    if (!window.confirm(`Delete "${title}"?`)) return;
+    try {
+      await deleteCuratedCourse(id);
+      setCuratedCourses(prev => prev.filter(c => c._id !== id));
+    } catch (err) {
+      alert('Failed to delete course.');
+    }
   };
 
   const handleSpotlightUpdate = async (e) => {
@@ -681,6 +719,86 @@ export default function Admin() {
             </form>
           </div>
         )}
+
+        {/* Curated Courses Manager */}
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mt-8">
+          <div className="p-6 border-b border-slate-100 bg-purple-50/50 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <Database size={20} className="text-purple-500" />
+              Curated Courses Manager
+            </h2>
+            <span className="text-xs font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full">{curatedCourses.length} courses</span>
+          </div>
+          <div className="p-8 space-y-6">
+            <form onSubmit={handleAddCourse} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Course Title *</label>
+                <input type="text" value={newCourse.title} onChange={e => setNewCourse({ ...newCourse, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="e.g. Prompt Engineering for Developers" required />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Course URL *</label>
+                <input type="url" value={newCourse.url} onChange={e => setNewCourse({ ...newCourse, url: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://..." required />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
+                <input type="text" value={newCourse.description} onChange={e => setNewCourse({ ...newCourse, description: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Short course description..." />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thumbnail URL</label>
+                <input type="text" value={newCourse.thumbnail} onChange={e => setNewCourse({ ...newCourse, thumbnail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://... (image)" />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Platform</label>
+                  <select value={newCourse.platform} onChange={e => setNewCourse({ ...newCourse, platform: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
+                    {['Anthropic', 'YouTube', 'Coursera', 'Udemy', 'GitHub', 'Other'].map(p => <option key={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Level</label>
+                  <select value={newCourse.level} onChange={e => setNewCourse({ ...newCourse, level: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
+                    <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pricing</label>
+                  <select value={newCourse.isFree} onChange={e => setNewCourse({ ...newCourse, isFree: e.target.value === 'true' })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
+                    <option value="true">Free</option><option value="false">Paid</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tags (comma-separated)</label>
+                <input type="text" value={newCourse.tags} onChange={e => setNewCourse({ ...newCourse, tags: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="defi, smart-contracts, ai" />
+              </div>
+              <div className="md:col-span-2">
+                <button type="submit" disabled={savingCourse} className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
+                  {savingCourse ? 'Adding...' : '+ Add Course'}
+                </button>
+              </div>
+            </form>
+
+            {curatedCourses.length > 0 && (
+              <div className="border-t border-slate-100 pt-6">
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Existing Courses</h3>
+                <ul className="space-y-3">
+                  {curatedCourses.map(course => (
+                    <li key={course._id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-900 text-sm truncate">{course.title}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{course.platform} · {course.level} · {course.isFree ? 'Free' : 'Paid'}</p>
+                      </div>
+                      <div className="flex items-center gap-3 ml-4">
+                        <a href={course.url} target="_blank" rel="noreferrer" className="text-indigo-500 hover:text-indigo-700"><ExternalLink size={15} /></a>
+                        <button onClick={() => handleDeleteCourse(course._id, course.title)} className="text-slate-400 hover:text-red-600 transition-colors"><Trash2 size={15} /></button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
 
       </div>
     </div>
