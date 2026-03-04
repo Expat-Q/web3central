@@ -171,8 +171,45 @@ export default function Admin() {
     if (!newCourse.title || !newCourse.url) return alert('Title and URL are required');
     setSavingCourse(true);
     try {
+      let finalThumbnail = newCourse.thumbnail;
+
+      // Auto-extract or assign thumbnails if the thumbnail field is empty
+      if (!finalThumbnail) {
+        const urlLower = newCourse.url.toLowerCase();
+
+        // 1. YouTube
+        if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) {
+          const videoIdMatch = newCourse.url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+          if (videoIdMatch && videoIdMatch[1]) {
+            finalThumbnail = `https://img.youtube.com/vi/${videoIdMatch[1]}/maxresdefault.jpg`;
+          }
+        }
+        // 2. Github
+        else if (urlLower.includes('github.com')) {
+          finalThumbnail = 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
+        }
+        // 3. Platform Defaults based on dropdown selection
+        else {
+          switch (newCourse.platform) {
+            case 'Udemy':
+              finalThumbnail = 'https://s.udemycdn.com/meta/default-meta-image-v2.png';
+              break;
+            case 'Coursera':
+              finalThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Coursera_logo.svg/1200px-Coursera_logo.svg.png';
+              break;
+            case 'Anthropic':
+              finalThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/1200px-Anthropic_logo.svg.png';
+              break;
+            default:
+              // Fallback image if nothing matches
+              finalThumbnail = 'https://images.unsplash.com/photo-1639762681485-074b7f4f24fe?w=800&auto=format&fit=crop&q=60';
+          }
+        }
+      }
+
       const payload = {
         ...newCourse,
+        thumbnail: finalThumbnail,
         tags: newCourse.tags ? newCourse.tags.split(',').map(t => t.trim()).filter(Boolean) : []
       };
       const result = await createCuratedCourse(payload);
@@ -745,7 +782,7 @@ export default function Admin() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thumbnail URL</label>
-                <input type="text" value={newCourse.thumbnail} onChange={e => setNewCourse({ ...newCourse, thumbnail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://... (image)" />
+                <input type="text" value={newCourse.thumbnail} onChange={e => setNewCourse({ ...newCourse, thumbnail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Image URL (Leave blank for YouTube videos to auto-generate)" />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
