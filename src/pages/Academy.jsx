@@ -6,8 +6,9 @@ import { fetchCuratedCourses } from '../services/apiService';
 import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
-    Play, Globe
+    Play, Globe, Bookmark
 } from 'lucide-react';
+import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 
 const PLATFORM_COLORS = {
     'Anthropic': 'bg-orange-100 text-orange-700 border-orange-200',
@@ -24,7 +25,8 @@ export default function Academy() {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
     const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' | 'courses'
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const { toggleBookmark, isBookmarked } = useCourseBookmarks();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,7 +35,7 @@ export default function Academy() {
             try {
                 const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
                 const [lessonsRes, coursesData] = await Promise.all([
-                    fetch(`${baseUrl}/academy/lessons`).then(r => r.json()),
+                    fetch(`${baseUrl} /academy/lessons`).then(r => r.json()),
                     fetchCuratedCourses().catch(() => [])
                 ]);
                 if (lessonsRes.success) setLessons(lessonsRes.data);
@@ -143,19 +145,19 @@ export default function Academy() {
                 <div className="flex gap-2 mb-10 border-b border-gray-100 pb-1">
                     <button
                         onClick={() => setActiveTab('lessons')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'lessons'
+                        className={`px - 6 py - 3 rounded - xl font - bold text - sm transition - all ${activeTab === 'lessons'
                             ? 'bg-gray-900 text-white shadow-md'
                             : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
+                            } `}
                     >
                         <span className="flex items-center gap-2"><BookOpen size={15} /> Interactive Lessons</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('courses')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${activeTab === 'courses'
+                        className={`px - 6 py - 3 rounded - xl font - bold text - sm transition - all flex items - center gap - 2 ${activeTab === 'courses'
                             ? 'bg-purple-600 text-white shadow-md'
                             : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50'
-                            }`}
+                            } `}
                     >
                         <Globe size={15} /> Curated Courses
                         {courses.length > 0 && (
@@ -177,10 +179,10 @@ export default function Academy() {
                                 <button
                                     key={cat.name}
                                     onClick={() => setActiveCategory(cat.name)}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all border shadow-sm ${activeCategory === cat.name
+                                    className={`flex items - center gap - 2 px - 6 py - 3 rounded - 2xl font - bold text - sm transition - all border shadow - sm ${activeCategory === cat.name
                                         ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
                                         : 'bg-white border-gray-100 text-gray-500 hover:border-purple-200 hover:text-purple-600'
-                                        }`}
+                                        } `}
                                 >
                                     {cat.icon} {cat.name}
                                 </button>
@@ -238,7 +240,7 @@ export default function Academy() {
                                                     </div>
                                                 ) : (
                                                     <Link
-                                                        to={`/academy/${lesson.slug}`}
+                                                        to={`/ academy / ${lesson.slug} `}
                                                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-purple-600 transition-all shadow-lg shadow-gray-200"
                                                     >
                                                         Initialize <ChevronRight size={14} />
@@ -294,13 +296,28 @@ export default function Academy() {
                                                         </div>
                                                     )}
                                                     <div className="absolute top-3 right-3 flex gap-2">
-                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${platformStyle}`}>
+                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${platformStyle} bg-white/90 backdrop-blur`}>
                                                             {course.platform}
                                                         </span>
-                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${course.isFree ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border bg-white/90 backdrop-blur ${course.isFree ? 'text-emerald-700 border-emerald-200' : 'text-amber-700 border-amber-200'}`}>
                                                             {course.isFree ? 'FREE' : 'PAID'}
                                                         </span>
                                                     </div>
+
+                                                    {/* Bookmark Button */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault(); // Prevent opening the link
+                                                            toggleBookmark(course);
+                                                        }}
+                                                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-sm border border-white/20 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all z-20"
+                                                    >
+                                                        <Bookmark
+                                                            size={18}
+                                                            fill={isBookmarked(course._id) ? "currentColor" : "none"}
+                                                            className={isBookmarked(course._id) ? "text-purple-600" : ""}
+                                                        />
+                                                    </button>
                                                 </div>
 
                                                 {/* Content */}
