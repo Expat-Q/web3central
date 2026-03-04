@@ -24,18 +24,18 @@ export default function Academy() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
-    const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' | 'courses'
+    const [activeTab, setActiveTab] = useState('lessons');
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) return; // Don't fetch if not logged in
+        if (!user) return;
         const fetchAll = async () => {
             try {
                 const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
                 const [lessonsRes, coursesData] = await Promise.all([
-                    fetch(`${baseUrl} /academy/lessons`).then(r => r.json()),
+                    fetch(`${baseUrl}/academy/lessons`).then(r => r.json()),
                     fetchCuratedCourses().catch(() => [])
                 ]);
                 if (lessonsRes.success) setLessons(lessonsRes.data);
@@ -50,7 +50,7 @@ export default function Academy() {
     }, [user]);
 
     // ── LOGIN GATE ──
-    if (!user) {
+    if (!authLoading && !user) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center px-6 pt-32 pb-20">
                 <motion.div
@@ -100,8 +100,6 @@ export default function Academy() {
         { name: 'Smart Contract Security', icon: <Shield size={18} /> }
     ];
 
-    const COURSE_LEVELS = ['All', 'Beginner', 'Intermediate', 'Advanced'];
-
     const filteredLessons = activeCategory === 'All'
         ? lessons
         : lessons.filter(l => l.module === activeCategory);
@@ -145,19 +143,19 @@ export default function Academy() {
                 <div className="flex gap-2 mb-10 border-b border-gray-100 pb-1">
                     <button
                         onClick={() => setActiveTab('lessons')}
-                        className={`px - 6 py - 3 rounded - xl font - bold text - sm transition - all ${activeTab === 'lessons'
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'lessons'
                             ? 'bg-gray-900 text-white shadow-md'
                             : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            } `}
+                            }`}
                     >
                         <span className="flex items-center gap-2"><BookOpen size={15} /> Interactive Lessons</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('courses')}
-                        className={`px - 6 py - 3 rounded - xl font - bold text - sm transition - all flex items - center gap - 2 ${activeTab === 'courses'
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${activeTab === 'courses'
                             ? 'bg-purple-600 text-white shadow-md'
                             : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50'
-                            } `}
+                            }`}
                     >
                         <Globe size={15} /> Curated Courses
                         {courses.length > 0 && (
@@ -179,10 +177,10 @@ export default function Academy() {
                                 <button
                                     key={cat.name}
                                     onClick={() => setActiveCategory(cat.name)}
-                                    className={`flex items - center gap - 2 px - 6 py - 3 rounded - 2xl font - bold text - sm transition - all border shadow - sm ${activeCategory === cat.name
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all border shadow-sm ${activeCategory === cat.name
                                         ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
                                         : 'bg-white border-gray-100 text-gray-500 hover:border-purple-200 hover:text-purple-600'
-                                        } `}
+                                        }`}
                                 >
                                     {cat.icon} {cat.name}
                                 </button>
@@ -240,7 +238,7 @@ export default function Academy() {
                                                     </div>
                                                 ) : (
                                                     <Link
-                                                        to={`/ academy / ${lesson.slug} `}
+                                                        to={`/academy/${lesson.slug}`}
                                                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-purple-600 transition-all shadow-lg shadow-gray-200"
                                                     >
                                                         Initialize <ChevronRight size={14} />
@@ -307,15 +305,15 @@ export default function Academy() {
                                                     {/* Bookmark Button */}
                                                     <button
                                                         onClick={(e) => {
-                                                            e.preventDefault(); // Prevent opening the link
+                                                            e.preventDefault();
                                                             toggleBookmark(course);
                                                         }}
                                                         className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-sm border border-white/20 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all z-20"
                                                     >
                                                         <Bookmark
                                                             size={18}
-                                                            fill={isBookmarked(course._id) ? "currentColor" : "none"}
-                                                            className={isBookmarked(course._id) ? "text-purple-600" : ""}
+                                                            fill={isBookmarked(course._id) ? 'currentColor' : 'none'}
+                                                            className={isBookmarked(course._id) ? 'text-purple-600' : ''}
                                                         />
                                                     </button>
                                                 </div>
