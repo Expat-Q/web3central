@@ -285,14 +285,32 @@ export default function Academy() {
                                                 className="group block bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.08)] hover:border-purple-100 transition-all duration-500 h-full"
                                             >
                                                 {/* Thumbnail */}
-                                                <div className="w-full h-44 bg-gradient-to-br from-purple-50 to-indigo-100 overflow-hidden relative">
+                                                <div className="w-full h-44 overflow-hidden relative">
                                                     {course.thumbnail ? (
-                                                        <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center">
-                                                            <Play size={40} className="text-purple-300" />
-                                                        </div>
-                                                    )}
+                                                        <img
+                                                            src={course.thumbnail}
+                                                            alt={course.title}
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                                e.target.nextSibling.style.display = 'flex';
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                    {/* Fallback banner — shown when thumbnail is absent or broken */}
+                                                    <div
+                                                        className="w-full h-full items-center justify-center flex-col gap-2"
+                                                        style={{ display: course.thumbnail ? 'none' : 'flex', background: 'linear-gradient(135deg,#ede9fe 0%,#c7d2fe 100%)' }}
+                                                    >
+                                                        <span className="text-3xl">
+                                                            {course.platform === 'YouTube' ? '▶' :
+                                                                course.platform === 'Coursera' ? '🎓' :
+                                                                    course.platform === 'Udemy' ? '📚' :
+                                                                        course.platform === 'Anthropic' ? '🤖' :
+                                                                            course.platform === 'GitHub' ? '⌨️' : '🌐'}
+                                                        </span>
+                                                        <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">{course.platform}</span>
+                                                    </div>
                                                     <div className="absolute top-3 right-3 flex gap-2">
                                                         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${platformStyle} bg-white/90 backdrop-blur`}>
                                                             {course.platform}
