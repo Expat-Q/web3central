@@ -71,9 +71,6 @@ export default function Home() {
           <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
           <div>
             <p className="text-purple-600 font-bold mb-1">Connecting to Web3Central Engine...</p>
-            <p className="text-xs text-purple-400 font-medium max-w-xs mx-auto animate-pulse">
-              Note: The free backend server sleeps when inactive. Please allow up to 50 seconds for it to wake up.
-            </p>
           </div>
         </div>
       </div>
