@@ -160,7 +160,7 @@ export default function Admin() {
       setStats(prev => ({ ...prev, activeTools: (prev.activeTools || 0) + 1 }));
       alert('Tool added successfully!');
     } catch (error) {
-      alert('Failed to add tool. Make sure you are logged in as admin.');
+      alert(`Failed to add tool. Error: ${error.message || 'Validation failed'}`);
     }
     setAddingTool(false);
   };

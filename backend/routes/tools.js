@@ -158,6 +158,17 @@ router.post('/:category', protect, async (req, res) => {
     // Ensure category matches param
     toolData.category = category;
 
+    // Auto-generate missing required fields from Admin UI payload
+    if (!toolData.id) {
+      toolData.id = toolData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
+    if (!toolData.builder) {
+      toolData.builder = {
+        name: 'Web3Central Admin',
+        twitter: toolData.twitter || ''
+      };
+    }
+
     // Check if ID exists
     const existingTool = await Tool.findOne({ id: toolData.id });
     if (existingTool) {
