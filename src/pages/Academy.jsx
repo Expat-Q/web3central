@@ -6,7 +6,7 @@ import { fetchCuratedCourses } from '../services/apiService';
 import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
-    Play, Globe, Bookmark
+    Play, Globe, Bookmark, Search
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 
@@ -25,6 +25,9 @@ export default function Academy() {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
     const [activeTab, setActiveTab] = useState('lessons');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [priceFilter, setPriceFilter] = useState('All'); // 'All', 'Free', 'Paid'
+
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
     const navigate = useNavigate();
@@ -109,6 +112,17 @@ export default function Academy() {
         const progressObj = user?.learningProgress || {};
         return prereqs.some(reqId => !progressObj[reqId]?.completed);
     };
+
+    const filteredCourses = courses.filter(course => {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = course.title.toLowerCase().includes(query) ||
+            (course.description && course.description.toLowerCase().includes(query)) ||
+            (course.tags && course.tags.some(tag => tag.toLowerCase().includes(query)));
+
+        if (priceFilter === 'Free') return matchesSearch && course.isFree;
+        if (priceFilter === 'Paid') return matchesSearch && !course.isFree;
+        return matchesSearch;
+    });
 
     return (
         <div className="bg-white min-h-screen text-gray-900 pt-32 pb-32 px-6 relative overflow-x-hidden">
@@ -260,15 +274,55 @@ export default function Academy() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
+                        {/* Search and Filters */}
+                        <div className="flex flex-col md:flex-row gap-4 mb-8 relative z-20">
+                            <div className="flex-grow relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search courses by title, description, or tags..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] focus:border-purple-300 focus:ring-4 focus:ring-purple-50 transition-all font-medium text-sm outline-none"
+                                />
+                            </div>
+                            <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                                {['All', 'Free', 'Paid'].map(filter => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setPriceFilter(filter)}
+                                        className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
+                                                ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                                                : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
+                                            }`}
+                                    >
+                                        {filter}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {courses.length === 0 ? (
                             <div className="text-center py-24 text-gray-400">
                                 <Play size={48} className="mx-auto mb-4 opacity-30" />
                                 <p className="font-bold text-lg">No courses curated yet.</p>
                                 <p className="text-sm mt-1 max-w-sm mx-auto">The team is sourcing the best Web3 courses. Check back soon!</p>
                             </div>
+                        ) : filteredCourses.length === 0 ? (
+                            <div className="text-center py-24 text-gray-500">
+                                <Search size={48} className="mx-auto mb-4 opacity-30" />
+                                <p className="font-bold text-lg text-gray-900">No courses found.</p>
+                                <p className="text-sm mt-1">Try adjusting your search or filters.</p>
+                                <button
+                                    onClick={() => { setSearchQuery(''); setPriceFilter('All'); }}
+                                    className="mt-4 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl font-bold text-sm hover:bg-purple-100 transition-colors"
+                                >
+                                    Clear Filters
+                                </button>
+                            </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {courses.map((course, i) => {
+                                {filteredCourses.map((course, i) => {
                                     const platformStyle = PLATFORM_COLORS[course.platform] || PLATFORM_COLORS['Other'];
                                     return (
                                         <motion.div

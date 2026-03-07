@@ -1,0 +1,23 @@
+
+> backend@1.0.0 dev
+> nodemon server.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node server.js`[39m
+[dotenv@17.2.3] injecting env (18) from .env -- tip: ΓÜÖ∩╕Å  suppress all logs with { quiet: true }
+Server running in development mode on port 5000
+MongoDB Connected: ac-fkcsn5t-shard-00-00.zxgqkbg.mongodb.net
+Starting initial DeFiLlama sync...
+--- DeFiLlama Sync Started ---
+DeFiLlama protocols: 7170
+Volume entries: 1971
+Local tools: 88
+Token data fetched for 41 coins
+--- Sync Complete ---
+Matched: 53 / 88
+Total Updated: 53
+Unmatched (35): Wormhole, Relay, 0x, Bantr, Cookie, Magic Newton, Anti Drain Tool by @zun2025, Lunar Strategy, Kaito Radar, Stargate, LayerSwap, Gas.zip, Matcha, Test Tool, Wallchain, Xeet, Galxe Starboard, Rollbit Perps, Tenderly, Undrained Asset Recovery from a compromised wallet, Blix Editor, Hyperlane, Kamino Finance, Revoke Delegation Tool by @zun2025, Web3 Toolkits by 0xMoei, Elsa, Warden Protocol, Gomtu, TestTool, Base Sport Fantasy, Moderation Test Tool, Anti Drain extension., Time Travel (Extension), Seed Phrase Recovery Tool, Sol Incinerator
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
