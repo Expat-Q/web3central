@@ -82,34 +82,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // OAuth Login
-    const oauthLogin = async (provider) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const res = await fetch(`${API_BASE_URL}/auth/oauth-mock`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ provider }),
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                setUser(data.user);
-                return { success: true };
-            } else {
-                setError(data.message || 'OAuth Login failed');
-                return { success: false, message: data.message };
-            }
-        } catch (err) {
-            setError('Server error');
-            return { success: false, message: 'Server error' };
-        } finally {
-            setLoading(false);
-        }
+    // OAuth Login (Initiates the redirect to the backend)
+    const oauthLogin = (provider) => {
+        // We use window.location.href because Passport OAuth requires a full browser 
+        // redirect to the provider's consent screen (Google, Discord, Twitter).
+        window.location.href = `${API_BASE_URL}/auth/${provider}`;
     };
 
     // Logout User

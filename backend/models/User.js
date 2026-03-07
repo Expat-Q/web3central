@@ -17,9 +17,28 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please add a password'],
+        // required: [true, 'Please add a password'], // Optional for OAuth users
         minlength: 6,
         select: false
+    },
+    googleId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    discordId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    twitterId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    avatarUrl: {
+        type: String,
+        default: ''
     },
     role: {
         type: String,

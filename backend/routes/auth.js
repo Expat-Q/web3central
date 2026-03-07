@@ -29,34 +29,66 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// @desc    Mock OAuth login for testing
-// @route   POST /api/auth/oauth-mock
-// @access  Public (DEVELOPMENT ONLY)
-if (process.env.NODE_ENV !== 'production') {
-    router.post('/oauth-mock', async (req, res) => {
-        try {
-            const { provider } = req.body;
+const passport = require('passport');
 
-            let email = `mock-${provider}@example.com`;
-            let name = `${provider.charAt(0).toUpperCase() + provider.slice(1)} Builder`;
+// @desc    OAuth - Initiate Google Login
+// @route   GET /api/auth/google
+// @access  Public
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-            let user = await User.findOne({ email });
+// @desc    OAuth - Google Callback
+// @route   GET /api/auth/google/callback
+router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login?error=Google_Auth_Failed', session: false }),
+    (req, res) => {
+        handleOAuthSuccess(req, res);
+    }
+);
 
-            if (!user) {
-                user = await User.create({
-                    name,
-                    email,
-                    password: 'mock_oauth_password_123',
-                });
-            }
+// @desc    OAuth - Initiate Discord Login
+// @route   GET /api/auth/discord
+// @access  Public
+router.get('/discord', passport.authenticate('discord'));
 
-            sendTokenResponse(user, 200, res);
-        } catch (error) {
-            console.error('Mock OAuth error:', error);
-            res.status(500).json({ success: false, message: 'Server error during mock OAuth' });
-        }
+// @desc    OAuth - Discord Callback
+// @route   GET /api/auth/discord/callback
+router.get('/discord/callback',
+    passport.authenticate('discord', { failureRedirect: '/login?error=Discord_Auth_Failed', session: false }),
+    (req, res) => {
+        handleOAuthSuccess(req, res);
+    }
+);
+
+// @desc    OAuth - Initiate Twitter Login
+// @route   GET /api/auth/twitter
+// @access  Public
+router.get('/twitter', passport.authenticate('twitter'));
+
+// @desc    OAuth - Twitter Callback
+// @route   GET /api/auth/twitter/callback
+router.get('/twitter/callback',
+    passport.authenticate('twitter', { failureRedirect: '/login?error=Twitter_Auth_Failed', session: false }),
+    (req, res) => {
+        handleOAuthSuccess(req, res);
+    }
+);
+
+// Helper function to issue JWT and redirect to frontend
+const handleOAuthSuccess = (req, res) => {
+    // Create JWT token specifically for the frontend to consume
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE || '30d'
     });
-}
+
+    // We can't use sendTokenResponse here because we need to perform an HTTP redirect
+    // back to the frontend React app domain, passing the token in the query string or fragment.
+    const frontendUrl = process.env.FRONTEND_URL
+        ? process.env.FRONTEND_URL.split(',')[0] // Use first allowed frontend
+        : 'http://localhost:3000';
+
+    // Redirect to a specific frontend route that will capture this token and save it to localStorage
+    res.redirect(`${frontendUrl}/oauth/callback?token=${token}`);
+};
 
 // @desc    Login user
 // @route   POST /api/auth/login

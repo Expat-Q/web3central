@@ -48,18 +48,9 @@ export default function Signup() {
         setLoading(false);
     };
 
-    const handleOAuth = async (provider) => {
-        setError('');
+    const handleOAuth = (provider) => {
         setLoading(true);
-
-        const res = await oauthLogin(provider);
-
-        if (res.success) {
-            navigate('/academy');
-        } else {
-            setError(res.message);
-        }
-        setLoading(false);
+        oauthLogin(provider);
     };
 
     return (

@@ -37,10 +37,32 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const session = require('express-session');
+const passport = require('passport');
+
+// Load Passport Configuration
+require('./config/passport');
+
 // --------------- Security Middleware ---------------
 
 // Helmet — sets secure HTTP headers (X-Content-Type-Options, X-Frame-Options, etc.)
 app.use(helmet());
+
+// Session middleware — required for Passport OAuth strategies (especially OAuth 1.0a like Twitter)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fallback_session_secret_for_dev_oauth',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+  }
+}));
+
+// Initialize Passport and restore authentication state, if any, from the session.
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Rate limiting — protect auth endpoints from brute-force attacks
 const authLimiter = rateLimit({
