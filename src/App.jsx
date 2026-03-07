@@ -16,6 +16,7 @@ import Admin from "./pages/Admin";
 
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+import OAuthCallback from "./pages/auth/OAuthCallback";
 import Academy from "./pages/Academy";
 import LessonDetail from "./pages/LessonDetail";
 import Profile from "./pages/Profile";
@@ -29,7 +30,7 @@ import BountyHub from "./pages/apps/BountyHub";
 
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = ["/login", "/signup"].includes(location.pathname);
+  const hideFooter = ["/login", "/signup", "/oauth/callback"].includes(location.pathname);
   return !hideFooter ? <Footer /> : null;
 };
 
@@ -54,6 +55,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/oauth/callback" element={<OAuthCallback />} />
 
               <Route path="/apps/dex" element={<Dex />} />
               <Route path="/apps/onchain-autonomy" element={<OnchainAutonomy />} />
