@@ -35,6 +35,10 @@ const chatRouter = require('./routes/chat');
 connectDB();
 
 const app = express();
+
+// Trust reverse proxy (required for Render/Vercel to ensure correct 'https' protocol in OAuth redirects)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 5000;
 
 const session = require('express-session');

@@ -60,7 +60,8 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'placeholder_google_id',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'placeholder_google_secret',
-    callbackURL: '/api/auth/google/callback'
+    callbackURL: '/api/auth/google/callback',
+    proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         const avatar = profile.photos && profile.photos.length > 0 ? profile.photos[0].value : '';
@@ -78,6 +79,7 @@ passport.use(new DiscordStrategy({
     clientID: process.env.DISCORD_CLIENT_ID || 'placeholder_discord_id',
     clientSecret: process.env.DISCORD_CLIENT_SECRET || 'placeholder_discord_secret',
     callbackURL: '/api/auth/discord/callback',
+    proxy: true,
     scope: ['identify', 'email']
 }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -99,6 +101,7 @@ passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY || 'placeholder_twitter_key',
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET || 'placeholder_twitter_secret',
     callbackURL: '/api/auth/twitter/callback',
+    proxy: true,
     includeEmail: true
 }, async (token, tokenSecret, profile, done) => {
     try {
