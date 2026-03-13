@@ -68,7 +68,7 @@ export default function Support() {
       title: "Community Help",
       desc: "Join our community and get instant feedback from builders and users.",
       icon: <Share2 className="w-8 h-8 text-blue-600" />,
-      href: "https://x.com/yourcommunitylink",
+      href: "https://x.com/web3aborode",
       color: "blue"
     },
     {
@@ -102,7 +102,7 @@ export default function Support() {
         className="max-w-7xl mx-auto relative z-10 text-center mb-16"
       >
         <motion.h1
-          className="text-4xl md:text-6xl font-black mb-6 tracking-tight text-gray-900"
+          className="text-3xl md:text-4xl font-bold mb-6 tracking-tight text-gray-900"
         >
           How can we <span className="text-purple-600">help you?</span>
         </motion.h1>
@@ -130,7 +130,7 @@ export default function Support() {
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
             whileHover={{ y: -5 }}
-            className="p-8 bg-white border border-gray-100 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-purple-100 transition-all group flex flex-col"
+            className="p-8 bg-white border border-gray-100 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-purple-100 transition-all group flex flex-col h-full"
           >
             <div className={`w-14 h-14 rounded-2xl bg-${item.color}-50 flex items-center justify-center mb-8 border border-${item.color}-100 group-hover:scale-110 transition-transform`}>
               {item.icon}
@@ -139,7 +139,7 @@ export default function Support() {
             <p className="text-gray-500 text-base mb-8 flex-1 leading-relaxed">
               {item.desc}
             </p>
-            <div className="flex items-center gap-2 text-purple-600 font-bold text-sm">
+            <div className="flex items-center gap-2 text-purple-600 font-bold text-sm mt-auto pt-4">
               Contact Now <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </motion.a>
@@ -163,7 +163,7 @@ export default function Support() {
 
           <form onSubmit={handleFormSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2">Full Name</label>
+              <label className="text-xs font-semibold text-gray-500 ml-2">Full Name</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -176,7 +176,7 @@ export default function Support() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2">Email Address</label>
+              <label className="text-xs font-semibold text-gray-500 ml-2">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -189,7 +189,7 @@ export default function Support() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2">Message</label>
+              <label className="text-xs font-semibold text-gray-500 ml-2">Message</label>
               <textarea
                 required
                 rows={4}

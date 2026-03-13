@@ -111,7 +111,7 @@ export default function ToolComparison() {
       return (
         <div className="flex flex-wrap justify-center gap-1">
           {value?.slice(0, 2).map((tag, i) => (
-            <span key={i} className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-gray-50 text-gray-500 border border-gray-100">
+            <span key={i} className="px-3 py-1 text-[10px] font-semibold rounded-lg bg-gray-50 text-gray-500 border border-gray-100">
               {tag}
             </span>
           ))}
@@ -170,7 +170,7 @@ export default function ToolComparison() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black mb-8 tracking-tight text-gray-900 leading-none"
+            className="text-3xl md:text-4xl font-bold mb-8 tracking-tight text-gray-900 leading-none"
           >
             Protocol <span className="text-indigo-600">Comparison</span>
           </motion.h1>
@@ -192,9 +192,9 @@ export default function ToolComparison() {
               <div className="w-20 h-20 bg-white rounded-[2rem] border border-gray-100 flex items-center justify-center mx-auto mb-8 text-indigo-600 shadow-sm">
                 <Plus size={40} />
               </div>
-              <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Analytical Bench Empty</h2>
-              <p className="text-gray-500 font-medium max-w-sm mx-auto mb-10">Select up to 4 protocols from the directory below to begin technical analysis.</p>
-              <a href="#available-assets" className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-indigo-600 transition-all shadow-xl shadow-gray-200">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">No protocols selected</h2>
+              <p className="text-gray-500 font-medium max-w-sm mx-auto mb-10">Select up to 4 protocols from the directory below to begin comparison.</p>
+              <a href="#available-assets" className="inline-flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all shadow-xl shadow-gray-200">
                 Explore Directory <ChevronRight size={16} />
               </a>
             </div>
@@ -203,7 +203,7 @@ export default function ToolComparison() {
               {/* Top Bar with Clear Actions */}
               <div className="flex items-center justify-between px-4">
                 <div className="flex items-center gap-4">
-                  <h2 className="text-xl font-black uppercase tracking-tight text-gray-900 italic">Active Analysis ({selectedTools.length}/4)</h2>
+                  <h2 className="text-lg font-bold text-gray-900">Active Comparison ({selectedTools.length}/4)</h2>
                   <div className="h-1 w-20 bg-indigo-100 rounded-full" />
                 </div>
                 <button
@@ -212,9 +212,9 @@ export default function ToolComparison() {
                     window.history.replaceState(null, "", "?");
                     setAvailableTools([...availableTools, ...selectedTools]);
                   }}
-                  className="px-6 py-2.5 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm"
+                  className="px-6 py-2.5 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 text-xs font-semibold transition-all"
                 >
-                  Flush Bench
+                  Clear All
                 </button>
               </div>
 
@@ -225,7 +225,7 @@ export default function ToolComparison() {
                     <thead>
                       <tr>
                         <th className="p-8 md:p-12 text-left bg-gray-50/50 border-b border-gray-100">
-                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Parameter</span>
+                          <span className="text-[10px] font-semibold text-gray-400">Parameter</span>
                         </th>
                         {selectedTools.map(tool => (
                           <th key={tool.id} className="p-8 md:p-12 border-b border-gray-100 min-w-[240px]">
@@ -236,7 +236,7 @@ export default function ToolComparison() {
                               <h3 className="text-xl font-black text-gray-900 tracking-tight mb-2">{tool.name}</h3>
                               <button
                                 onClick={() => removeFromComparison(tool.id)}
-                                className="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors flex items-center gap-1"
+                                className="text-[10px] font-semibold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
                               >
                                 <X size={12} /> Remove
                               </button>
@@ -297,10 +297,10 @@ export default function ToolComparison() {
         <section id="available-assets" className="mb-32">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>
-              <h2 className="text-4xl font-black tracking-tight text-gray-900 mb-4 leading-none italic uppercase">Available <span className="text-indigo-600">Assets</span></h2>
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4 leading-none">Available <span className="text-indigo-600">Protocols</span></h2>
               <p className="text-gray-500 font-medium">Inject high-liquidity protocols into the engine for comparative evaluation.</p>
             </div>
-            <Link to="/apps" className="px-6 py-3 rounded-xl border border-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest hover:border-indigo-100 hover:text-indigo-600 transition-all flex items-center gap-2">
+            <Link to="/apps" className="px-6 py-3 rounded-xl border border-gray-100 text-gray-500 font-semibold text-xs hover:border-indigo-100 hover:text-indigo-600 transition-all flex items-center gap-2">
               All Protocols <Globe size={14} />
             </Link>
           </div>
@@ -326,7 +326,7 @@ export default function ToolComparison() {
                       {tool.name.charAt(0)}
                     </div>
                     {tool.verified && (
-                      <div className="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-lg border border-green-100">
+                      <div className="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-semibold rounded-lg border border-green-100">
                         Vetted
                       </div>
                     )}
@@ -342,16 +342,16 @@ export default function ToolComparison() {
                   <div className="pt-8 border-t border-gray-50 flex items-center justify-between relative z-10">
                     <div className="flex items-center gap-1.5 opacity-60">
                       <Star size={12} className="text-yellow-400 fill-yellow-400" />
-                      <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{tool.rating || "NEW"}</span>
+                      <span className="text-[10px] font-semibold text-gray-500">{tool.rating || "New"}</span>
                     </div>
                     <button
-                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg shadow-gray-200"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-indigo-600 transition-all shadow-lg shadow-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         addToComparison(tool);
                       }}
                     >
-                      Sync to Bench <Zap size={14} fill="currentColor" />
+                      Add to Compare <Zap size={14} fill="currentColor" />
                     </button>
                   </div>
                 </div>
@@ -364,12 +364,12 @@ export default function ToolComparison() {
         <div className="text-center pt-20">
           <Link
             to="/"
-            className="group inline-flex items-center gap-4 text-[10px] font-black text-gray-400 hover:text-gray-900 transition-all uppercase tracking-[0.3em]"
+            className="group inline-flex items-center gap-4 text-sm font-medium text-gray-400 hover:text-gray-900 transition-all"
           >
             <div className="w-12 h-12 rounded-full border border-gray-100 bg-white flex items-center justify-center group-hover:border-indigo-200 group-hover:shadow-md transition-all">
               <ArrowLeft size={16} />
             </div>
-            Universal Entry Point
+            Back to Home
           </Link>
         </div>
       </div>

@@ -125,8 +125,8 @@ export default function SubmitTool() {
           className="text-center mb-16"
         >
 
-          <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight text-gray-900 leading-tight">
-            Submit Your <span className="text-purple-600">Tool</span>
+          <h1 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight text-gray-900 leading-tight">
+            Submit a <span className="text-purple-600">Protocol</span>
           </h1>
           <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
             Expand the web3central ecosystem. Apply for your protocol to be indexed in our institutional-grade discovery hub.
@@ -161,7 +161,7 @@ export default function SubmitTool() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Name */}
                 <div className="space-y-3">
-                  <label htmlFor="name" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2">
+                  <label htmlFor="name" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
                     <PlusCircle className="w-3 h-3 text-purple-600" /> Tool Name *
                   </label>
                   <input
@@ -178,7 +178,7 @@ export default function SubmitTool() {
 
                 {/* Link */}
                 <div className="space-y-3">
-                  <label htmlFor="link" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2">
+                  <label htmlFor="link" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
                     <Globe className="w-3 h-3 text-purple-600" /> Website URL *
                   </label>
                   <input
@@ -197,7 +197,7 @@ export default function SubmitTool() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Category */}
                 <div className="space-y-3">
-                  <label htmlFor="category" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2">
+                  <label htmlFor="category" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
                     <Tag className="w-3 h-3 text-purple-600" /> Category *
                   </label>
                   <div className="relative group/select">
@@ -223,8 +223,8 @@ export default function SubmitTool() {
 
                 {/* Builder Handle */}
                 <div className="space-y-3">
-                  <label htmlFor="builderHandle" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2">
-                    <User className="w-3 h-3 text-purple-600" /> Architect ID (@handle) *
+                  <label htmlFor="builderHandle" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
+                    <User className="w-3 h-3 text-purple-600" /> Your Handle (@username) *
                   </label>
                   <input
                     type="text"
@@ -241,8 +241,8 @@ export default function SubmitTool() {
 
               {/* Description */}
               <div className="space-y-3">
-                <label htmlFor="description" className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 flex items-center gap-2">
-                  <FileText className="w-3 h-3 text-purple-600" /> Technical Abstract *
+                <label htmlFor="description" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
+                  <FileText className="w-3 h-3 text-purple-600" /> Description *
                 </label>
                 <textarea
                   id="description"
@@ -261,14 +261,14 @@ export default function SubmitTool() {
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="w-full py-5 bg-gray-900 text-white font-bold uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-gray-200 hover:bg-purple-600 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 group disabled:opacity-50"
+                  className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl transition-all shadow-xl shadow-gray-200 hover:bg-purple-600 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 group disabled:opacity-50"
                 >
                   <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
                   {status === "sending" ? "Processing..." : "Submit for Verification"}
                 </button>
 
                 {status === "error" && (
-                  <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-xs font-bold uppercase tracking-widest">
+                  <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm font-medium">
                     <XCircle size={16} /> Connection error. Please retry.
                   </div>
                 )}
@@ -281,7 +281,7 @@ export default function SubmitTool() {
         <div className="text-center">
           <Link
             to="/"
-            className="group inline-flex items-center gap-4 text-xs font-bold text-gray-400 hover:text-purple-600 transition-all uppercase tracking-widest outline-none"
+            className="group inline-flex items-center gap-4 text-sm font-medium text-gray-400 hover:text-purple-600 transition-all"
           >
             <div className="w-10 h-10 rounded-full border border-gray-100 bg-gray-50 flex items-center justify-center group-hover:border-purple-200 group-hover:bg-purple-50 transition-all">
               <ArrowLeft size={16} />

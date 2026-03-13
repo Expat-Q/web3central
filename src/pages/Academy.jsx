@@ -144,8 +144,8 @@ export default function Academy() {
                         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-xs font-bold text-purple-600 tracking-wider uppercase mb-6 shadow-sm">
                             <Sparkles size={14} className="animate-pulse" /> Structured Mastery
                         </span>
-                        <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight text-gray-900 leading-[1.1]">
-                            Web3 <span className="text-purple-600">Academy</span>
+                        <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-gray-900 leading-[1.1]">
+                            Your Web3 <span className="text-purple-600">Learning Path</span>
                         </h1>
                         <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-medium leading-relaxed">
                             From basic bridging to institutional-grade analysis. Curated courses, lessons, and quizzes — all in one place.
@@ -154,10 +154,10 @@ export default function Academy() {
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex gap-2 mb-10 border-b border-gray-100 pb-1">
+                <div className="flex flex-col sm:flex-row gap-2 mb-10 border-b border-gray-100 pb-1">
                     <button
                         onClick={() => setActiveTab('lessons')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'lessons'
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'lessons'
                             ? 'bg-gray-900 text-white shadow-md'
                             : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                             }`}
@@ -166,7 +166,7 @@ export default function Academy() {
                     </button>
                     <button
                         onClick={() => setActiveTab('courses')}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${activeTab === 'courses'
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'courses'
                             ? 'bg-purple-600 text-white shadow-md'
                             : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50'
                             }`}
@@ -185,7 +185,7 @@ export default function Academy() {
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="flex flex-wrap gap-3 mb-12"
+                            className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-12"
                         >
                             {LESSON_MODULES.map(cat => (
                                 <button
@@ -218,7 +218,7 @@ export default function Academy() {
                                         transition={{ delay: (i % 3) * 0.1, duration: 0.6 }}
                                         className="group"
                                     >
-                                        <div className="bg-white border border-gray-100 p-8 rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.06)] hover:border-purple-100 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
+                                        <div className="bg-white border border-gray-100 p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.06)] hover:border-purple-100 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-[100px] -translate-y-4 translate-x-4 opacity-0 group-hover:opacity-100 transition-all duration-500" />
                                             <div className="mb-8 flex justify-between items-start relative z-10">
                                                 <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-3xl group-hover:scale-110 shadow-sm transition-transform duration-500 text-purple-600">
@@ -232,8 +232,8 @@ export default function Academy() {
                                                 </div>
                                             </div>
                                             <div className="relative z-10 flex-grow">
-                                                <h3 className="text-2xl font-black mb-4 tracking-tight text-gray-900 group-hover:text-purple-600 transition-colors leading-tight">{lesson.title}</h3>
-                                                <p className="text-gray-500 text-sm mb-8 line-clamp-2 leading-relaxed font-medium">{lesson.description}</p>
+                                                <h3 className="text-lg md:text-xl font-bold mb-3 tracking-tight text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">{lesson.title}</h3>
+                                                <p className="text-gray-500 text-sm mb-6 line-clamp-3 leading-relaxed font-medium">{lesson.description}</p>
                                             </div>
                                             <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between relative z-10">
                                                 <div className="flex items-center gap-2">
@@ -253,9 +253,9 @@ export default function Academy() {
                                                 ) : (
                                                     <Link
                                                         to={`/academy/${lesson.slug}`}
-                                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-purple-600 transition-all shadow-lg shadow-gray-200"
+                                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-purple-600 transition-all shadow-lg shadow-gray-200"
                                                     >
-                                                        Initialize <ChevronRight size={14} />
+                                                        Start Lesson <ChevronRight size={14} />
                                                     </Link>
                                                 )}
                                             </div>
