@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     User, Mail, LogOut, Award, BookOpen, Target, Zap, ChevronRight, TrendingUp,
-    Bookmark, ExternalLink, Trash2, Edit3, Save, X, Twitter, FolderGit2
+    Bookmark, ExternalLink, Trash2, Edit3, Save, X, Twitter, FolderGit2, Settings
 } from 'lucide-react';
 import { useBookmarks } from '../hooks/useBookmarks';
 import SafeLink from '../components/SafeLink';
@@ -132,16 +132,40 @@ export default function Profile() {
 
             <div className="max-w-6xl mx-auto relative z-10">
                 {/* Profile Header */}
-                <div className="bg-white border border-gray-100 p-8 md:p-14 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] mb-12 relative overflow-hidden group">
+                <div className="bg-white border border-gray-100 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] mb-12 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-purple-50 blur-[120px] -z-10 rounded-full translate-x-32 -translate-y-32 group-hover:bg-purple-100 transition-colors duration-1000" />
 
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-10">
+                    {/* Top-right action icons */}
+                    {!isEditing && (
+                        <div className="absolute top-5 right-5 md:top-8 md:right-8 flex items-center gap-2 z-20">
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50 transition-all"
+                                title="Edit Profile"
+                            >
+                                <Settings size={18} />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('Are you sure you want to sign out?')) {
+                                        logout();
+                                    }
+                                }}
+                                className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all"
+                                title="Sign Out"
+                            >
+                                <LogOut size={18} />
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                         <div className="relative shrink-0">
-                            <div className="w-32 h-32 rounded-[2.5rem] bg-gray-900 text-white flex items-center justify-center text-5xl font-black shadow-2xl relative z-10">
+                            <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
                                 {user.name.charAt(0).toUpperCase()}
                             </div>
-                            <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-purple-600 border-4 border-white flex items-center justify-center text-white shadow-lg z-20 shadow-purple-200">
-                                <Zap size={20} fill="currentColor" />
+                            <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-purple-600 border-3 border-white flex items-center justify-center text-white shadow-md z-20">
+                                <Zap size={14} fill="currentColor" />
                             </div>
                         </div>
 
@@ -185,7 +209,7 @@ export default function Profile() {
                             ) : (
                                 <>
                                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 leading-none">{user.name}</h1>
+                                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-none">{user.name}</h1>
                                         <div className="flex flex-wrap gap-2">
                                             <span className="px-4 py-1.5 rounded-xl bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest border border-purple-100 flex items-center gap-2">
                                                 <Award size={12} /> {user.rank || 'Novice'}
@@ -214,26 +238,7 @@ export default function Profile() {
                             )}
                         </div>
 
-                        {!isEditing && (
-                            <div className="flex flex-col gap-3 shrink-0">
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold text-xs uppercase tracking-widest transition-all shadow-sm border border-indigo-100"
-                                >
-                                    <Edit3 size={16} /> Edit Profile
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (window.confirm('Are you sure you want to terminate your session and log out?')) {
-                                            logout();
-                                        }
-                                    }}
-                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl border border-gray-100 text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-100 font-bold text-xs uppercase tracking-widest transition-all shadow-sm"
-                                >
-                                    <LogOut size={16} /> Terminate
-                                </button>
-                            </div>
-                        )}
+
                     </div>
                 </div>
 
@@ -255,7 +260,7 @@ export default function Profile() {
                                 {React.cloneElement(stat.icon, { size: 32 })}
                             </div>
                             <h3 className="text-5xl font-black text-gray-900 mb-2 tracking-tight leading-none group-hover:text-purple-600 transition-colors">{stat.value}</h3>
-                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-gray-400 text-xs font-semibold">{stat.label}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -268,11 +273,11 @@ export default function Profile() {
                         {/* Learning Velocity */}
                         <div className="bg-white p-8 md:p-12 border border-gray-100 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
                             <div className="flex items-center justify-between mb-12">
-                                <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-4">
+                                <h2 className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shadow-sm">
                                         <TrendingUp size={20} />
                                     </div>
-                                    Learning Velocity
+                                    Learning Progress
                                 </h2>
                             </div>
 
@@ -287,23 +292,23 @@ export default function Profile() {
                                                 <div>
                                                     <h4 className="font-bold text-lg text-gray-900 mb-1 tracking-tight capitalize">{slug.replace(/-/g, ' ')}</h4>
                                                     <div className="flex items-center gap-4">
-                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
-                                                            Efficiency: <span className="text-purple-600">{progress.quizScore}%</span>
+                                                        <p className="text-xs font-semibold text-gray-400 flex items-center gap-1">
+                                                            Score: <span className="text-purple-600">{progress.quizScore}%</span>
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 relative z-10">
                                                 <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)] animate-pulse" />
-                                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Mastered</span>
+                                                <span className="text-xs font-semibold text-green-600">Completed</span>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
                                     <div className="text-center py-10">
-                                        <p className="text-gray-500 mb-6 font-medium text-lg leading-relaxed">Your mastery journey is awaiting initialization.</p>
-                                        <Link to="/academy" className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white font-bold uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl shadow-gray-200 hover:bg-purple-600 hover:scale-[1.02]">
-                                            Initialize Training <ChevronRight size={16} />
+                                        <p className="text-gray-500 mb-6 font-medium text-lg leading-relaxed">You haven't completed any lessons yet.</p>
+                                        <Link to="/academy" className="inline-flex items-center gap-3 px-6 py-3 bg-purple-600 text-white font-bold text-sm rounded-xl transition-all shadow-lg hover:bg-purple-700">
+                                            Start Learning <ChevronRight size={16} />
                                         </Link>
                                     </div>
                                 )}
@@ -313,7 +318,7 @@ export default function Profile() {
                         {/* My Listed Tools */}
                         <div className="bg-white p-8 md:p-12 border border-gray-100 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
                             <div className="flex items-center justify-between mb-12">
-                                <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-4">
+                                <h2 className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-sm">
                                         <FolderGit2 size={20} />
                                     </div>

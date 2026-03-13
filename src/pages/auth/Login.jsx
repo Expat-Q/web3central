@@ -56,11 +56,11 @@ export default function Login() {
                         <motion.span
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-indigo-400 tracking-[0.2em] uppercase mb-6"
+                            className="inline-block px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-[10px] font-bold text-indigo-500 tracking-wider uppercase mb-6"
                         >
                             Secure Gateway
                         </motion.span>
-                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 tracking-tighter italic uppercase">Welcome <span className="text-purple-600">Back</span></h1>
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Welcome <span className="text-purple-600">Back</span></h1>
                         <p className="text-gray-500 font-medium">Identify yourself to access the platform.</p>
                     </div>
 
@@ -71,14 +71,14 @@ export default function Login() {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest"
+                                className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-2xl text-sm font-medium"
                             >
                                 {error}
                             </motion.div>
                         )}
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Email</label>
+                            <label className="text-xs font-semibold text-gray-500 pl-2">Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -93,8 +93,8 @@ export default function Login() {
 
                         <div className="space-y-3">
                             <div className="flex justify-between items-center pl-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Password</label>
-                                <Link to="/forgot-password" size="sm" className="text-[10px] font-black text-purple-600 hover:text-purple-700 uppercase tracking-widest">
+                                <label className="text-xs font-semibold text-gray-500">Password</label>
+                                <Link to="/forgot-password" size="sm" className="text-xs font-semibold text-purple-600 hover:text-purple-700">
                                     Reset Password
                                 </Link>
                             </div>
@@ -122,14 +122,14 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-5 bg-gray-900 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-gray-200 hover:scale-[1.01] active:scale-[0.99] hover:bg-purple-600 disabled:opacity-50"
+                            className="w-full py-3 bg-gray-900 text-white font-bold rounded-2xl transition-all shadow-xl shadow-gray-200 hover:scale-[1.01] active:scale-[0.99] hover:bg-purple-600 disabled:opacity-50"
                         >
                             {loading ? 'Authenticating...' : 'Sign In'}
                         </button>
                     </form>
 
                     <div className="mt-10 pt-10 border-t border-gray-50 text-center">
-                        <p className="text-gray-400 text-xs font-black uppercase tracking-widest">
+                        <p className="text-gray-400 text-sm font-medium">
                             New here?{' '}
                             <Link to="/signup" className="text-purple-600 hover:text-purple-700 ml-2 transition-colors">
                                 Create Account

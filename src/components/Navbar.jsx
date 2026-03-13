@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.jpg";
 
@@ -12,6 +12,8 @@ export default function Navbar() {
   const [appsOpen, setAppsOpen] = useState(false);
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
+  const location = useLocation();
+  const isOnAppsPage = location.pathname.startsWith('/apps');
 
   const navLinks = [
     { name: "Home", to: "/" },
@@ -54,8 +56,9 @@ export default function Navbar() {
           <div className="hidden md:flex flex-1 justify-center items-center space-x-8">
             <NavLink
               to="/"
+              end
               className={({ isActive }) =>
-                `text-sm font-semibold transition-colors ${isActive ? "text-purple-600" : "text-gray-500 hover:text-purple-600"}`
+                `text-sm transition-colors ${isActive ? "font-semibold text-purple-600" : "font-medium text-gray-500 hover:text-purple-600"}`
               }
             >
               Home
@@ -68,7 +71,7 @@ export default function Navbar() {
               onMouseLeave={() => setAppsOpen(false)}
             >
               <button
-                className={`flex items-center gap-1 text-sm font-semibold transition-colors ${appsOpen ? "text-purple-600" : "text-gray-500 hover:text-purple-600"
+                className={`flex items-center gap-1 text-sm transition-colors ${appsOpen || isOnAppsPage ? "font-semibold text-purple-600" : "font-medium text-gray-500 hover:text-purple-600"
                   }`}
               >
                 Apps
@@ -97,7 +100,7 @@ export default function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `text-sm font-semibold transition-colors ${isActive ? "text-purple-600" : "text-gray-500 hover:text-purple-600"
+                  `text-sm transition-colors ${isActive ? "font-semibold text-purple-600" : "font-medium text-gray-500 hover:text-purple-600"
                   }`
                 }
               >

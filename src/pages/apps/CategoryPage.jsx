@@ -119,6 +119,16 @@ const scaleIn = {
   })
 };
 
+const heroImages = {
+  dex: '/images/heroes/hero-dex.png',
+  perps: '/images/heroes/hero-perps.png',
+  web3Chat: '/images/heroes/hero-perps.png',
+  interoperability: '/images/heroes/hero-interoperability.png',
+  onchainAutonomy: '/images/heroes/hero-onchain-autonomy.png',
+  communityTools: '/images/heroes/hero-community-tools.png',
+  bountyHub: '/images/heroes/hero-onchain-autonomy.png', // fallback until dedicated image is generated
+};
+
 export default function CategoryPage({ categoryKey: propCategoryKey, title, description }) {
   const params = useParams();
   const categoryKey = propCategoryKey || params.categoryKey;
@@ -221,7 +231,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
           <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
           <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-b-purple-400 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
         </div>
-        <p className="text-slate-400 font-semibold uppercase tracking-[0.25em] text-[11px] mt-6">Loading protocols...</p>
+        <p className="text-slate-400 font-medium text-sm mt-6">Fetching data...</p>
       </div>
     );
   }
@@ -244,16 +254,16 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
             animate="visible"
             custom={0}
           >
-            <Link to="/apps" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60 text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-300 shadow-sm mb-10">
-              <ChevronLeft size={14} /> Back to Directory
+            <Link to="/apps" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60 text-sm font-medium text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-300 shadow-sm mb-10">
+              <ChevronLeft size={14} /> Back to Apps
             </Link>
           </motion.div>
 
           {/* Hero Content Grid */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
 
             {/* Left: Title Block */}
-            <div className="max-w-3xl">
+            <div className="flex-1 space-y-6">
               {/* Accent Label */}
               <motion.div
                 variants={slideRight}
@@ -272,7 +282,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
                 initial="hidden"
                 animate="visible"
                 custom={0.2}
-                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.05] mb-6"
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.05] mb-6"
               >
                 {title}
               </motion.h1>
@@ -296,18 +306,34 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
                 custom={0.5}
                 className="flex flex-wrap items-center gap-3 mt-8"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-[12px] font-bold text-slate-700">{filteredData.length} Protocols</span>
                 </div>
                 {allChains.length > 0 && (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80">
                     <LayoutGrid size={13} className="text-indigo-500" />
                     <span className="text-[12px] font-bold text-slate-700">{allChains.length} Networks</span>
                   </div>
                 )}
               </motion.div>
             </div>
+
+            {/* Right: Hero Illustration (hidden on mobile, shows when no bench) */}
+            {bench.length === 0 && heroImages[categoryKey] && (
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                className="hidden lg:block flex-1 w-full"
+              >
+                <img
+                  src={heroImages[categoryKey]}
+                  alt={`${title} illustration`}
+                  className="rounded-[2.5rem] shadow-2xl shadow-purple-200/50 border border-gray-100 w-full max-w-[500px] lg:h-[380px] object-cover ml-auto"
+                />
+              </motion.div>
+            )}
 
             {/* Right: Bench Comparison Bar */}
             {bench.length > 0 && (
@@ -432,7 +458,13 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
 
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => toggleBookmark(app)}
+                          onClick={() => {
+                            if (!user || user.email === 'guest@web3central.internal') {
+                              navigate('/login');
+                              return;
+                            }
+                            toggleBookmark(app);
+                          }}
                           className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-300 ${isBookmarked(app.id || app._id)
                             ? 'bg-purple-50 border-purple-200 text-purple-600 shadow-sm'
                             : 'bg-white border-slate-200 text-slate-400 hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50'

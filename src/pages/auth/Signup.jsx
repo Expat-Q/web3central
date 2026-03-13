@@ -67,11 +67,11 @@ export default function Signup() {
                         <motion.span
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-purple-400 tracking-[0.2em] uppercase mb-6"
+                            className="inline-block px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-[10px] font-bold text-purple-500 tracking-wider uppercase mb-6"
                         >
                             Protocol Onboarding
                         </motion.span>
-                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 tracking-tighter italic uppercase">Join <span className="text-purple-600">Network</span></h1>
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Join <span className="text-purple-600">Web3Central</span></h1>
                         <p className="text-gray-500 font-medium">Create your credentials to join our community.</p>
                     </div>
 
@@ -82,7 +82,7 @@ export default function Signup() {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest"
+                                className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-2xl text-sm font-medium"
                             >
                                 {error}
                             </motion.div>
@@ -90,7 +90,7 @@ export default function Signup() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Username</label>
+                                <label className="text-xs font-semibold text-gray-500 pl-2">Username</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -103,7 +103,7 @@ export default function Signup() {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Email</label>
+                                <label className="text-xs font-semibold text-gray-500 pl-2">Email</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -119,7 +119,7 @@ export default function Signup() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Password</label>
+                                <label className="text-xs font-semibold text-gray-500 pl-2">Password</label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
@@ -142,7 +142,7 @@ export default function Signup() {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Verify Password</label>
+                                <label className="text-xs font-semibold text-gray-500 pl-2">Verify Password</label>
                                 <div className="relative">
                                     <input
                                         type={showConfirmPassword ? "text" : "password"}
@@ -168,14 +168,14 @@ export default function Signup() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-5 bg-gray-900 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-gray-200 hover:scale-[1.01] active:scale-[0.99] hover:bg-purple-600 disabled:opacity-50 mt-4"
+                            className="w-full py-3 bg-gray-900 text-white font-bold rounded-2xl transition-all shadow-xl shadow-gray-200 hover:scale-[1.01] active:scale-[0.99] hover:bg-purple-600 disabled:opacity-50 mt-4"
                         >
                             {loading ? 'Initializing...' : 'Create Account'}
                         </button>
                     </form>
 
                     <div className="mt-10 pt-10 border-t border-gray-50 text-center">
-                        <p className="text-gray-400 text-xs font-black uppercase tracking-widest">
+                        <p className="text-gray-400 text-sm font-medium">
                             Already have an account?{' '}
                             <Link to="/login" className="text-purple-600 hover:text-purple-700 ml-2 transition-colors">
                                 Sign In

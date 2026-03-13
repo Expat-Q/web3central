@@ -14,7 +14,8 @@ import {
     Trophy,
     Sparkles,
     Timer,
-    Unlock
+    Unlock,
+    ArrowLeftCircle
 } from 'lucide-react';
 
 export default function LessonDetail() {
@@ -141,7 +142,7 @@ export default function LessonDetail() {
                     >
                         {/* Title Section */}
                         <div className="p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
-                            <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4 tracking-tight">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
                                 {lesson.title}
                             </h1>
                             <p className="text-lg text-gray-500 font-medium flex items-center gap-3">
@@ -150,7 +151,7 @@ export default function LessonDetail() {
                         </div>
 
                         {/* Markdown Content */}
-                        <div className="p-8 md:p-12 prose prose-lg prose-purple max-w-none prose-headings:font-bold prose-h1:text-3xl prose-p:text-gray-600 prose-p:leading-relaxed">
+                        <div className="p-5 md:p-12 prose md:prose-lg prose-purple max-w-none prose-headings:font-bold prose-h1:text-2xl md:prose-h1:text-3xl prose-p:text-gray-600 prose-p:leading-relaxed prose-p:break-words">
                             <ReactMarkdown>{lesson.contentMarkdown}</ReactMarkdown>
                         </div>
 
@@ -162,7 +163,7 @@ export default function LessonDetail() {
                             </div>
                             <button
                                 onClick={() => setShowQuiz(true)}
-                                className="w-full md:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2"
+                                className="w-full md:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-base transition-all shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2"
                             >
                                 Start Assessment <ChevronRight size={20} />
                             </button>
@@ -302,7 +303,7 @@ export default function LessonDetail() {
                                         onClick={() => navigate('/academy')}
                                         className="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-2 mx-auto"
                                     >
-                                        Return to Curriculum <Unlock size={18} />
+                                        Return to Curriculum <ArrowLeftCircle size={18} />
                                     </button>
                                 </div>
                             </div>
