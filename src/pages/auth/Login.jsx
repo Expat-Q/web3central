@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { FcGoogle } from 'react-icons/fc';
-import { FaDiscord, FaTwitter } from 'react-icons/fa';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
@@ -15,7 +13,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login, oauthLogin } = useAuth();
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -37,10 +35,7 @@ export default function Login() {
         setLoading(false);
     };
 
-    const handleOAuth = (provider) => {
-        setLoading(true);
-        oauthLogin(provider);
-    };
+
 
     return (
         <div className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden bg-white">
@@ -69,24 +64,7 @@ export default function Login() {
                         <p className="text-gray-500 font-medium">Identify yourself to access the platform.</p>
                     </div>
 
-                    {/* Social Login Section */}
-                    <div className="grid grid-cols-3 gap-4 mb-8">
-                        <button type="button" onClick={() => handleOAuth('google')} className="flex items-center justify-center py-3 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm">
-                            <FcGoogle size={24} />
-                        </button>
-                        <button type="button" onClick={() => handleOAuth('discord')} className="flex items-center justify-center py-3 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm">
-                            <FaDiscord size={24} className="text-[#5865F2]" />
-                        </button>
-                        <button type="button" onClick={() => handleOAuth('twitter')} className="flex items-center justify-center py-3 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm">
-                            <FaTwitter size={24} className="text-[#1DA1F2]" />
-                        </button>
-                    </div>
 
-                    <div className="relative flex items-center gap-4 mb-8">
-                        <div className="flex-1 h-[1px] bg-gray-100"></div>
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">or use email</span>
-                        <div className="flex-1 h-[1px] bg-gray-100"></div>
-                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {error && (
