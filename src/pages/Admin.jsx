@@ -266,7 +266,7 @@ export default function Admin() {
       const payload = {
         ...lessonForm,
         contentMarkdown: lessonForm.content,
-        quiz: quizPreview,
+        quiz: { questions: quizPreview },
         slug,
         id: slug
       };
