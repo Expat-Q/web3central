@@ -27,6 +27,7 @@ export default function Academy() {
     const [activeTab, setActiveTab] = useState('lessons');
     const [searchQuery, setSearchQuery] = useState('');
     const [priceFilter, setPriceFilter] = useState('All'); // 'All', 'Free', 'Paid'
+    const [dropOpen, setDropOpen] = useState(false);
 
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
@@ -147,28 +148,28 @@ export default function Academy() {
                         <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-gray-900 leading-[1.1]">
                             Your Web3 <span className="text-purple-600">Learning Path</span>
                         </h1>
-                        <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-medium leading-relaxed">
-                            From basic bridging to institutional-grade analysis. Curated courses, lessons, and quizzes — all in one place.
+                        <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-normal leading-relaxed">
+                            From basic bridging to institutional-grade analysis. Curated courses, lessons, and quizzes all in one place.
                         </p>
                     </motion.div>
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex flex-col sm:flex-row gap-2 mb-10 border-b border-gray-100 pb-1">
+                <div className="flex flex-col sm:flex-row gap-2 mb-10 pb-1">
                     <button
                         onClick={() => setActiveTab('lessons')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'lessons'
-                            ? 'bg-gray-900 text-white shadow-md'
-                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all border ${activeTab === 'lessons'
+                            ? 'bg-gray-900 text-white shadow-md border-gray-900'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 border-gray-200 shadow-sm'
                             }`}
                     >
-                        <span className="flex items-center gap-2"><BookOpen size={15} /> Interactive Lessons</span>
+                        <span className="flex items-center justify-center gap-2"><BookOpen size={15} /> Interactive Lessons</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('courses')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'courses'
-                            ? 'bg-purple-600 text-white shadow-md'
-                            : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50'
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'courses'
+                            ? 'bg-purple-600 text-white shadow-md border-purple-600'
+                            : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50 border-gray-200 shadow-sm'
                             }`}
                     >
                         <Globe size={15} /> Curated Courses
@@ -181,11 +182,45 @@ export default function Academy() {
                 {/* ── LESSONS TAB ── */}
                 {activeTab === 'lessons' && (
                     <>
+                        <div className="sm:hidden mb-8 relative">
+                            <button
+                                onClick={() => setDropOpen(!dropOpen)}
+                                className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            >
+                                {activeCategory}
+                                <ChevronRight size={16} className={`text-gray-400 transition-transform duration-200 ${dropOpen ? '-rotate-90' : 'rotate-90'}`} />
+                            </button>
+                            {dropOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setDropOpen(false)} />
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1">
+                                        {LESSON_MODULES.map(cat => (
+                                            <button
+                                                key={cat.name}
+                                                onClick={() => { setActiveCategory(cat.name); setDropOpen(false); }}
+                                                className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors text-left ${activeCategory === cat.name
+                                                    ? 'bg-purple-50 text-purple-700'
+                                                    : 'text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                <span className="text-base">{cat.icon}</span>
+                                                {cat.name}
+                                                {activeCategory === cat.name && (
+                                                    <span className="ml-auto text-purple-500">✓</span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Desktop: Buttons */}
                         <motion.div
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-12"
+                            className="hidden sm:flex sm:flex-wrap gap-3 mb-12"
                         >
                             {LESSON_MODULES.map(cat => (
                                 <button
@@ -226,9 +261,6 @@ export default function Academy() {
                                                 </div>
                                                 <div className="flex flex-col items-end gap-2">
                                                     <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider border border-purple-100">{lesson.level}</span>
-                                                    <div className="flex items-center gap-1.5 text-gray-400 font-bold text-[10px] uppercase tracking-wider">
-                                                        <Clock size={12} /> {lesson.estimatedTime}
-                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="relative z-10 flex-grow">
@@ -292,8 +324,8 @@ export default function Academy() {
                                         key={filter}
                                         onClick={() => setPriceFilter(filter)}
                                         className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
-                                                ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                                                : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
+                                            ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                                            : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
                                             }`}
                                     >
                                         {filter}

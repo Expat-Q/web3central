@@ -135,31 +135,8 @@ export default function Profile() {
                 <div className="bg-white border border-gray-100 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] mb-12 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-purple-50 blur-[120px] -z-10 rounded-full translate-x-32 -translate-y-32 group-hover:bg-purple-100 transition-colors duration-1000" />
 
-                    {/* Top-right action icons */}
-                    {!isEditing && (
-                        <div className="absolute top-5 right-5 md:top-8 md:right-8 flex items-center gap-2 z-20">
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50 transition-all"
-                                title="Edit Profile"
-                            >
-                                <Settings size={18} />
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (window.confirm('Are you sure you want to sign out?')) {
-                                        logout();
-                                    }
-                                }}
-                                className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all"
-                                title="Sign Out"
-                            >
-                                <LogOut size={18} />
-                            </button>
-                        </div>
-                    )}
 
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                    <div className="flex flex-col items-center md:items-start md:flex-row gap-6">
                         <div className="relative shrink-0">
                             <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
                                 {user.name.charAt(0).toUpperCase()}
@@ -169,46 +146,9 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        <div className="text-left flex-grow space-y-4">
-                            {isEditing ? (
-                                <div className="space-y-4 max-w-xl">
-                                    <input
-                                        type="text"
-                                        value={editForm.name}
-                                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                        className="w-full text-3xl font-black text-gray-900 bg-gray-50 border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-purple-500"
-                                        placeholder="Your Name"
-                                    />
-                                    <textarea
-                                        value={editForm.bio}
-                                        onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                                        className="w-full text-gray-600 bg-gray-50 border border-gray-200 rounded-2xl p-4 min-h-[100px] focus:ring-2 focus:ring-purple-500"
-                                        placeholder="Add a bio... e.g., Smart Contract Dev @ Example"
-                                    />
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 flex-grow focus-within:ring-2 focus-within:ring-purple-500">
-                                            <Twitter size={18} className="text-sky-500" />
-                                            <input
-                                                type="text"
-                                                value={editForm.twitter}
-                                                onChange={(e) => setEditForm({ ...editForm, twitter: e.target.value })}
-                                                className="w-full bg-transparent border-none focus:ring-0 p-4 text-gray-700 placeholder-gray-400"
-                                                placeholder="Twitter handle (e.g. @0x_builder)"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 pt-4">
-                                        <button onClick={handleSaveProfile} disabled={saving} className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition">
-                                            {saving ? 'Saving...' : <><Save size={16} /> Save Profile</>}
-                                        </button>
-                                        <button onClick={() => setIsEditing(false)} className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
+                        <div className="text-center md:text-left flex-grow space-y-4">
                                 <>
-                                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                    <div className="flex flex-col md:flex-row items-center gap-4">
                                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-none">{user.name}</h1>
                                         <div className="flex flex-wrap gap-2">
                                             <span className="px-4 py-1.5 rounded-xl bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest border border-purple-100 flex items-center gap-2">
@@ -220,7 +160,7 @@ export default function Profile() {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-4 text-gray-400 font-bold text-xs">
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-400 font-bold text-xs">
                                         <span className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"><Mail size={14} className="text-gray-400" /> {user.email}</span>
                                         {user.twitter && (
                                             <a href={user.twitter.startsWith('http') ? user.twitter : `https://x.com/${user.twitter.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-100 text-sky-600 hover:bg-sky-100 transition">
@@ -235,32 +175,115 @@ export default function Profile() {
                                         <p className="text-gray-400 italic max-w-xl text-sm">No bio provided. Tell the community about yourself!</p>
                                     )}
                                 </>
-                            )}
                         </div>
 
 
                     </div>
+
+                    {/* Edit Profile Modal */}
+                    {isEditing && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsEditing(false)}>
+                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                            <div
+                                className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 md:p-8 space-y-5"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-bold text-gray-900">Edit Profile</h2>
+                                    <button onClick={() => setIsEditing(false)} className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition">
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-500 ml-1">Display Name</label>
+                                        <input
+                                            type="text"
+                                            value={editForm.name}
+                                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                            className="w-full text-gray-900 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 font-medium focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition"
+                                            placeholder="Your Name"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-500 ml-1">Bio</label>
+                                        <textarea
+                                            value={editForm.bio}
+                                            onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                                            className="w-full text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 min-h-[100px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition"
+                                            placeholder="Add a bio... e.g., Smart Contract Dev @ Example"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-500 ml-1">Twitter Handle</label>
+                                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-purple-500 transition">
+                                            <Twitter size={16} className="text-sky-500 shrink-0" />
+                                            <input
+                                                type="text"
+                                                value={editForm.twitter}
+                                                onChange={(e) => setEditForm({ ...editForm, twitter: e.target.value })}
+                                                className="w-full bg-transparent border-none focus:ring-0 py-3 px-3 text-gray-700 placeholder-gray-400 outline-none"
+                                                placeholder="@0x_builder"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button onClick={handleSaveProfile} disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition text-sm">
+                                        {saving ? 'Saving...' : <><Save size={16} /> Save Profile</>}
+                                    </button>
+                                    <button onClick={() => setIsEditing(false)} className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition text-sm">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Action icons — settings top-left, logout top-right */}
+                    {!isEditing && (
+                        <>
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="absolute top-5 left-5 md:top-8 md:left-8 w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50 transition-all z-20"
+                                title="Edit Profile"
+                            >
+                                <Settings size={18} />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('Are you sure you want to sign out?')) {
+                                        logout();
+                                    }
+                                }}
+                                className="absolute top-5 right-5 md:top-8 md:right-8 w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-400 hover:text-red-600 hover:border-red-300 hover:bg-red-100 transition-all z-20"
+                                title="Sign Out"
+                            >
+                                <LogOut size={18} />
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+                <div className="grid grid-cols-3 gap-4 mb-10">
                     {[
-                        { label: 'Completed Lessons', value: stats.completedLessons, icon: <BookOpen />, color: 'purple' },
-                        { label: 'Total Mastery XP', value: stats.totalXP, icon: <Award />, color: 'indigo' },
-                        { label: 'Avg. Quiz Score', value: `${stats.avgQuizScore}%`, icon: <Target />, color: 'purple' }
+                        { label: 'Completed', value: stats.completedLessons, icon: <BookOpen size={18} />, color: 'purple' },
+                        { label: 'Total XP', value: stats.totalXP, icon: <Award size={18} />, color: 'indigo' },
+                        { label: 'Avg. Score', value: `${stats.avgQuizScore}%`, icon: <Target size={18} />, color: 'purple' }
                     ].map((stat, i) => (
                         <motion.div
                             key={i}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1, duration: 0.6 }}
-                            className="bg-white p-10 flex flex-col items-center text-center group border border-gray-100 hover:border-purple-200 hover:shadow-[0_20px_50px_rgba(109,40,217,0.05)] transition-all rounded-[2.5rem] shadow-sm relative overflow-hidden"
+                            transition={{ delay: i * 0.1, duration: 0.5 }}
+                            className="bg-white px-4 py-5 flex flex-col items-center text-center border border-gray-100 hover:border-purple-200 transition-all rounded-2xl shadow-sm"
                         >
-                            <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 mb-6 group-hover:scale-110 group-hover:text-purple-600 group-hover:bg-purple-50 transition-all duration-500 shadow-sm">
-                                {React.cloneElement(stat.icon, { size: 32 })}
+                            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 mb-3">
+                                {stat.icon}
                             </div>
-                            <h3 className="text-5xl font-black text-gray-900 mb-2 tracking-tight leading-none group-hover:text-purple-600 transition-colors">{stat.value}</h3>
-                            <p className="text-gray-400 text-xs font-semibold">{stat.label}</p>
+                            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 tracking-tight leading-none">{stat.value}</h3>
+                            <p className="text-gray-400 text-xs font-medium">{stat.label}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -269,13 +292,13 @@ export default function Profile() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                     {/* Left Column (Learning & Submitted Tools) */}
-                    <div className="lg:col-span-2 space-y-10">
-                        {/* Learning Velocity */}
-                        <div className="bg-white p-8 md:p-12 border border-gray-100 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
-                            <div className="flex items-center justify-between mb-12">
-                                <h2 className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shadow-sm">
-                                        <TrendingUp size={20} />
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Learning Progress */}
+                        <div className="bg-white p-6 md:p-8 border border-gray-100 rounded-2xl shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-base font-bold tracking-tight text-gray-900 flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+                                        <TrendingUp size={16} />
                                     </div>
                                     Learning Progress
                                 </h2>
@@ -284,13 +307,13 @@ export default function Profile() {
                             <div className="space-y-4 flex-grow">
                                 {Object.keys(user.learningProgress || {}).length > 0 ? (
                                     Object.entries(user.learningProgress).map(([slug, progress], i) => (
-                                        <div key={slug} className="p-6 rounded-[2rem] bg-gray-50 border border-gray-50 flex items-center justify-between hover:bg-white hover:border-purple-100 transition-all group relative overflow-hidden shadow-sm hover:shadow-md">
-                                            <div className="flex items-center gap-6 relative z-10">
-                                                <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center font-black text-xs text-gray-400 group-hover:text-purple-600 group-hover:border-purple-200 transition-all">
+                                        <div key={slug} className="p-4 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between hover:bg-white hover:border-purple-100 transition-all">
+                                            <div className="flex items-center gap-4 relative z-10">
+                                                <div className="w-9 h-9 rounded-xl bg-white border border-gray-100 flex items-center justify-center font-bold text-xs text-gray-400">
                                                     {i + 1}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-lg text-gray-900 mb-1 tracking-tight capitalize">{slug.replace(/-/g, ' ')}</h4>
+                                                    <h4 className="font-medium text-sm text-gray-900 capitalize">{slug.replace(/-/g, ' ')}</h4>
                                                     <div className="flex items-center gap-4">
                                                         <p className="text-xs font-semibold text-gray-400 flex items-center gap-1">
                                                             Score: <span className="text-purple-600">{progress.quizScore}%</span>
@@ -316,15 +339,15 @@ export default function Profile() {
                         </div>
 
                         {/* My Listed Tools */}
-                        <div className="bg-white p-8 md:p-12 border border-gray-100 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
-                            <div className="flex items-center justify-between mb-12">
-                                <h2 className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-sm">
-                                        <FolderGit2 size={20} />
+                        <div className="bg-white p-6 md:p-8 border border-gray-100 rounded-2xl shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-8">
+                                <h2 className="text-sm font-bold tracking-tight text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                                    <div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+                                        <FolderGit2 size={16} />
                                     </div>
-                                    My Submitted Tools
+                                    Submitted Tools
                                 </h2>
-                                <span className="px-4 py-2 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-100">
+                                <span className="px-3 py-1.5 bg-slate-50 text-slate-500 font-medium text-xs rounded-lg border border-slate-100 whitespace-nowrap shrink-0">
                                     {myTools.length} Listed
                                 </span>
                             </div>
@@ -333,7 +356,7 @@ export default function Profile() {
                                 {myTools.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {myTools.map((tool) => (
-                                            <div key={tool._id} className="p-5 rounded-[1.5rem] bg-gray-50 border border-gray-100 flex items-center justify-between hover:bg-white hover:border-sky-200 hover:shadow-lg transition-all group">
+                                            <div key={tool._id} className="p-4 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between hover:bg-white hover:border-sky-200 transition-all group">
                                                 <div className="flex items-center gap-4 min-w-0">
                                                     <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 p-2 flex-shrink-0">
                                                         <ToolLogo tool={tool} />
@@ -364,13 +387,13 @@ export default function Profile() {
                     </div>
 
                     {/* Right Column (Saved Protocols) */}
-                    <div className="bg-white p-8 md:p-10 border border-gray-100 rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col h-full lg:max-h-[850px]">
-                        <div className="flex items-center justify-between mb-10">
-                            <h2 className="text-xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
-                                    <Bookmark size={18} className="fill-current" />
+                    <div className="bg-white p-6 md:p-8 border border-gray-100 rounded-2xl shadow-sm flex flex-col h-full lg:max-h-[850px]">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-base font-bold tracking-tight text-gray-900 flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                                    <Bookmark size={14} className="fill-current" />
                                 </div>
-                                Saved Vault
+                                Saved Tools
                             </h2>
                         </div>
 

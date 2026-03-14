@@ -178,7 +178,7 @@ export default function ToolComparison() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-gray-500 text-lg md:text-xl max-w-3xl font-medium leading-relaxed"
+            className="text-gray-500 text-lg md:text-xl max-w-3xl font-normal leading-relaxed"
           >
             Side-by-side technical evaluation of institutional-grade protocols.
             Analyze liquidity, security parameters, and growth metrics in real-time.
@@ -188,13 +188,13 @@ export default function ToolComparison() {
         {/* Comparison Dashboard */}
         <div className="mb-32">
           {selectedTools.length === 0 ? (
-            <div className="bg-gray-50 border border-gray-100 rounded-[3rem] p-20 text-center shadow-sm">
+            <div className="bg-gray-50 border border-gray-100 rounded-[3rem] p-12 md:p-20 text-center shadow-sm">
               <div className="w-20 h-20 bg-white rounded-[2rem] border border-gray-100 flex items-center justify-center mx-auto mb-8 text-indigo-600 shadow-sm">
                 <Plus size={40} />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">No protocols selected</h2>
-              <p className="text-gray-500 font-medium max-w-sm mx-auto mb-10">Select up to 4 protocols from the directory below to begin comparison.</p>
-              <a href="#available-assets" className="inline-flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all shadow-xl shadow-gray-200">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-tight">No protocols selected</h2>
+              <p className="text-gray-500 font-normal max-w-sm mx-auto mb-10 leading-relaxed">Select up to 4 protocols from the directory below to begin comparison.</p>
+              <a href="#available-assets" className="inline-flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all shadow-xl shadow-gray-200 whitespace-nowrap">
                 Explore Directory <ChevronRight size={16} />
               </a>
             </div>

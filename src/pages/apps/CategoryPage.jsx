@@ -46,17 +46,22 @@ const extractTwitterHandle = (url) => {
 
 // Custom robust logo component
 const ToolLogo = ({ tool }) => {
-  const [imgError, setImgError] = useState(false);
+  const [fallbackIdx, setFallbackIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
 
-  const twitterHandle = extractTwitterHandle(tool.twitter || tool.socials?.twitter);
   const domain = tool.url ? getDomain(tool.url) : null;
 
-  // Resolution Priority: Database Logo -> Twitter PFP -> Clearbit Domain -> Initial
-  const initialSrc = tool.logo ||
-    (twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}` : null) ||
-    (domain ? `https://logo.clearbit.com/${domain}?size=128` : null);
+  // Build ordered list of image sources to try
+  // 1. Stored logo  2. Clearbit (404 on miss)  3. Google Favicon (always works)
+  const sources = [
+    tool.logo,
+    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
+    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
+  ].filter(Boolean);
 
-  if (imgError || !initialSrc) {
+  const currentSrc = sources[fallbackIdx];
+
+  if (!currentSrc || failed) {
     return (
       <div className="w-full h-full bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">
         {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
@@ -66,9 +71,15 @@ const ToolLogo = ({ tool }) => {
 
   return (
     <img
-      src={initialSrc}
+      src={currentSrc}
       alt={tool.name}
-      onError={() => setImgError(true)}
+      onError={() => {
+        if (fallbackIdx + 1 < sources.length) {
+          setFallbackIdx(prev => prev + 1);
+        } else {
+          setFailed(true);
+        }
+      }}
       className="w-full h-full object-contain drop-shadow-sm"
     />
   );

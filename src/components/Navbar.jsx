@@ -10,6 +10,7 @@ import logo from "../assets/logo.jpg";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [mobileAppsOpen, setMobileAppsOpen] = useState(false);
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
   const location = useLocation();
@@ -181,19 +182,33 @@ export default function Navbar() {
               {link.name}
             </NavLink>
           ))}
-          {/* Mobile Apps Section */}
-          <div className="pt-2 pb-1 border-t border-gray-100 mt-2">
-            <p className="px-3 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Apps</p>
-            {appLinks.map((app) => (
-              <Link
-                key={app.to}
-                to={app.to}
-                onClick={() => setMenuOpen(false)}
-                className="block px-6 py-2 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-              >
-                {app.name}
-              </Link>
-            ))}
+          {/* Mobile Apps Dropdown */}
+          <div className="pt-2 mt-2 border-t border-gray-100">
+            <button
+              onClick={() => setMobileAppsOpen(!mobileAppsOpen)}
+              className={`w-full flex items-center justify-between px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                isOnAppsPage ? 'text-purple-600 bg-purple-50' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Apps
+              <svg className={`w-4 h-4 transition-transform duration-200 ${mobileAppsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {mobileAppsOpen && (
+              <div className="mt-1 mx-2 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden py-1">
+                {appLinks.map((app) => (
+                  <Link
+                    key={app.to}
+                    to={app.to}
+                    onClick={() => { setMenuOpen(false); setMobileAppsOpen(false); }}
+                    className="block px-5 py-2.5 text-sm font-normal text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                  >
+                    {app.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-gray-100">

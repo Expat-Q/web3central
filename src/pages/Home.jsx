@@ -97,12 +97,12 @@ export default function Home() {
     <>
       {tools.map((t, i) => (
         <span key={i} className="flex items-center gap-2">
-          <span className="text-purple-300 font-bold">NEW APP LISTED</span>
+          <span className="text-purple-500 font-bold">NEW APP LISTED</span>
           <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-          <Link to={`/apps/${t.category}`} className="text-white hover:text-purple-200 transition-colors cursor-pointer">
+          <Link to={`/apps/${t.category}`} className="text-purple-900 hover:text-purple-600 transition-colors cursor-pointer">
             {t.name || t.title}
           </Link>
-          <span className="mx-4 text-purple-400/50">|</span>
+          <span className="mx-4 text-purple-300">|</span>
         </span>
       ))}
     </>
@@ -146,7 +146,7 @@ export default function Home() {
 
       {/* Scrolling Headline News for Newly Added Tools */}
       {recentlyAdded.length > 0 && (
-        <div className="w-full bg-purple-600 border-b border-purple-700 overflow-hidden relative flex text-white font-medium text-sm py-1.5">
+        <div className="w-full bg-purple-100 text-purple-700 border-b border-purple-200 overflow-hidden relative flex font-medium text-sm py-1.5">
           <div className="whitespace-nowrap flex items-center gap-10 animate-marquee z-10">
             {recentToolsMarquee(recentlyAdded)}
             <span aria-hidden="true" className="flex items-center gap-10">{recentToolsMarquee(recentlyAdded)}</span>
@@ -157,7 +157,7 @@ export default function Home() {
       {/* 2nd Section: Hero */}
       <motion.section
         {...slideFromLeft}
-        className="py-10 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16 min-h-[70vh]"
+        className="py-10 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16 lg:min-h-[70vh]"
       >
         <div className="flex-1 space-y-8 order-1">
           <div className="space-y-2">
@@ -166,14 +166,14 @@ export default function Home() {
               The Hub for <span className="text-purple-600">On-Chain</span> Mastery.
             </h1>
           </div>
-          <p className="text-xl text-gray-500 leading-relaxed font-medium">
+          <p className="text-sm sm:text-base text-gray-500 leading-relaxed font-normal">
             Web3Central is the trusted hub for community-built Web3 tools. We curate the most useful decentralized applications built by the community, spanning DeFi, interoperability, automation, analytics, and social tools.
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
-            <Link to="/apps/community-tools" className="px-8 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 hover:scale-105 active:scale-95 text-base">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Link to="/apps/community-tools" className="w-full sm:w-auto text-center px-8 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 hover:scale-105 active:scale-95 text-base">
               Start Your Journey
             </Link>
-            <Link to="/tool-comparison" className="px-8 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all text-base">
+            <Link to="/tool-comparison" className="w-full sm:w-auto text-center px-8 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all text-base">
               Compare Tools
             </Link>
           </div>
@@ -264,7 +264,7 @@ export default function Home() {
             <div className="flex-1 p-8 rounded-[2rem] bg-gradient-to-br from-purple-50 via-white to-indigo-50 border border-purple-100/60 relative overflow-hidden group flex flex-col">
               {/* Spotlight glow effect */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-gradient-to-b from-purple-200/40 to-transparent rounded-full blur-[80px] pointer-events-none" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-32 bg-gradient-to-b from-purple-400/60 to-transparent pointer-events-none" />
+
 
               <div className="relative z-10 flex flex-col flex-1 space-y-5">
                 {/* Header: Avatar + Name + Socials */}
@@ -364,11 +364,11 @@ export default function Home() {
             </div>
             <div className="grid gap-3 flex-1 content-start">
               {activeTrendingTools.map((tool, i) => (
-                <div key={i} className="flex items-center justify-between p-4 border border-gray-100 rounded-[1.2rem] bg-white hover:bg-purple-50/50 hover:border-purple-100 transition-all group overflow-hidden relative">
+                <div key={i} className="flex items-center justify-between p-3 md:p-4 border border-gray-100 rounded-xl md:rounded-[1.2rem] bg-white hover:bg-purple-50/50 hover:border-purple-100 transition-all group overflow-hidden relative">
                   <div className="flex items-center gap-4 relative z-10 min-w-0">
-                    <span className="text-2xl font-black text-gray-200 w-8">0{i + 1}</span>
+                    <span className="text-lg md:text-2xl font-black text-gray-200 w-6 md:w-8 shrink-0">0{i + 1}</span>
                     <div className="min-w-0">
-                      <span className="font-bold text-lg text-gray-900 block truncate group-hover:text-purple-600">{tool.name || tool.title}</span>
+                      <span className="font-bold text-sm md:text-lg text-gray-900 block truncate group-hover:text-purple-600">{tool.name || tool.title}</span>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] font-bold px-1.5 py-0.5 bg-green-50 text-green-600 rounded-md shrink-0">
                           ⭐ {tool.averageRating || tool.rating || "4.8"}
@@ -379,7 +379,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right relative z-10 shrink-0 ml-4">
+                  <div className="text-right relative z-10 shrink-0 ml-4 hidden md:block">
                     <p className="text-[10px] font-bold text-gray-400 uppercase">CATEGORY</p>
                     <p className="text-purple-600 font-bold text-sm capitalize">{tool.category || "General"}</p>
                   </div>

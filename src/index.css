@@ -290,3 +290,90 @@ h6 {
   font-style: italic;
   color: #c7d2fe;
 }
+
+/* ── Lesson Content Styling (clean reading experience) ── */
+.lesson-content {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #374151;
+  line-height: 1.9;
+  word-spacing: 0.05em;
+  letter-spacing: 0.01em;
+}
+
+.lesson-content h1,
+.lesson-content h2,
+.lesson-content h3,
+.lesson-content h4,
+.lesson-content h5,
+.lesson-content h6 {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #111827;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.lesson-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.9;
+}
+
+.lesson-content strong,
+.lesson-content b {
+  font-weight: 400;
+  color: #111827;
+}
+
+.lesson-content ul,
+.lesson-content ol {
+  margin-left: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding-left: 0.5rem;
+}
+
+.lesson-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.8;
+}
+
+.lesson-content code {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #6d28d9;
+}
+
+.lesson-content pre {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.lesson-content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #d1d5db;
+}
+
+.lesson-content blockquote {
+  border-left: 3px solid #e5e7eb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  color: #6b7280;
+  font-style: normal;
+}
+
+.lesson-content a {
+  color: #6d28d9;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

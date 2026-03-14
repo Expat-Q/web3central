@@ -44,6 +44,7 @@ export default function SubmitTool() {
   });
 
   const [status, setStatus] = useState(""); // "" | "sending" | "success" | "error"
+  const [catDropOpen, setCatDropOpen] = useState(false);
 
   const categories = [
     { id: "dex", name: "Decentralized Exchanges (DEX)" },
@@ -128,7 +129,7 @@ export default function SubmitTool() {
           <h1 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight text-gray-900 leading-tight">
             Submit a <span className="text-purple-600">Protocol</span>
           </h1>
-          <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-normal leading-relaxed">
             Expand the web3central ecosystem. Apply for your protocol to be indexed in our institutional-grade discovery hub.
           </p>
         </motion.div>
@@ -171,7 +172,7 @@ export default function SubmitTool() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 shadow-sm"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
                     placeholder="e.g. Uniswap V4"
                   />
                 </div>
@@ -188,36 +189,53 @@ export default function SubmitTool() {
                     value={formData.link}
                     onChange={handleChange}
                     required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 shadow-sm"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
                     placeholder="https://..."
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Category */}
                 <div className="space-y-3">
-                  <label htmlFor="category" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
+                  <label className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
                     <Tag className="w-3 h-3 text-purple-600" /> Category *
                   </label>
-                  <div className="relative group/select">
-                    <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold appearance-none outline-none focus:border-purple-600 focus:bg-white transition-all cursor-pointer shadow-sm"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setCatDropOpen(!catDropOpen)}
+                      className="w-full flex items-center justify-between bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all cursor-pointer shadow-sm text-left"
                     >
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-6 flex items-center pointer-events-none text-gray-400 group-hover/select:text-purple-600 transition-colors">
-                      <ChevronDown size={20} />
-                    </div>
+                      {categories.find(c => c.id === formData.category)?.name || 'Select category'}
+                      <ChevronDown size={18} className={`text-gray-400 transition-transform duration-200 ${catDropOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {catDropOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setCatDropOpen(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1">
+                          {categories.map((cat) => (
+                            <button
+                              key={cat.id}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, category: cat.id }));
+                                setCatDropOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-6 py-3 text-sm font-normal transition-colors text-left ${
+                                formData.category === cat.id
+                                  ? 'bg-purple-50 text-purple-700'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              {cat.name}
+                              {formData.category === cat.id && (
+                                <span className="text-purple-500 text-sm">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -233,7 +251,7 @@ export default function SubmitTool() {
                     value={formData.builderHandle}
                     onChange={handleChange}
                     required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 shadow-sm"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
                     placeholder="@architect_name"
                   />
                 </div>
@@ -251,7 +269,7 @@ export default function SubmitTool() {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-medium outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 shadow-sm leading-relaxed"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm leading-relaxed"
                   placeholder="Define the utility and core architecture of your protocol..."
                 ></textarea>
               </div>
