@@ -142,30 +142,23 @@ export default function LessonDetail() {
                     >
                         {/* Title Section */}
                         <div className="p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight tracking-tight">
                                 {lesson.title}
                             </h1>
-                            <p className="text-lg text-gray-500 font-medium flex items-center gap-3">
-                                <Timer size={18} className="text-gray-400" /> {lesson.estimatedTime} reading time
-                            </p>
                         </div>
 
                         {/* Markdown Content */}
-                        <div className="p-5 md:p-12 prose md:prose-lg prose-purple max-w-none prose-headings:font-bold prose-h1:text-2xl md:prose-h1:text-3xl prose-p:text-gray-600 prose-p:leading-relaxed prose-p:break-words">
+                        <div className="p-5 md:p-12 max-w-none lesson-content">
                             <ReactMarkdown>{lesson.contentMarkdown}</ReactMarkdown>
                         </div>
 
-                        {/* Footer Action */}
-                        <div className="p-8 md:p-12 bg-gray-900 text-white flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div>
-                                <h3 className="text-2xl font-bold mb-2">Ready to test your knowledge?</h3>
-                                <p className="text-gray-400 font-medium">Pass the quiz to earn {lesson.xpReward} Mastery XP.</p>
-                            </div>
+                        {/* Start Quiz */}
+                        <div className="p-6 md:p-8 border-t border-gray-100 flex justify-center">
                             <button
                                 onClick={() => setShowQuiz(true)}
-                                className="w-full md:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-base transition-all shadow-lg hover:shadow-purple-500/25 flex items-center justify-center gap-2"
+                                className="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-purple-200 flex items-center gap-2"
                             >
-                                Start Assessment <ChevronRight size={20} />
+                                Start Quiz <ChevronRight size={18} />
                             </button>
                         </div>
                     </motion.div>

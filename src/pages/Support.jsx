@@ -106,7 +106,7 @@ export default function Support() {
         >
           How can we <span className="text-purple-600">help you?</span>
         </motion.h1>
-        <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+        <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-normal leading-relaxed">
           Need technical assistance, partnership info, or have feedback? Our team is ready to help you navigate the on-chain world.
         </p>
       </motion.div>
@@ -157,7 +157,7 @@ export default function Support() {
           className="bg-gray-50/50 border border-gray-100 p-8 md:p-12 rounded-[2.5rem]"
         >
           <div className="mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Direct Inquiry</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Direct Inquiry</h2>
             <p className="text-gray-500">Send us a message and we'll get back to you shortly.</p>
           </div>
 
@@ -170,7 +170,7 @@ export default function Support() {
                   type="text"
                   required
                   placeholder="John Doe"
-                  className="w-full bg-white border border-gray-100 rounded-2xl px-12 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 transition-all placeholder:text-gray-300"
+                  className="w-full bg-white border border-gray-100 rounded-2xl px-12 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 transition-all placeholder:text-gray-300 placeholder:font-normal"
                 />
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function Support() {
                   type="email"
                   required
                   placeholder="john@example.com"
-                  className="w-full bg-white border border-gray-100 rounded-2xl px-12 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 transition-all placeholder:text-gray-300"
+                  className="w-full bg-white border border-gray-100 rounded-2xl px-12 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 transition-all placeholder:text-gray-300 placeholder:font-normal"
                 />
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function Support() {
                 required
                 rows={4}
                 placeholder="How can we help?"
-                className="w-full bg-white border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-bold outline-none focus:border-purple-600 transition-all placeholder:text-gray-300"
+                className="w-full bg-white border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 transition-all placeholder:text-gray-300 placeholder:font-normal"
               />
             </div>
 
@@ -222,7 +222,7 @@ export default function Support() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
             <h2 className="text-3xl font-bold mb-4 tracking-tight text-gray-900">Support Innovation</h2>
-            <p className="text-gray-500 text-lg mb-10 font-medium leading-relaxed">
+            <p className="text-gray-500 text-lg mb-10 font-normal leading-relaxed">
               Help us maintain and scale web3central infrastructure. Every contribution fuels open-source research and community-driven tools.
             </p>
 
@@ -245,12 +245,32 @@ export default function Support() {
               </motion.button>
             </div>
 
-            <div className="mt-8 flex items-center gap-6 justify-center grayscale opacity-40">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Supported Networks:</span>
-              <div className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-gray-200" title="Ethereum" />
-                <div className="w-6 h-6 rounded-full bg-gray-200" title="Base" />
-                <div className="w-6 h-6 rounded-full bg-gray-200" title="Polygon" />
+            <div className="mt-8 flex items-center gap-6 justify-center">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Supported Networks:</span>
+              <div className="flex gap-3 items-center">
+                {/* Ethereum */}
+                <div className="w-7 h-7 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center" title="Ethereum">
+                  <svg width="14" height="14" viewBox="0 0 256 417" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M127.961 0L125.166 9.5V285.168L127.961 287.958L255.923 212.32L127.961 0Z" fill="#343434" />
+                    <path d="M127.962 0L0 212.32L127.962 287.959V154.158V0Z" fill="#8C8C8C" />
+                    <path d="M127.961 312.187L126.386 314.107V412.306L127.961 416.905L255.999 236.587L127.961 312.187Z" fill="#3C3C3B" />
+                    <path d="M127.962 416.905V312.187L0 236.587L127.962 416.905Z" fill="#8C8C8C" />
+                    <path d="M127.961 287.958L255.923 212.32L127.961 154.159V287.958Z" fill="#141414" />
+                    <path d="M0.001 212.32L127.962 287.958V154.159L0.001 212.32Z" fill="#393939" />
+                  </svg>
+                </div>
+                {/* Base */}
+                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center" title="Base">
+                  <svg width="14" height="14" viewBox="0 0 111 111" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M54.921 110.034C85.359 110.034 110.034 85.402 110.034 55.017C110.034 24.6319 85.359 0 54.921 0C26.0432 0 2.35281 22.1714 0 50.3923H72.8467V59.6416H0C2.35281 87.8625 26.0432 110.034 54.921 110.034Z" fill="white" />
+                  </svg>
+                </div>
+                {/* Polygon */}
+                <div className="w-7 h-7 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center" title="Polygon">
+                  <svg width="14" height="14" viewBox="0 0 38 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M28.5 12.3C27.9 11.9 27.1 11.9 26.4 12.3L21.1 15.4L17.5 17.4L12.3 20.5C11.7 20.9 10.9 20.9 10.2 20.5L6.1 18.1C5.5 17.7 5.1 17 5.1 16.3V11.5C5.1 10.8 5.4 10.1 6.1 9.7L10.1 7.4C10.7 7 11.5 7 12.2 7.4L16.2 9.7C16.8 10.1 17.2 10.8 17.2 11.5V14.6L20.8 12.5V9.3C20.8 8.6 20.5 7.9 19.8 7.5L12.3 3.2C11.7 2.8 10.9 2.8 10.2 3.2L2.6 7.6C1.9 8 1.6 8.7 1.6 9.4V17.9C1.6 18.6 1.9 19.3 2.6 19.7L10.2 24C10.8 24.4 11.6 24.4 12.3 24L17.5 21L21.1 18.9L26.3 15.8C26.9 15.4 27.7 15.4 28.4 15.8L32.4 18.1C33 18.5 33.4 19.2 33.4 19.9V24.7C33.4 25.4 33.1 26.1 32.4 26.5L28.5 28.8C27.9 29.2 27.1 29.2 26.4 28.8L22.4 26.5C21.8 26.1 21.4 25.4 21.4 24.7V21.7L17.8 23.8V26.9C17.8 27.6 18.1 28.3 18.8 28.7L26.4 33C27 33.4 27.8 33.4 28.5 33L36.1 28.6C36.7 28.2 37.1 27.5 37.1 26.8V18.3C37.1 17.6 36.8 16.9 36.1 16.5L28.5 12.3Z" fill="#8247E5" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
