@@ -19,6 +19,13 @@ const projectSchema = {
     }
 };
 
+const projectUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 100 }],
+        description: [{ type: 'string', maxLength: 500 }]
+    }
+};
+
 // GET community spotlight
 router.get('/', async (req, res) => {
   try {
@@ -37,7 +44,7 @@ router.get('/', async (req, res) => {
 });
 
 // PUT update community spotlight (Builder Spotlight generally)
-router.put('/', protect, admin, async (req, res) => {
+router.put('/', protect, admin, validate(spotlightUpdateSchema), async (req, res) => {
   try {
     const updatedData = req.body;
 
@@ -86,7 +93,7 @@ router.post('/projects', protect, admin, validate(projectSchema), async (req, re
 });
 
 // PUT update a project in spotlight
-router.put('/projects/:id', protect, admin, async (req, res) => {
+router.put('/projects/:id', protect, admin, validate(projectUpdateSchema), async (req, res) => {
   try {
     const id = req.params.id;
     const updatedProject = req.body;

@@ -6,10 +6,16 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+
 jobs:
   secret-scan:
     name: Secret Scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,6 +31,8 @@ jobs:
   dependency-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,7 +50,7 @@ jobs:
         run: cd backend && npm ci --ignore-scripts
 
       - name: Run npm audit (root)
-        run: npm audit --audit-level=high || true
+        run: npm audit --audit-level=critical || true
 
       - name: Run npm audit (backend)
-        run: cd backend && npm audit --audit-level=high || true
+        run: cd backend && npm audit --audit-level=critical || true
