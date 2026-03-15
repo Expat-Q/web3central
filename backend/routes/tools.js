@@ -2,8 +2,42 @@ const express = require('express');
 const Tool = require('../models/Tool');
 const nodemailer = require('nodemailer');
 const { protect, admin } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
 
 const router = express.Router();
+
+const VALID_CATEGORIES = [
+  'dex', 'interoperability', 'onchainAutonomy', 'bountyHub',
+  'web3Chat', 'communityTools', 'researchFiles', 'vibeCoding', 'perps'
+];
+
+const toolSubmitSchema = {
+  body: {
+    name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+    link: ['required', 'url'],
+    category: ['required', { type: 'enum', values: VALID_CATEGORIES }],
+    description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }],
+    builderHandle: [{ type: 'string', maxLength: 50 }]
+  }
+};
+
+const toolCreateSchema = {
+  body: {
+    name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+    url: ['required', 'url'],
+    description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }]
+  },
+  params: {
+    category: ['required', { type: 'enum', values: VALID_CATEGORIES }]
+  }
+};
+
+const toolReviewSchema = {
+  body: {
+    action: ['required', { type: 'enum', values: ['accept', 'reject'] }],
+    reason: [{ type: 'string', maxLength: 500 }]
+  }
+};
 
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
@@ -68,7 +102,7 @@ router.get('/:category', async (req, res) => {
 });
 
 // POST a new tool (Public Submission)
-router.post('/submit', protect, async (req, res) => {
+router.post('/submit', protect, validate(toolSubmitSchema), async (req, res) => {
   try {
     const { name, link, category, builderHandle, description } = req.body;
 
@@ -150,7 +184,7 @@ router.post('/submit', protect, async (req, res) => {
 });
 
 // POST a new tool (Admin creation)
-router.post('/:category', protect, async (req, res) => {
+router.post('/:category', protect, admin, validate(toolCreateSchema), async (req, res) => {
   try {
     const category = req.params.category;
     const toolData = req.body;
@@ -184,7 +218,7 @@ router.post('/:category', protect, async (req, res) => {
 });
 
 // PUT review a submitted tool
-router.put('/:category/:id/review', protect, async (req, res) => {
+router.put('/:category/:id/review', protect, admin, validate(toolReviewSchema), async (req, res) => {
   try {
     const { category, id } = req.params;
     const { action, reason } = req.body; // action: 'accept' or 'reject'
@@ -267,7 +301,7 @@ router.put('/:category/:id/review', protect, async (req, res) => {
 });
 
 // PUT (update) a tool
-router.put('/:category/:id', protect, async (req, res) => {
+router.put('/:category/:id', protect, admin, async (req, res) => {
   try {
     const { category, id } = req.params;
     const updateData = req.body;
@@ -293,7 +327,7 @@ router.put('/:category/:id', protect, async (req, res) => {
 });
 
 // DELETE a tool
-router.delete('/:category/:id', protect, async (req, res) => {
+router.delete('/:category/:id', protect, admin, async (req, res) => {
   try {
     const { id } = req.params;
 
