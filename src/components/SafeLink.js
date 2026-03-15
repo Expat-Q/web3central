@@ -27,7 +27,7 @@ export default function SafeLink({ url, children, className, verified = false, h
   return (
     <>
       <a href={url} onClick={handleClick} className={className}>
-        <div className="flex items-center justify-between w-full">
+        <div className={`flex items-center w-full ${className?.includes('justify-center') ? 'justify-center gap-2' : 'justify-between'}`}>
           {children}
           {verified && (
             <span className="inline-flex items-center ml-2">
