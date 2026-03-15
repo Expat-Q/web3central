@@ -1,17 +1,20 @@
 const express = require('express');
 const { protect, admin } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
 const router = express.Router();
+
+const quizGenerateSchema = {
+    body: {
+        content: ['required', { type: 'string', minLength: 100, maxLength: 10000 }]
+    }
+};
 
 // @desc    Generate a 5-question quiz based on lesson markdown content using Gemini
 // @route   POST /api/ai/generate-quiz
 // @access  Private/Admin
-router.post('/generate-quiz', protect, async (req, res) => {
+router.post('/generate-quiz', protect, admin, validate(quizGenerateSchema), async (req, res) => {
     try {
         const { content } = req.body;
-
-        if (!content) {
-            return res.status(400).json({ success: false, message: 'Content is required.' });
-        }
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {

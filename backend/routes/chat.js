@@ -1,5 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const { validate } = require('../middleware/validate');
+
+const chatSchema = {
+    body: {
+        messages: ['required', { type: 'array', minLength: 1, maxLength: 50 }]
+    }
+};
 
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
 
@@ -106,18 +113,14 @@ async function callGemini(messages) {
 }
 
 // POST /api/chat — Grok primary, Gemini fallback
-router.post('/', async (req, res) => {
+router.post('/', validate(chatSchema), async (req, res) => {
     try {
         const { messages } = req.body;
-
-        if (!messages || !Array.isArray(messages) || messages.length === 0) {
-            return res.status(400).json({ success: false, message: 'Messages array is required' });
-        }
 
         // Sanitize messages to only include role and content
         const sanitized = messages.map(m => ({
             role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: String(m.content).slice(0, 2000) // Limit input length
+            content: String(m.content || '').slice(0, 2000)
         }));
 
         let reply;
