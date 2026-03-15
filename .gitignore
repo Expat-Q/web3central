@@ -20,3 +20,12 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Test Files
+*.test.js
+*.spec.js
+test-*.js
+backend/test-*.js
+temp-pwa/**/*.test.js
+Coverage/
+coverage/

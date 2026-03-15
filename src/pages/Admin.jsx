@@ -410,41 +410,96 @@ export default function Admin() {
                   <p className="text-slate-500 text-sm mt-1">Add your first tool using the form.</p>
                 </div>
               ) : (
-                <ul className="divide-y divide-slate-100">
-                  {activeTools.map(tool => (
-                    <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
-                            {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                              <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                                {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
-                              </span>
-                            </div>
-                          </div>
+                <div className="divide-y divide-slate-100">
+                  {CATEGORIES.map(category => {
+                    const categoryTools = activeTools.filter(t => t.category === category.id);
+                    if (categoryTools.length === 0) return null;
+                    return (
+                      <div key={category.id} className="pb-4">
+                        <div className="px-6 py-3 bg-slate-100 border-y border-slate-200 sticky top-0 z-10 backdrop-blur-sm">
+                          <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{category.name}</h3>
                         </div>
-                        <button
-                          onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
-                          title="Remove Tool"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        <ul className="divide-y divide-slate-50">
+                          {categoryTools.map(tool => (
+                            <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
+                                    {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                      <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                                        {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
+                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
+                                  title="Remove Tool"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
+                              <div className="pl-14 pr-2">
+                                <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
+                                <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                                  <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
+                                  {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
+                                </div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <div className="pl-14 pr-2">
-                        <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
-                        <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                          <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
-                          {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
-                        </div>
+                    );
+                  })}
+                  {activeTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).length > 0 && (
+                    <div className="pb-4">
+                      <div className="px-6 py-3 bg-slate-100 border-y border-slate-200 sticky top-0 z-10 backdrop-blur-sm">
+                        <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Uncategorized</h3>
                       </div>
-                    </li>
-                  ))}
-                </ul>
+                      <ul className="divide-y divide-slate-50">
+                        {activeTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).map(tool => (
+                            <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
+                                    {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
+                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                      <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                                        {tool.category?.replace(/([A-Z])/g, ' $1').trim() || 'Missing Configuration'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
+                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
+                                  title="Remove Tool"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
+                              <div className="pl-14 pr-2">
+                                <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
+                                <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                                  <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
+                                  {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
+                                </div>
+                              </div>
+                            </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -559,61 +614,136 @@ export default function Admin() {
                 <p className="text-slate-500 text-sm mt-1">No pending tool submissions to review.</p>
               </div>
             ) : (
-              <ul className="divide-y divide-slate-100">
-                {pendingTools.map(tool => (
-                  <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
-                          {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
-                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                            <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                              {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
-                            </span>
-                            <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
-                          </div>
-                        </div>
+              <div className="divide-y divide-slate-100">
+                {CATEGORIES.map(category => {
+                  const categoryTools = pendingTools.filter(t => t.category === category.id);
+                  if (categoryTools.length === 0) return null;
+                  return (
+                    <div key={category.id} className="pb-4">
+                      <div className="px-6 py-3 bg-amber-50/80 border-y border-amber-100 sticky top-0 z-10 backdrop-blur-sm">
+                        <h3 className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">{category.name}</h3>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
-                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
-                        >
-                          Reject
-                        </button>
-                      </div>
+                      <ul className="divide-y divide-slate-50">
+                        {categoryTools.map(tool => (
+                          <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
+                                  {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
+                                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                                      {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
+                                    </span>
+                                    <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
+                                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
+                                  className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
+                            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                              <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
+                              <div className="grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
+                                  <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
+                                  {tool.url ? (
+                                    <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
+                                      {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
+                                    </a>
+                                  ) : (
+                                    <span className="text-slate-400 italic">No URL provided</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-                      <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
-                          <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
-                          {tool.url ? (
-                            <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
-                              {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
-                            </a>
-                          ) : (
-                            <span className="text-slate-400 italic">No URL provided</span>
-                          )}
-                        </div>
-                      </div>
+                  );
+                })}
+                {pendingTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).length > 0 && (
+                  <div className="pb-4">
+                    <div className="px-6 py-3 bg-amber-50/80 border-y border-amber-100 sticky top-0 z-10 backdrop-blur-sm">
+                      <h3 className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Uncategorized</h3>
                     </div>
-                  </li>
-                ))}
-              </ul>
+                    <ul className="divide-y divide-slate-50">
+                      {pendingTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).map(tool => (
+                          <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
+                                  {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
+                                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
+                                      {tool.category?.replace(/([A-Z])/g, ' $1').trim() || 'Missing Configuration'}
+                                    </span>
+                                    <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
+                                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
+                                  className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
+                            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                              <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
+                              <div className="grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
+                                  <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
+                                  {tool.url ? (
+                                    <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
+                                      {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
+                                    </a>
+                                  ) : (
+                                    <span className="text-slate-400 italic">No URL provided</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

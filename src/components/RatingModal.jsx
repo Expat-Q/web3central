@@ -88,7 +88,7 @@ export default function RatingModal({ tool, onClose, onRatingSubmitted }) {
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="What do you like or dislike about this tool?"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm focus:outline-none focus:border-indigo-500 transition-colors h-32 resize-none"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-indigo-500 transition-colors h-32 resize-none"
                         />
                     </div>
 
