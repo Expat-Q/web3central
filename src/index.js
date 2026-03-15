@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import "./index.css";
 
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -14,6 +13,3 @@ root.render(
     </ErrorBoundary>
   </React.StrictMode>
 );
-
-// Register the PWA service worker
-serviceWorkerRegistration.register();
