@@ -39,6 +39,14 @@ const toolReviewSchema = {
   }
 };
 
+const toolUpdateSchema = {
+  body: {
+    name: [{ type: 'string', minLength: 2, maxLength: 100 }],
+    url: ['url'],
+    description: [{ type: 'string', minLength: 10, maxLength: 1000 }]
+  }
+};
+
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
 // expected by the frontend (e.g. { category1: [tools], category2: [tools] })
@@ -301,7 +309,7 @@ router.put('/:category/:id/review', protect, admin, validate(toolReviewSchema), 
 });
 
 // PUT (update) a tool
-router.put('/:category/:id', protect, admin, async (req, res) => {
+router.put('/:category/:id', protect, admin, validate(toolUpdateSchema), async (req, res) => {
   try {
     const { category, id } = req.params;
     const updateData = req.body;
