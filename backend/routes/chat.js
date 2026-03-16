@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { AppError, asyncHandler } = require('../errors');
 
+const MAX_ERROR_MESSAGE_LENGTH = 150;
+
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
 
 - DeFi protocols (DEXs, lending, yield farming, liquid staking)
@@ -134,7 +136,7 @@ router.post('/', asyncHandler(async (req, res) => {
             console.error('[Chat] Both AI providers failed.');
             console.error('  Gemini:', geminiErr.message);
             console.error('  Grok:', grokErr.message);
-            throw AppError.externalService('AI', `AI service unavailable. Reason: ${geminiErr.message.slice(0, 150)}`);
+            throw AppError.externalService('AI', `AI service unavailable. Reason: ${geminiErr.message.slice(0, MAX_ERROR_MESSAGE_LENGTH)}`);
         }
     }
 

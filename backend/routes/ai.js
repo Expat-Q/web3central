@@ -10,7 +10,7 @@ router.post('/generate-quiz', protect, asyncHandler(async (req, res) => {
     const { content } = req.body;
 
     if (!content) {
-        throw AppError.validation('Content is required');
+        throw AppError.validation('Lesson content is required');
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
