@@ -26,6 +26,7 @@ for (const key of REQUIRED_ENV) {
 
 const connectDB = require('./config/db');
 const { fetchLlamaData } = require('./services/llamaService');
+const { errorHandler, notFoundHandler } = require('./errors');
 
 // Route imports
 const toolsRouter = require('./routes/tools');
@@ -154,6 +155,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// 404 handler for unknown API routes
+app.use('/api/*', notFoundHandler);
+
 // --------------- Global Error Handler ---------------
 app.use((err, req, res, next) => {
   const log = req.log || logger;
@@ -166,13 +170,8 @@ app.use((err, req, res, next) => {
   
   incrementError('server');
   
-  res.status(err.status || 500).json({
-    success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'An internal error occurred' 
-      : err.message,
-    correlationId: req.correlationId
-  });
+  // Use centralized error handler for structured responses
+  errorHandler(err, req, res, next);
 });
 
 // --------------- Background Workers ---------------
