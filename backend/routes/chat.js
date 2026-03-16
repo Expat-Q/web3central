@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { AppError, asyncHandler } = require('../errors');
 const { validate } = require('../middleware/validate');
+
+const MAX_ERROR_MESSAGE_LENGTH = 150;
 
 const chatSchema = {
     body: {
@@ -112,43 +115,35 @@ async function callGemini(messages) {
     return data.candidates[0].content.parts[0].text;
 }
 
-// POST /api/chat — Grok primary, Gemini fallback
-router.post('/', validate(chatSchema), async (req, res) => {
+// POST /api/chat — Gemini primary, Grok fallback
+router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
+    const { messages } = req.body;
+
+    // Sanitize messages to only include role and content
+    const sanitized = messages.map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: String(m.content || '').slice(0, 2000)
+    }));
+
+    let reply;
+    let provider = 'gemini';
+
     try {
-        const { messages } = req.body;
-
-        // Sanitize messages to only include role and content
-        const sanitized = messages.map(m => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: String(m.content || '').slice(0, 2000)
-        }));
-
-        let reply;
-        let provider = 'gemini';
-
+        reply = await callGemini(sanitized);
+    } catch (geminiErr) {
+        console.warn('Gemini failed:', geminiErr.message);
+        provider = 'grok';
         try {
-            reply = await callGemini(sanitized);
-        } catch (geminiErr) {
-            console.warn('Gemini failed:', geminiErr.message);
-            provider = 'grok';
-            try {
-                reply = await callGrok(sanitized);
-            } catch (grokErr) {
-                console.error('[Chat] Both AI providers failed.');
-                console.error('  Gemini:', geminiErr.message);
-                console.error('  Grok:', grokErr.message);
-                return res.status(503).json({
-                    success: false,
-                    message: `AI service unavailable. Reason: ${geminiErr.message.slice(0, 150)}`
-                });
-            }
+            reply = await callGrok(sanitized);
+        } catch (grokErr) {
+            console.error('[Chat] Both AI providers failed.');
+            console.error('  Gemini:', geminiErr.message);
+            console.error('  Grok:', grokErr.message);
+            throw AppError.externalService('AI', `AI service unavailable. Reason: ${geminiErr.message.slice(0, MAX_ERROR_MESSAGE_LENGTH)}`);
         }
-
-        res.json({ success: true, reply, provider });
-    } catch (err) {
-        console.error('Chat route error:', err.message);
-        res.status(500).json({ success: false, message: 'Internal server error' });
     }
-});
+
+    res.json({ success: true, reply, provider });
+}));
 
 module.exports = router;
