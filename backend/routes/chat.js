@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { AppError, asyncHandler } = require('../errors');
 
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
 
@@ -106,46 +107,38 @@ async function callGemini(messages) {
 }
 
 // POST /api/chat — Grok primary, Gemini fallback
-router.post('/', async (req, res) => {
-    try {
-        const { messages } = req.body;
+router.post('/', asyncHandler(async (req, res) => {
+    const { messages } = req.body;
 
-        if (!messages || !Array.isArray(messages) || messages.length === 0) {
-            return res.status(400).json({ success: false, message: 'Messages array is required' });
-        }
-
-        // Sanitize messages to only include role and content
-        const sanitized = messages.map(m => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: String(m.content).slice(0, 2000) // Limit input length
-        }));
-
-        let reply;
-        let provider = 'gemini';
-
-        try {
-            reply = await callGemini(sanitized);
-        } catch (geminiErr) {
-            console.warn('Gemini failed:', geminiErr.message);
-            provider = 'grok';
-            try {
-                reply = await callGrok(sanitized);
-            } catch (grokErr) {
-                console.error('[Chat] Both AI providers failed.');
-                console.error('  Gemini:', geminiErr.message);
-                console.error('  Grok:', grokErr.message);
-                return res.status(503).json({
-                    success: false,
-                    message: `AI service unavailable. Reason: ${geminiErr.message.slice(0, 150)}`
-                });
-            }
-        }
-
-        res.json({ success: true, reply, provider });
-    } catch (err) {
-        console.error('Chat route error:', err.message);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        throw AppError.validation('Messages array is required');
     }
-});
+
+    // Sanitize messages to only include role and content
+    const sanitized = messages.map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: String(m.content).slice(0, 2000) // Limit input length
+    }));
+
+    let reply;
+    let provider = 'gemini';
+
+    try {
+        reply = await callGemini(sanitized);
+    } catch (geminiErr) {
+        console.warn('Gemini failed:', geminiErr.message);
+        provider = 'grok';
+        try {
+            reply = await callGrok(sanitized);
+        } catch (grokErr) {
+            console.error('[Chat] Both AI providers failed.');
+            console.error('  Gemini:', geminiErr.message);
+            console.error('  Grok:', grokErr.message);
+            throw AppError.externalService('AI', `AI service unavailable. Reason: ${geminiErr.message.slice(0, 150)}`);
+        }
+    }
+
+    res.json({ success: true, reply, provider });
+}));
 
 module.exports = router;
