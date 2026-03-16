@@ -3,7 +3,33 @@ const router = express.Router();
 const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
 const User = require('../models/User');
-const { protect } = require('../utils/authMiddleware');
+const { protect, admin } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+
+const lessonCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }],
+        module: ['required', { type: 'string', maxLength: 100 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }],
+        contentMarkdown: ['required', { type: 'string', minLength: 50 }]
+    }
+};
+
+const progressSchema = {
+    body: {
+        score: ['required', { type: 'number', min: 0, max: 100, integer: true }]
+    }
+};
+
+const courseCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        url: ['required', 'url'],
+        platform: [{ type: 'string', maxLength: 50 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }]
+    }
+};
 
 // @desc    Get all lessons
 // @route   GET /api/academy/lessons
@@ -20,7 +46,7 @@ router.get('/lessons', async (req, res) => {
 // @desc    Create a new lesson
 // @route   POST /api/academy
 // @access  Private/Admin
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, admin, validate(lessonCreateSchema), async (req, res) => {
     try {
         const newLesson = await Lesson.create(req.body);
         res.status(201).json({ success: true, data: newLesson });
@@ -49,7 +75,7 @@ router.get('/lessons/:slug', async (req, res) => {
 // @desc    Complete a lesson / Quiz
 // @route   POST /api/academy/progress/:id
 // @access  Private
-router.post('/progress/:id', protect, async (req, res) => {
+router.post('/progress/:id', protect, validate(progressSchema), async (req, res) => {
     try {
         const lesson = await Lesson.findOne({ id: req.params.id });
 
@@ -122,7 +148,7 @@ router.get('/courses', async (req, res) => {
 // @desc    Create a curated course
 // @route   POST /api/academy/courses
 // @access  Private (password-gated admin)
-router.post('/courses', protect, async (req, res) => {
+router.post('/courses', protect, admin, validate(courseCreateSchema), async (req, res) => {
     try {
         const course = await Course.create(req.body);
         res.status(201).json({ success: true, data: course });
@@ -133,8 +159,8 @@ router.post('/courses', protect, async (req, res) => {
 
 // @desc    Delete a curated course
 // @route   DELETE /api/academy/courses/:id
-// @access  Private
-router.delete('/courses/:id', protect, async (req, res) => {
+// @access  Private/Admin
+router.delete('/courses/:id', protect, admin, async (req, res) => {
     try {
         const course = await Course.findByIdAndDelete(req.params.id);
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
