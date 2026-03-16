@@ -1,34 +1,62 @@
 const express = require('express');
 const Spotlight = require('../models/Spotlight');
 const { protect, admin } = require('../middleware/auth');
-const { validate, schemas } = require('../middleware/validate');
+const { validate } = require('../middleware/validate');
 
 const router = express.Router();
+
+const spotlightUpdateSchema = {
+    body: {
+        builderSpotlight: [{ type: 'object' }]
+    }
+};
+
+const projectSchema = {
+    body: {
+        id: ['required', { type: 'string', minLength: 1, maxLength: 50 }],
+        name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+        description: [{ type: 'string', maxLength: 500 }]
+    }
+};
+
+const projectUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 100 }],
+        description: [{ type: 'string', maxLength: 500 }]
+    }
+};
 
 // GET community spotlight
 router.get('/', async (req, res) => {
   try {
+    // Assuming we only have one spotlight document. 
+    // If not exists, we should probably create one or return null?
+    // The seed script created one.
     const spotlight = await Spotlight.findOne();
     if (!spotlight) {
-      return res.status(404).json({ success: false, message: 'Spotlight data not found' });
+      return res.status(404).json({ error: 'Spotlight data not found' });
     }
-    res.json({ success: true, data: spotlight });
+    res.json(spotlight);
   } catch (error) {
-    console.error('Get spotlight error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to fetch spotlight' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT update community spotlight (Admin only)
-router.put('/', protect, admin, async (req, res) => {
+// PUT update community spotlight (Builder Spotlight generally)
+router.put('/', protect, admin, validate(spotlightUpdateSchema), async (req, res) => {
   try {
     const updatedData = req.body;
 
+    // Update the first found document
+    // If we want to support multiple spotlights, we'd need an ID.
+    // For now, singleton pattern.
     const spotlight = await Spotlight.findOne();
 
     if (!spotlight) {
+      // Create if not exists?
       const newSpotlight = await Spotlight.create(updatedData);
-      return res.json({ success: true, message: 'Community spotlight created', spotlight: newSpotlight });
+      return res.json({ message: 'Community spotlight created', spotlight: newSpotlight });
     }
 
     const updatedSpotlight = await Spotlight.findByIdAndUpdate(
@@ -37,89 +65,76 @@ router.put('/', protect, admin, async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    res.json({ success: true, message: 'Community spotlight updated successfully', spotlight: updatedSpotlight });
+    res.json({ message: 'Community spotlight updated successfully', spotlight: updatedSpotlight });
   } catch (error) {
-    console.error('Update spotlight error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to update spotlight' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// POST add a new project to spotlight (Admin only)
-router.post('/projects', protect, admin, validate(schemas.spotlightProject), async (req, res) => {
+// POST add a new project to spotlight
+router.post('/projects', protect, admin, validate(projectSchema), async (req, res) => {
   try {
     const newProject = req.body;
 
     const spotlight = await Spotlight.findOne();
     if (!spotlight) {
-      return res.status(404).json({ success: false, message: 'Spotlight data not found' });
+      return res.status(404).json({ error: 'Spotlight data not found' });
     }
 
     spotlight.projects.push(newProject);
     await spotlight.save();
 
-    res.status(201).json({ success: true, message: 'Project added to spotlight successfully', project: newProject });
+    res.status(201).json({ message: 'Project added to spotlight successfully', project: newProject });
   } catch (error) {
-    console.error('Add project error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to add project' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT update a project in spotlight (Admin only)
-router.put('/projects/:id', protect, admin, async (req, res) => {
+// PUT update a project in spotlight
+router.put('/projects/:id', protect, admin, validate(projectUpdateSchema), async (req, res) => {
   try {
     const id = req.params.id;
-    if (!id || id.length > 100) {
-      return res.status(400).json({ success: false, message: 'Invalid project ID' });
-    }
-
     const updatedProject = req.body;
 
     const spotlight = await Spotlight.findOne();
     if (!spotlight) {
-      return res.status(404).json({ success: false, message: 'Spotlight data not found' });
+      return res.status(404).json({ error: 'Spotlight data not found' });
     }
 
     const projectIndex = spotlight.projects.findIndex(project => project.id === id);
     if (projectIndex === -1) {
-      return res.status(404).json({ success: false, message: 'Project not found' });
+      return res.status(404).json({ error: 'Project not found' });
     }
 
     spotlight.projects[projectIndex] = { ...spotlight.projects[projectIndex].toObject(), ...updatedProject };
     await spotlight.save();
 
-    res.json({ success: true, message: 'Project updated successfully', project: spotlight.projects[projectIndex] });
+    res.json({ message: 'Project updated successfully', project: spotlight.projects[projectIndex] });
   } catch (error) {
-    console.error('Update project error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to update project' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// DELETE a project from spotlight (Admin only)
+// DELETE a project from spotlight
 router.delete('/projects/:id', protect, admin, async (req, res) => {
   try {
     const id = req.params.id;
-    if (!id || id.length > 100) {
-      return res.status(400).json({ success: false, message: 'Invalid project ID' });
-    }
 
     const spotlight = await Spotlight.findOne();
     if (!spotlight) {
-      return res.status(404).json({ success: false, message: 'Spotlight data not found' });
+      return res.status(404).json({ error: 'Spotlight data not found' });
     }
 
-    const originalLength = spotlight.projects.length;
     spotlight.projects = spotlight.projects.filter(project => project.id !== id);
-    
-    if (spotlight.projects.length === originalLength) {
-      return res.status(404).json({ success: false, message: 'Project not found' });
-    }
-
     await spotlight.save();
 
-    res.json({ success: true, message: 'Project removed from spotlight successfully' });
+    res.json({ message: 'Project removed from spotlight successfully' });
   } catch (error) {
-    console.error('Delete project error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to delete project' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

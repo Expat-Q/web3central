@@ -4,7 +4,32 @@ const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
 const User = require('../models/User');
 const { protect, admin } = require('../middleware/auth');
-const { validate, schemas } = require('../middleware/validate');
+const { validate } = require('../middleware/validate');
+
+const lessonCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }],
+        module: ['required', { type: 'string', maxLength: 100 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }],
+        contentMarkdown: ['required', { type: 'string', minLength: 50 }]
+    }
+};
+
+const progressSchema = {
+    body: {
+        score: ['required', { type: 'number', min: 0, max: 100, integer: true }]
+    }
+};
+
+const courseCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        url: ['required', 'url'],
+        platform: [{ type: 'string', maxLength: 50 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }]
+    }
+};
 
 // @desc    Get all lessons
 // @route   GET /api/academy/lessons
@@ -21,13 +46,12 @@ router.get('/lessons', async (req, res) => {
 // @desc    Create a new lesson
 // @route   POST /api/academy
 // @access  Private/Admin
-router.post('/', protect, admin, validate(schemas.lessonCreate), async (req, res) => {
+router.post('/', protect, admin, validate(lessonCreateSchema), async (req, res) => {
     try {
         const newLesson = await Lesson.create(req.body);
         res.status(201).json({ success: true, data: newLesson });
     } catch (err) {
-        console.error('Lesson creation error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to create lesson' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
@@ -51,7 +75,7 @@ router.get('/lessons/:slug', async (req, res) => {
 // @desc    Complete a lesson / Quiz
 // @route   POST /api/academy/progress/:id
 // @access  Private
-router.post('/progress/:id', protect, validate(schemas.lessonProgress), async (req, res) => {
+router.post('/progress/:id', protect, validate(progressSchema), async (req, res) => {
     try {
         const lesson = await Lesson.findOne({ id: req.params.id });
 
@@ -59,12 +83,8 @@ router.post('/progress/:id', protect, validate(schemas.lessonProgress), async (r
             return res.status(404).json({ success: false, message: 'Lesson not found' });
         }
 
-        const { score } = req.body;
+        const { score } = req.body; // e.g., 100 for 100%
         const user = await User.findById(req.user.id);
-        
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'User not found' });
-        }
 
         if (!user.learningProgress) {
             user.learningProgress = new Map();
@@ -101,11 +121,11 @@ router.post('/progress/:id', protect, validate(schemas.lessonProgress), async (r
             passed,
             xpGained,
             newTotalXP: user.totalXP,
-            newRank: user.rank
+            newRank: user.rank,
+            user
         });
     } catch (err) {
-        console.error('Progress update error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to update progress' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
@@ -127,28 +147,26 @@ router.get('/courses', async (req, res) => {
 
 // @desc    Create a curated course
 // @route   POST /api/academy/courses
-// @access  Private/Admin
-router.post('/courses', protect, admin, validate(schemas.courseCreate), async (req, res) => {
+// @access  Private (password-gated admin)
+router.post('/courses', protect, admin, validate(courseCreateSchema), async (req, res) => {
     try {
         const course = await Course.create(req.body);
         res.status(201).json({ success: true, data: course });
     } catch (err) {
-        console.error('Course creation error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to create course' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
 // @desc    Delete a curated course
 // @route   DELETE /api/academy/courses/:id
 // @access  Private/Admin
-router.delete('/courses/:id', protect, admin, validate(schemas.idParam), async (req, res) => {
+router.delete('/courses/:id', protect, admin, async (req, res) => {
     try {
         const course = await Course.findByIdAndDelete(req.params.id);
-        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+        if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
         res.status(200).json({ success: true, message: 'Course deleted' });
     } catch (err) {
-        console.error('Course deletion error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to delete course' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
