@@ -1,0 +1,13 @@
+[dotenv@17.2.3] injecting env (18) from .env -- tip: ΓÜÖ∩╕Å  write to custom object with { processEnv: myObject }
+Server running in development mode on port 5000
+Starting initial DeFiLlama sync...
+--- DeFiLlama Sync Started ---
+MongoDB Connected: ac-fkcsn5t-shard-00-00.zxgqkbg.mongodb.net
+DeFiLlama protocols: 7199
+Volume entries: 2007
+Local tools: 92
+Token data fetched for 40 coins
+--- Sync Complete ---
+Matched: 53 / 92
+Total Updated: 53
+Unmatched (39): Wormhole, Stargate, Relay, Hyperlane, LayerSwap, Gas.zip, 0x, Matcha, Kamino Finance, Test Tool, Wallchain, Xeet, Bantr, Galxe Starboard, Cookie, Rollbit Perps, Elsa, Warden Protocol, Magic Newton, Anti Drain Tool by @zun2025, Revoke Delegation Tool by @zun2025, Tenderly, Undrained Asset Recovery from a compromised wallet, Web3 Toolkits by 0xMoei, Gomtu, Lunar Strategy, Kaito Radar, Blix Editor, TestTool, Base Sport Fantasy, Moderation Test Tool, Anti Drain extension., Time Travel (Extension), Seed Phrase Recovery Tool, Sol Incinerator, Twitter interaction circle, Sol wallet cleaner( Claim your sol), Twitter Video Downloader, Rapid Bridge

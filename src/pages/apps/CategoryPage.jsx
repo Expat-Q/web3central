@@ -292,16 +292,24 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-100 transition-all duration-300 p-4 flex flex-col gap-3 h-full">
           {/* Icon + Verified */}
           <div className="flex items-start justify-between">
-            <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 p-2 shadow-sm">
-                <ToolLogo tool={app} />
-              </div>
-              {app.verified && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
-                  <ShieldCheck size={8} className="text-white" />
-                </div>
-              )}
-            </div>
+            {(() => {
+              const twUrl = app.twitter || app.builder?.twitter;
+              const Wrapper = twUrl ? 'a' : 'div';
+              const wrapperProps = twUrl ? { href: twUrl, target: '_blank', rel: 'noreferrer', title: "Visit X Profile" } : {};
+              
+              return (
+                <Wrapper {...wrapperProps} className="relative block group/logo">
+                  <div className={`w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 p-2 shadow-sm ${twUrl ? 'group-hover/logo:border-purple-300 group-hover/logo:shadow-md transition-all' : ''}`}>
+                    <ToolLogo tool={app} />
+                  </div>
+                  {app.verified && (
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
+                      <ShieldCheck size={8} className="text-white" />
+                    </div>
+                  )}
+                </Wrapper>
+              );
+            })()}
             <button
               onClick={() => {
                 if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); return; }

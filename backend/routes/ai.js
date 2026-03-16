@@ -1,24 +1,27 @@
 const express = require('express');
 const { protect, admin } = require('../middleware/auth');
 const { AppError, asyncHandler } = require('../errors');
+const { validate } = require('../middleware/validate');
 const router = express.Router();
+
+const quizGenerateSchema = {
+    body: {
+        content: ['required', { type: 'string', minLength: 100, maxLength: 10000 }]
+    }
+};
 
 // @desc    Generate a 5-question quiz based on lesson markdown content using Gemini
 // @route   POST /api/ai/generate-quiz
 // @access  Private/Admin
-router.post('/generate-quiz', protect, asyncHandler(async (req, res) => {
+router.post('/generate-quiz', protect, admin, validate(quizGenerateSchema), asyncHandler(async (req, res) => {
     const { content } = req.body;
-
-    if (!content) {
-        throw AppError.validation('Lesson content is required');
-    }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         throw AppError.externalService('Gemini', 'GEMINI_API_KEY not configured on server');
     }
 
-        const prompt = `You are an expert quiz generator for a Web3 education platform. Based ONLY on the lesson content below, generate exactly 5 multiple-choice questions that test the reader's understanding of the material.
+    const prompt = `You are an expert quiz generator for a Web3 education platform. Based ONLY on the lesson content below, generate exactly 5 multiple-choice questions that test the reader's understanding of the material.
 
 RULES:
 - Each question MUST be directly answerable from the provided content
