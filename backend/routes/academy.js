@@ -3,7 +3,8 @@ const router = express.Router();
 const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
 const User = require('../models/User');
-const { protect } = require('../utils/authMiddleware');
+const { protect, admin } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 // @desc    Get all lessons
 // @route   GET /api/academy/lessons
@@ -20,12 +21,13 @@ router.get('/lessons', async (req, res) => {
 // @desc    Create a new lesson
 // @route   POST /api/academy
 // @access  Private/Admin
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, admin, validate(schemas.lessonCreate), async (req, res) => {
     try {
         const newLesson = await Lesson.create(req.body);
         res.status(201).json({ success: true, data: newLesson });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Lesson creation error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to create lesson' });
     }
 });
 
@@ -49,7 +51,7 @@ router.get('/lessons/:slug', async (req, res) => {
 // @desc    Complete a lesson / Quiz
 // @route   POST /api/academy/progress/:id
 // @access  Private
-router.post('/progress/:id', protect, async (req, res) => {
+router.post('/progress/:id', protect, validate(schemas.lessonProgress), async (req, res) => {
     try {
         const lesson = await Lesson.findOne({ id: req.params.id });
 
@@ -57,8 +59,12 @@ router.post('/progress/:id', protect, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Lesson not found' });
         }
 
-        const { score } = req.body; // e.g., 100 for 100%
+        const { score } = req.body;
         const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found' });
+        }
 
         if (!user.learningProgress) {
             user.learningProgress = new Map();
@@ -95,11 +101,11 @@ router.post('/progress/:id', protect, async (req, res) => {
             passed,
             xpGained,
             newTotalXP: user.totalXP,
-            newRank: user.rank,
-            user
+            newRank: user.rank
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Progress update error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to update progress' });
     }
 });
 
@@ -121,26 +127,28 @@ router.get('/courses', async (req, res) => {
 
 // @desc    Create a curated course
 // @route   POST /api/academy/courses
-// @access  Private (password-gated admin)
-router.post('/courses', protect, async (req, res) => {
+// @access  Private/Admin
+router.post('/courses', protect, admin, validate(schemas.courseCreate), async (req, res) => {
     try {
         const course = await Course.create(req.body);
         res.status(201).json({ success: true, data: course });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Course creation error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to create course' });
     }
 });
 
 // @desc    Delete a curated course
 // @route   DELETE /api/academy/courses/:id
-// @access  Private
-router.delete('/courses/:id', protect, async (req, res) => {
+// @access  Private/Admin
+router.delete('/courses/:id', protect, admin, validate(schemas.idParam), async (req, res) => {
     try {
         const course = await Course.findByIdAndDelete(req.params.id);
-        if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
         res.status(200).json({ success: true, message: 'Course deleted' });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Course deletion error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to delete course' });
     }
 });
 

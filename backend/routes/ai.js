@@ -1,21 +1,18 @@
 const express = require('express');
 const { protect, admin } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 const router = express.Router();
 
 // @desc    Generate a 5-question quiz based on lesson markdown content using Gemini
 // @route   POST /api/ai/generate-quiz
 // @access  Private/Admin
-router.post('/generate-quiz', protect, async (req, res) => {
+router.post('/generate-quiz', protect, admin, validate(schemas.generateQuiz), async (req, res) => {
     try {
         const { content } = req.body;
 
-        if (!content) {
-            return res.status(400).json({ success: false, message: 'Content is required.' });
-        }
-
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            return res.status(500).json({ success: false, message: 'GEMINI_API_KEY not configured on server.' });
+            return res.status(503).json({ success: false, message: 'AI service not configured' });
         }
 
         const prompt = `You are an expert quiz generator for a Web3 education platform. Based ONLY on the lesson content below, generate exactly 5 multiple-choice questions that test the reader's understanding of the material.
@@ -55,37 +52,42 @@ ${content.substring(0, 6000)}`;
         );
 
         if (!response.ok) {
-            const errBody = await response.text();
-            console.error(`[Gemini Quiz] HTTP ${response.status}:`, errBody);
-            return res.status(500).json({ success: false, message: `Gemini API error: ${response.status}` });
+            console.error(`[Gemini Quiz] HTTP ${response.status}`);
+            return res.status(503).json({ success: false, message: 'AI service temporarily unavailable' });
         }
 
         const data = await response.json();
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!rawText) {
-            return res.status(500).json({ success: false, message: 'No response from Gemini API.' });
+            return res.status(503).json({ success: false, message: 'AI service returned empty response' });
         }
 
         // Strip any markdown code fences Gemini might add
         const cleanedText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const quiz = JSON.parse(cleanedText);
+        
+        let quiz;
+        try {
+            quiz = JSON.parse(cleanedText);
+        } catch {
+            return res.status(500).json({ success: false, message: 'AI returned invalid quiz format' });
+        }
 
         // Validate the schema
         if (!Array.isArray(quiz) || quiz.length === 0) {
-            return res.status(500).json({ success: false, message: 'Gemini returned invalid quiz format.' });
+            return res.status(500).json({ success: false, message: 'AI returned invalid quiz format' });
         }
 
         for (const q of quiz) {
             if (!q.questionText || !Array.isArray(q.options) || q.options.length !== 4 || typeof q.correctAnswerIndex !== 'number') {
-                return res.status(500).json({ success: false, message: 'One or more questions have invalid format.' });
+                return res.status(500).json({ success: false, message: 'One or more questions have invalid format' });
             }
         }
 
         res.json({ success: true, quiz });
     } catch (error) {
-        console.error('AI Quiz Generation Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to generate quiz. ' + error.message });
+        console.error('AI Quiz Generation Error:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to generate quiz' });
     }
 });
 
