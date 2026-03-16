@@ -3,16 +3,39 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
-const { validate, schemas } = require('../middleware/validate');
+const { validate } = require('../middleware/validate');
+
+const registerSchema = {
+    body: {
+        name: ['required', { type: 'string', minLength: 2, maxLength: 50 }],
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 6, maxLength: 100 }]
+    }
+};
+
+const loginSchema = {
+    body: {
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 1 }]
+    }
+};
+
+const profileUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 50 }],
+        bio: [{ type: 'string', maxLength: 500 }],
+        twitter: [{ type: 'string', maxLength: 50 }]
+    }
+};
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', validate(schemas.register), async (req, res) => {
+router.post('/register', validate(registerSchema), async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        let user = await User.findOne({ email: email.toLowerCase() });
+        let user = await User.findOne({ email });
 
         if (user) {
             return res.status(400).json({ success: false, message: 'User already exists' });
@@ -20,14 +43,13 @@ router.post('/register', validate(schemas.register), async (req, res) => {
 
         user = await User.create({
             name,
-            email: email.toLowerCase(),
+            email,
             password
         });
 
         sendTokenResponse(user, 201, res);
     } catch (err) {
-        console.error('Registration error:', err.message);
-        res.status(500).json({ success: false, message: 'Registration failed' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
@@ -95,12 +117,12 @@ const handleOAuthSuccess = (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', validate(schemas.login), async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
 
     try {
         // Check for user
-        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+        const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -115,8 +137,7 @@ router.post('/login', validate(schemas.login), async (req, res) => {
 
         sendTokenResponse(user, 200, res);
     } catch (err) {
-        console.error('Login error:', err.message);
-        res.status(500).json({ success: false, message: 'Login failed' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
@@ -159,28 +180,20 @@ const sendTokenResponse = (user, statusCode, res) => {
 router.get('/me', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'User not found' });
-        }
         res.status(200).json({
             success: true,
             user
         });
     } catch (err) {
-        console.error('Get user error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to get user data' });
+        res.status(401).json({ success: false, message: 'Not authorized' });
     }
 });
 
 // Update Profile details
-router.put('/profile', protect, validate(schemas.profileUpdate), async (req, res) => {
+router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) => {
     try {
         const { bio, twitter, name } = req.body;
         const user = await User.findById(req.user.id);
-
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'User not found' });
-        }
 
         if (bio !== undefined) user.bio = bio;
         if (twitter !== undefined) user.twitter = twitter;
@@ -188,9 +201,8 @@ router.put('/profile', protect, validate(schemas.profileUpdate), async (req, res
 
         await user.save();
         res.status(200).json({ success: true, user });
-    } catch (err) {
-        console.error('Profile update error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to update profile' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to update profile' });
     }
 });
 

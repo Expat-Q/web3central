@@ -9,17 +9,24 @@ const mongoose = require('mongoose');
 // Load environment variables FIRST — before anything else
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+// Observability imports
+const { logger } = require('./lib/logger');
+const { correlationMiddleware } = require('./middleware/correlation');
+const { requestLogger } = require('./middleware/requestLogger');
+const { metricsMiddleware, getMetricsSummary, incrementError } = require('./lib/metrics');
+
 // Validate required env vars at startup
 const REQUIRED_ENV = ['MONGODB_URI', 'JWT_SECRET'];
 for (const key of REQUIRED_ENV) {
   if (!process.env[key]) {
-    console.error(`FATAL: Missing required environment variable: ${key}`);
+    logger.error('Missing required environment variable', { key });
     process.exit(1);
   }
 }
 
 const connectDB = require('./config/db');
 const { fetchLlamaData } = require('./services/llamaService');
+const { errorHandler, notFoundHandler } = require('./errors');
 
 // Route imports
 const toolsRouter = require('./routes/tools');
@@ -105,15 +112,29 @@ app.use(cors({
 // Body parser with size limit to prevent payload attacks
 app.use(express.json({ limit: '10kb' }));
 
+// --------------- Observability Middleware ---------------
+app.use(correlationMiddleware);
+app.use(metricsMiddleware);
+app.use(requestLogger);
+
 // --------------- API Routes ---------------
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'Backend is live',
-    version: '1.0.2',
+    version: '1.0.3',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV,
-    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    correlationId: req.correlationId
+  });
+});
+
+app.get('/api/metrics', (req, res) => {
+  const metrics = getMetricsSummary();
+  res.json({
+    success: true,
+    metrics
   });
 });
 
@@ -134,13 +155,23 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// 404 handler for unknown API routes
+app.use('/api/*', notFoundHandler);
+
 // --------------- Global Error Handler ---------------
 app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err.message);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message // Temporarily showing error message in prod for debugging
+  const log = req.log || logger;
+  log.error('Unhandled Error', {
+    error: err,
+    correlationId: req.correlationId,
+    route: req.path,
+    method: req.method
   });
+  
+  incrementError('server');
+  
+  // Use centralized error handler for structured responses
+  errorHandler(err, req, res, next);
 });
 
 // --------------- Background Workers ---------------
@@ -151,24 +182,30 @@ setInterval(async () => {
   try {
     await fetchLlamaData();
   } catch (err) {
-    console.error('Scheduled DeFiLlama sync failed:', err.message);
+    logger.error('Scheduled DeFiLlama sync failed', { error: err });
+    incrementError('transaction');
   }
 }, SYNC_INTERVAL);
 
 // Initial Sync on Boot
 setTimeout(async () => {
   try {
-    console.log('Starting initial DeFiLlama sync...');
+    logger.info('Starting initial DeFiLlama sync');
     await fetchLlamaData();
+    logger.info('Initial DeFiLlama sync completed');
   } catch (err) {
-    console.error('Initial DeFiLlama sync failed:', err.message);
+    logger.error('Initial DeFiLlama sync failed', { error: err });
+    incrementError('transaction');
   }
 }, 5000);
 
 // Start server only if running directly
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    logger.info('Server started', {
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development'
+    });
   });
 }
 

@@ -3,34 +3,37 @@ const router = express.Router();
 const Rating = require('../models/Rating');
 const Tool = require('../models/Tool');
 const { protect } = require('../middleware/auth');
-const { validate, schemas } = require('../middleware/validate');
+const { validate } = require('../middleware/validate');
+
+const ratingSchema = {
+    body: {
+        score: ['required', { type: 'number', min: 1, max: 5, integer: true }],
+        comment: [{ type: 'string', maxLength: 1000 }]
+    },
+    params: {
+        toolId: ['required', { type: 'string', minLength: 1, maxLength: 100 }]
+    }
+};
 
 // @desc    Get ratings for a specific tool
 // @route   GET /api/ratings/:toolId
 // @access  Public
 router.get('/:toolId', async (req, res) => {
     try {
-        // Basic validation for toolId
-        const toolId = req.params.toolId;
-        if (!toolId || toolId.length > 100) {
-            return res.status(400).json({ success: false, message: 'Invalid tool ID' });
-        }
-
-        const ratings = await Rating.find({ tool: toolId })
+        const ratings = await Rating.find({ tool: req.params.toolId })
             .populate('user', 'name')
             .sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, count: ratings.length, data: ratings });
     } catch (err) {
-        console.error('Get ratings error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to fetch ratings' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
 // @desc    Add or update rating for a tool
 // @route   POST /api/ratings/:toolId
 // @access  Private
-router.post('/:toolId', protect, validate(schemas.rating), async (req, res) => {
+router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
     try {
         const { score, comment } = req.body;
         const toolId = req.params.toolId;
@@ -69,8 +72,7 @@ router.post('/:toolId', protect, validate(schemas.rating), async (req, res) => {
 
         res.status(200).json({ success: true, data: rating, toolAvg: tool.rating });
     } catch (err) {
-        console.error('Rating submission error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to submit rating' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 

@@ -2,9 +2,50 @@ const express = require('express');
 const Tool = require('../models/Tool');
 const nodemailer = require('nodemailer');
 const { protect, admin } = require('../middleware/auth');
-const { validate, schemas, sanitizeString } = require('../middleware/validate');
+const { validate } = require('../middleware/validate');
 
 const router = express.Router();
+
+const VALID_CATEGORIES = [
+  'dex', 'interoperability', 'onchainAutonomy', 'bountyHub',
+  'web3Chat', 'communityTools', 'researchFiles', 'vibeCoding', 'perps'
+];
+
+const toolSubmitSchema = {
+  body: {
+    name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+    link: ['required', 'url'],
+    category: ['required', { type: 'enum', values: VALID_CATEGORIES }],
+    description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }],
+    builderHandle: [{ type: 'string', maxLength: 50 }]
+  }
+};
+
+const toolCreateSchema = {
+  body: {
+    name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+    url: ['required', 'url'],
+    description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }]
+  },
+  params: {
+    category: ['required', { type: 'enum', values: VALID_CATEGORIES }]
+  }
+};
+
+const toolReviewSchema = {
+  body: {
+    action: ['required', { type: 'enum', values: ['accept', 'reject'] }],
+    reason: [{ type: 'string', maxLength: 500 }]
+  }
+};
+
+const toolUpdateSchema = {
+  body: {
+    name: [{ type: 'string', minLength: 2, maxLength: 100 }],
+    url: ['url'],
+    description: [{ type: 'string', minLength: 10, maxLength: 1000 }]
+  }
+};
 
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
@@ -69,17 +110,17 @@ router.get('/:category', async (req, res) => {
 });
 
 // POST a new tool (Public Submission)
-router.post('/submit', protect, validate(schemas.toolSubmit), async (req, res) => {
+router.post('/submit', protect, validate(toolSubmitSchema), async (req, res) => {
   try {
     const { name, link, category, builderHandle, description } = req.body;
 
-    // Generate a slug-like ID from the name (sanitized)
+    // Generate a slug-like ID from the name
     const toolId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     // Check if ID already exists
     const existingTool = await Tool.findOne({ id: toolId });
     if (existingTool) {
-      return res.status(400).json({ success: false, message: 'A tool with a similar name already exists.' });
+      return res.status(400).json({ error: 'A tool with a similar name already exists.' });
     }
 
     const newTool = await Tool.create({
@@ -97,6 +138,7 @@ router.post('/submit', protect, validate(schemas.toolSubmit), async (req, res) =
       verified: false
     });
 
+    // Send email notification to project mail
     // Send email notification to admin
     try {
       if (process.env.SMTP_USER && process.env.SMTP_PASS) {
@@ -108,30 +150,23 @@ router.post('/submit', protect, validate(schemas.toolSubmit), async (req, res) =
           }
         });
 
-        // Sanitize values for email to prevent injection
-        const safeName = sanitizeString(name, { maxLength: 100 });
-        const safeCategory = sanitizeString(category, { maxLength: 50 });
-        const safeBuilder = sanitizeString(builderHandle || 'Anonymous', { maxLength: 100 });
-        const safeLink = sanitizeString(link, { maxLength: 500 });
-        const safeDesc = sanitizeString(description || '', { maxLength: 500 });
-
         await transporter.sendMail({
           from: `"Web3Central" <${process.env.SMTP_USER}>`,
           to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
-          subject: `New Tool Submission: ${safeName}`,
+          subject: `🔧 New Tool Submission: ${name}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="background: linear-gradient(135deg, #1e293b, #312e81); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-                <h2 style="color: white; margin: 0;">New Tool Submission</h2>
+                <h2 style="color: white; margin: 0;">🔧 New Tool Submission</h2>
                 <p style="color: #a5b4fc; margin: 8px 0 0;">Pending your review on Web3Central</p>
               </div>
               <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-radius: 0 0 16px 16px;">
                 <table style="width: 100%; border-collapse: collapse;">
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Tool Name</td><td style="padding: 8px 0;">${safeName}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Category</td><td style="padding: 8px 0;">${safeCategory}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Builder</td><td style="padding: 8px 0;">${safeBuilder}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">URL</td><td style="padding: 8px 0;"><a href="${safeLink}" style="color: #4f46e5;">${safeLink}</a></td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Description</td><td style="padding: 8px 0;">${safeDesc}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Tool Name</td><td style="padding: 8px 0;">${name}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Category</td><td style="padding: 8px 0;">${category}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Builder</td><td style="padding: 8px 0;">${builderHandle || 'Anonymous'}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">URL</td><td style="padding: 8px 0;"><a href="${link}" style="color: #4f46e5;">${link}</a></td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Description</td><td style="padding: 8px 0;">${description}</td></tr>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
                   <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Review in Admin Panel</a>
@@ -140,29 +175,33 @@ router.post('/submit', protect, validate(schemas.toolSubmit), async (req, res) =
             </div>
           `
         });
+        console.log(`Submission notification sent to ${process.env.ADMIN_EMAIL || process.env.SMTP_USER}`);
+      } else {
+        console.log('Email not configured (SMTP_USER/SMTP_PASS missing). Skipping notification.');
       }
     } catch (emailErr) {
       console.error("Failed to send notification email:", emailErr.message);
+      // Tool was still saved successfully, so we don't fail the request
     }
 
-    res.status(201).json({ success: true, message: 'Tool submitted successfully and is pending review.', tool: newTool });
+    res.status(201).json({ message: 'Tool submitted successfully and is pending review.', tool: newTool });
   } catch (error) {
-    console.error('Tool submission error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to submit tool' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
 // POST a new tool (Admin creation)
-router.post('/:category', protect, admin, validate(schemas.toolCreate), async (req, res) => {
+router.post('/:category', protect, admin, validate(toolCreateSchema), async (req, res) => {
   try {
     const category = req.params.category;
-    const toolData = { ...req.body };
+    const toolData = req.body;
 
     // Ensure category matches param
     toolData.category = category;
 
     // Auto-generate missing required fields from Admin UI payload
-    if (!toolData.id && toolData.name) {
+    if (!toolData.id) {
       toolData.id = toolData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
     if (!toolData.builder) {
@@ -175,32 +214,34 @@ router.post('/:category', protect, admin, validate(schemas.toolCreate), async (r
     // Check if ID exists
     const existingTool = await Tool.findOne({ id: toolData.id });
     if (existingTool) {
-      return res.status(400).json({ success: false, message: 'Tool ID already exists' });
+      return res.status(400).json({ error: 'Tool ID already exists' });
     }
 
     const newTool = await Tool.create(toolData);
-    res.status(201).json({ success: true, message: 'Tool added successfully', tool: newTool });
+    res.status(201).json({ message: 'Tool added successfully', tool: newTool });
   } catch (error) {
-    console.error('Tool creation error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to create tool' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
-// PUT review a submitted tool (Admin only)
-router.put('/:category/:id/review', protect, admin, validate(schemas.toolReview), async (req, res) => {
+// PUT review a submitted tool
+router.put('/:category/:id/review', protect, admin, validate(toolReviewSchema), async (req, res) => {
   try {
-    const { id } = req.params;
-    const { action, reason } = req.body;
+    const { category, id } = req.params;
+    const { action, reason } = req.body; // action: 'accept' or 'reject'
 
     const tool = await Tool.findOne({ id }).populate('submitter', 'name email');
     if (!tool) {
-      return res.status(404).json({ success: false, message: 'Tool not found' });
+      return res.status(404).json({ error: 'Tool not found' });
     }
 
     if (action === 'accept') {
       tool.status = 'active';
-    } else {
+    } else if (action === 'reject') {
       tool.status = 'rejected';
+    } else {
+      return res.status(400).json({ error: 'Invalid action. Use accept or reject.' });
     }
 
     await tool.save();
@@ -216,9 +257,7 @@ router.put('/:category/:id/review', protect, admin, validate(schemas.toolReview)
           }
         });
 
-        const safeName = sanitizeString(tool.name, { maxLength: 100 });
-        const safeReason = reason ? sanitizeString(reason, { maxLength: 500 }) : '';
-        const subject = action === 'accept' ? `Your tool ${safeName} has been approved!` : `Update on your tool submission: ${safeName}`;
+        const subject = action === 'accept' ? `🎉 Your tool ${tool.name} has been approved!` : `Update on your tool submission: ${tool.name}`;
 
         let htmlBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -226,21 +265,21 @@ router.put('/:category/:id/review', protect, admin, validate(schemas.toolReview)
               <h2 style="color: white; margin: 0;">Tool Submission Status Update</h2>
             </div>
             <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-radius: 0 0 16px 16px;">
-              <p>Hi ${sanitizeString(tool.submitter.name, { maxLength: 100 })},</p>
+              <p>Hi ${tool.submitter.name},</p>
         `;
 
         if (action === 'accept') {
           htmlBody += `
-              <p>Great news! Your submission for <strong>${safeName}</strong> has been reviewed and approved by our moderation team.</p>
-              <p>It is now live on the platform under the ${sanitizeString(tool.category, { maxLength: 50 })} category.</p>
+              <p>Great news! Your submission for <strong>${tool.name}</strong> has been reviewed and approved by our moderation team.</p>
+              <p>It is now live on the platform under the ${tool.category} category.</p>
               <div style="margin-top: 20px; text-align: center;">
                 <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">View the Hub</a>
               </div>
           `;
         } else {
           htmlBody += `
-              <p>Thank you for submitting <strong>${safeName}</strong> to our platform.</p>
-              <p>Unfortunately, your submission has been declined at this time. ${safeReason ? `<br><br><strong>Reason:</strong> ${safeReason}` : ''}</p>
+              <p>Thank you for submitting <strong>${tool.name}</strong> to our platform.</p>
+              <p>Unfortunately, your submission has been declined at this time. ${reason ? `<br><br><strong>Reason:</strong> ${reason}` : ''}</p>
               <p>If you have any questions or have updated your protocol, you are welcome to submit again in the future.</p>
           `;
         }
@@ -256,45 +295,46 @@ router.put('/:category/:id/review', protect, admin, validate(schemas.toolReview)
           subject: subject,
           html: htmlBody
         });
+        console.log(`Review notification sent to ${tool.submitter.email}`);
       } catch (emailErr) {
         console.error("Failed to send review notification email:", emailErr.message);
       }
     }
 
-    res.json({ success: true, message: `Tool ${action}ed successfully`, tool });
+    res.json({ message: `Tool ${action}ed successfully`, tool });
   } catch (error) {
-    console.error('Tool review error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to review tool' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// PUT (update) a tool (Admin only)
-router.put('/:category/:id', protect, admin, async (req, res) => {
+// PUT (update) a tool
+router.put('/:category/:id', protect, admin, validate(toolUpdateSchema), async (req, res) => {
   try {
-    const { id } = req.params;
+    const { category, id } = req.params;
     const updateData = req.body;
 
-    // Prevent changing critical fields
-    delete updateData._id;
+    // Prevent changing ID via update if that breaks references, generally safer to ignore ID update
+    // But here we rely on ID.
 
     const updatedTool = await Tool.findOneAndUpdate(
-      { id: id },
+      { id: id }, // Find by custom ID
       updateData,
       { new: true, runValidators: true }
     );
 
     if (!updatedTool) {
-      return res.status(404).json({ success: false, message: 'Tool not found' });
+      return res.status(404).json({ error: 'Tool not found' });
     }
 
-    res.json({ success: true, message: 'Tool updated successfully', tool: updatedTool });
+    res.json({ message: 'Tool updated successfully', tool: updatedTool });
   } catch (error) {
-    console.error('Tool update error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to update tool' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// DELETE a tool (Admin only)
+// DELETE a tool
 router.delete('/:category/:id', protect, admin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -302,13 +342,12 @@ router.delete('/:category/:id', protect, admin, async (req, res) => {
     const deletedTool = await Tool.findOneAndDelete({ id });
 
     if (!deletedTool) {
-      return res.status(404).json({ success: false, message: 'Tool not found' });
+      return res.status(404).json({ error: 'Tool not found' });
     }
 
-    res.json({ success: true, message: 'Tool deleted successfully' });
+    res.json({ message: 'Tool deleted successfully', tool: deletedTool });
   } catch (error) {
-    console.error('Tool deletion error:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to delete tool' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
