@@ -138,7 +138,6 @@ router.post('/submit', protect, validate(toolSubmitSchema), async (req, res) => 
       verified: false
     });
 
-    // Send email notification to project mail
     // Send email notification to admin
     try {
       if (process.env.SMTP_USER && process.env.SMTP_PASS) {
@@ -314,9 +313,7 @@ router.put('/:category/:id', protect, admin, validate(toolUpdateSchema), async (
     const { category, id } = req.params;
     const updateData = req.body;
 
-    // Prevent changing ID via update if that breaks references, generally safer to ignore ID update
-    // But here we rely on ID.
-
+    // Find tool by custom ID and update with validated data
     const updatedTool = await Tool.findOneAndUpdate(
       { id: id }, // Find by custom ID
       updateData,
