@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import {
   fetchStatsOverview, fetchToolsData, deleteTool, createTool,
-  generateAiQuiz, createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight,
+  createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight,
   reviewTool, fetchCuratedCourses, createCuratedCourse, deleteCuratedCourse
 } from '../services/apiService';
 
@@ -52,9 +52,10 @@ export default function Admin() {
     title: '', description: '', duration: '', xpReward: 100,
     level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations'
   });
-  const [quizPreview, setQuizPreview] = useState(null);
-  const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [manualQuizItems, setManualQuizItems] = useState([
+    { question: '', options: ['', '', '', ''], correctOptionIndex: 0 }
+  ]);
 
   // Curated Courses State
   const [curatedCourses, setCuratedCourses] = useState([]);
@@ -245,37 +246,31 @@ export default function Admin() {
   };
 
   // Academy handlers
-  const handleGenerateQuiz = async () => {
-    if (!lessonForm.content) return alert("Write some lesson content first!");
-    setGeneratingQuiz(true);
-    try {
-      const res = await generateAiQuiz(lessonForm.content);
-      if (res.success) setQuizPreview(res.quiz);
-      else alert(res.message || "Failed to generate quiz");
-    } catch (e) {
-      alert("Error generating quiz");
-    }
-    setGeneratingQuiz(false);
-  };
-
   const handlePublishLesson = async () => {
-    if (!lessonForm.title || !lessonForm.content || !quizPreview) return alert("Complete all fields and generate a quiz first.");
+    if (!lessonForm.title || !lessonForm.content) return alert("Complete all lesson content fields.");
+    
+    for (const q of manualQuizItems) {
+      if (!q.question || q.options.some(opt => !opt)) {
+        return alert("Please fill out all quiz questions and options entirely.");
+      }
+    }
+
     setPublishing(true);
     try {
       const slug = lessonForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const payload = {
         ...lessonForm,
         contentMarkdown: lessonForm.content,
-        quiz: { questions: quizPreview },
+        quiz: { questions: manualQuizItems },
         slug,
         id: slug
       };
       await createAcademyLesson(payload);
       alert("Lesson Published Successfully!");
       setLessonForm({ title: '', description: '', duration: '', xpReward: 100, level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations' });
-      setQuizPreview(null);
+      setManualQuizItems([{ question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
     } catch (e) {
-      alert("Error publishing lesson");
+      alert("Error publishing lesson: " + e.message);
     }
     setPublishing(false);
   };
@@ -753,7 +748,7 @@ export default function Admin() {
           <div className="p-6 border-b border-slate-100 bg-slate-900 flex justify-between items-center">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Database size={20} className="text-indigo-400" />
-              Academy Content Engine <span className="text-[10px] ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded">AI POWERED</span>
+              Academy Content Engine
             </h2>
           </div>
           <div className="p-8 space-y-6">
@@ -810,39 +805,96 @@ export default function Admin() {
               />
             </div>
 
-            {/* AI Quiz Gen */}
-            <div className="flex items-center justify-between p-6 bg-indigo-50 border border-indigo-100 rounded-2xl">
-              <div>
-                <h4 className="font-bold text-indigo-900">Auto-Generate Quiz</h4>
-                <p className="text-xs text-indigo-700/70 mt-1">AI-powered quiz generation from your lesson content.</p>
-              </div>
-              <button
-                onClick={handleGenerateQuiz}
-                disabled={generatingQuiz || !lessonForm.content}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md disabled:opacity-50"
-              >
-                {generatingQuiz ? 'Synthesizing...' : 'Generate AI Quiz'}
-              </button>
-            </div>
-
-            {quizPreview && (
-              <div className="space-y-4 border border-emerald-200 bg-emerald-50 p-6 rounded-2xl">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-emerald-900 flex items-center gap-2"><CheckCircle size={18} /> Quiz Payload Built</h4>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-200 px-3 py-1 rounded-full uppercase tracking-widest">Ready For Publish</span>
-                </div>
-                <pre className="text-[10px] text-emerald-800 bg-emerald-100 p-4 rounded-xl overflow-x-auto font-mono max-h-[200px] custom-scrollbar">
-                  {JSON.stringify(quizPreview, null, 2)}
-                </pre>
+            {/* Manual Quiz Configuration */}
+            <div className="space-y-4 border-t border-slate-100 pt-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                  <CheckCircle size={16} className="text-indigo-500" /> Lesson Quiz Builder
+                </h3>
                 <button
-                  onClick={handlePublishLesson}
-                  disabled={publishing}
-                  className="w-full py-4 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:-translate-y-0.5"
+                  type="button"
+                  onClick={() => setManualQuizItems([...manualQuizItems, { question: '', options: ['', '', '', ''], correctOptionIndex: 0 }])}
+                  className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1"
                 >
-                  {publishing ? 'Publishing...' : 'Publish Masterclass to DB'}
+                  <Plus size={14} /> Add Question
                 </button>
               </div>
-            )}
+
+              <div className="space-y-6">
+                {manualQuizItems.map((q, qIndex) => (
+                  <div key={qIndex} className="p-6 bg-slate-50 border border-slate-200 rounded-2xl relative shadow-sm">
+                    {manualQuizItems.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setManualQuizItems(manualQuizItems.filter((_, i) => i !== qIndex))}
+                        className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
+                        title="Delete Question"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                    
+                    <div className="space-y-5">
+                      <div className="space-y-1.5 pr-8">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Question {qIndex + 1}</label>
+                        <input
+                          type="text"
+                          value={q.question}
+                          onChange={e => {
+                            const newItems = [...manualQuizItems];
+                            newItems[qIndex].question = e.target.value;
+                            setManualQuizItems(newItems);
+                          }}
+                          className="w-full bg-white border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-bold text-slate-900"
+                          placeholder="e.g. What is a smart contract?"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Options & Correct Answer</label>
+                        <p className="text-[10px] text-slate-400 mb-2">Select the radio button next to the correct answer.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {q.options.map((opt, oIndex) => (
+                            <div key={oIndex} className={`flex items-center gap-3 p-2 rounded-xl border transition-colors ${q.correctOptionIndex === oIndex ? 'bg-indigo-50 border-indigo-200 shadow-sm' : 'bg-white border-slate-100 focus-within:border-slate-300'}`}>
+                              <input
+                                type="radio"
+                                name={`correct-${qIndex}`}
+                                checked={q.correctOptionIndex === oIndex}
+                                onChange={() => {
+                                  const newItems = [...manualQuizItems];
+                                  newItems[qIndex].correctOptionIndex = oIndex;
+                                  setManualQuizItems(newItems);
+                                }}
+                                className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 ml-2 cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={opt}
+                                onChange={e => {
+                                  const newItems = [...manualQuizItems];
+                                  newItems[qIndex].options[oIndex] = e.target.value;
+                                  setManualQuizItems(newItems);
+                                }}
+                                className={`w-full p-2 bg-transparent border-none focus:ring-0 font-medium text-sm ${q.correctOptionIndex === oIndex ? 'text-indigo-900 placeholder:text-indigo-300' : 'text-slate-700 placeholder:text-slate-300'}`}
+                                placeholder={`Option ${oIndex + 1} ${oIndex === 0 ? '(e.g. A digital agreement)' : ''}`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handlePublishLesson}
+              disabled={publishing}
+              className="w-full py-4 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:-translate-y-0.5 disabled:opacity-50"
+            >
+              {publishing ? 'Publishing...' : 'Publish Masterclass to DB'}
+            </button>
           </div>
         </div>
 
