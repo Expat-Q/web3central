@@ -3,31 +3,23 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { AppError, asyncHandler } = require('../errors');
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
-    try {
-        let user = await User.findOne({ email });
-
-        if (user) {
-            return res.status(400).json({ success: false, message: 'User already exists' });
-        }
-
-        user = await User.create({
-            name,
-            email,
-            password
-        });
-
-        sendTokenResponse(user, 201, res);
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+    if (!name || !email || !password) {
+        throw AppError.validation('Please provide name, email and password');
     }
-});
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        throw AppError.conflict('User with this email already exists');
+    }
+
+    const user = await User.create({ name, email, password });
+    sendTokenResponse(user, 201, res);
+}));
 
 const passport = require('passport');
 
@@ -90,37 +82,25 @@ const handleOAuthSuccess = (req, res) => {
     res.redirect(`${frontendUrl}/oauth/callback?token=${token}`);
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
-router.post('/login', async (req, res) => {
+router.post('/login', asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    // Validate email & password
     if (!email || !password) {
-        return res.status(400).json({ success: false, message: 'Please provide an email and password' });
+        throw AppError.validation('Please provide an email and password');
     }
 
-    try {
-        // Check for user
-        const user = await User.findOne({ email }).select('+password');
-
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-
-        // Check if password matches
-        const isMatch = await user.matchPassword(password);
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-
-        sendTokenResponse(user, 200, res);
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+        throw AppError.auth('Invalid credentials');
     }
-});
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+        throw AppError.auth('Invalid credentials');
+    }
+
+    sendTokenResponse(user, 200, res);
+}));
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -155,36 +135,28 @@ const sendTokenResponse = (user, statusCode, res) => {
         });
 };
 
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
-router.get('/me', protect, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        res.status(200).json({
-            success: true,
-            user
-        });
-    } catch (err) {
-        res.status(401).json({ success: false, message: 'Not authorized' });
+router.get('/me', protect, asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        throw AppError.notFound('User');
     }
-});
+    res.status(200).json({ success: true, user });
+}));
 
-// Update Profile details
-router.put('/profile', protect, async (req, res) => {
-    try {
-        const { bio, twitter, name } = req.body;
-        const user = await User.findById(req.user.id);
+router.put('/profile', protect, asyncHandler(async (req, res) => {
+    const { bio, twitter, name } = req.body;
+    const user = await User.findById(req.user.id);
 
-        if (bio !== undefined) user.bio = bio;
-        if (twitter !== undefined) user.twitter = twitter;
-        if (name !== undefined) user.name = name;
-
-        await user.save();
-        res.status(200).json({ success: true, user });
-    } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to update profile' });
+    if (!user) {
+        throw AppError.notFound('User');
     }
-});
+
+    if (bio !== undefined) user.bio = bio;
+    if (twitter !== undefined) user.twitter = twitter;
+    if (name !== undefined) user.name = name;
+
+    await user.save();
+    res.status(200).json({ success: true, user });
+}));
 
 module.exports = router;
