@@ -149,7 +149,7 @@ export default function Academy() {
                             Your Web3 <span className="text-purple-600">Learning Path</span>
                         </h1>
                         <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-normal leading-relaxed">
-                            From basic bridging to institutional-grade analysis. Curated courses, lessons, and quizzes all in one place.
+                            From basic bridging to institutional-grade analysis. Curated courses and interactive lessons all in one place.
                         </p>
                     </motion.div>
                 </div>

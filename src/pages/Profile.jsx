@@ -48,8 +48,7 @@ export default function Profile() {
 
     const [stats, setStats] = useState({
         completedLessons: 0,
-        totalXP: 0,
-        avgQuizScore: 0
+        totalXP: 0
     });
 
     const [myTools, setMyTools] = useState([]);
@@ -73,7 +72,6 @@ export default function Profile() {
             });
 
             let completed = 0;
-            let avgScore = 0;
 
             if (user.learningProgress) {
                 const lessons = (user.learningProgress instanceof Map)
@@ -81,15 +79,11 @@ export default function Profile() {
                     : Object.values(user.learningProgress);
 
                 completed = lessons.filter(l => l.completed).length;
-                avgScore = completed > 0
-                    ? lessons.reduce((sum, l) => sum + (l.quizScore || 0), 0) / completed
-                    : 0;
             }
 
             setStats({
                 completedLessons: completed,
-                totalXP: user.totalXP || 0,
-                avgQuizScore: Math.round(avgScore)
+                totalXP: user.totalXP || 0
             });
 
             // fetch listed tools
@@ -266,11 +260,10 @@ export default function Profile() {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-4 mb-10">
+                <div className="grid grid-cols-2 gap-4 mb-10">
                     {[
-                        { label: 'Completed', value: stats.completedLessons, icon: <BookOpen size={18} />, color: 'purple' },
-                        { label: 'Total XP', value: stats.totalXP, icon: <Award size={18} />, color: 'indigo' },
-                        { label: 'Avg. Score', value: `${stats.avgQuizScore}%`, icon: <Target size={18} />, color: 'purple' }
+                        { label: 'Lessons Completed', value: stats.completedLessons, icon: <BookOpen size={18} />, color: 'purple' },
+                        { label: 'Total XP Earned', value: stats.totalXP, icon: <Award size={18} />, color: 'indigo' }
                     ].map((stat, i) => (
                         <motion.div
                             key={i}
@@ -314,11 +307,6 @@ export default function Profile() {
                                                 </div>
                                                 <div>
                                                     <h4 className="font-medium text-sm text-gray-900 capitalize">{slug.replace(/-/g, ' ')}</h4>
-                                                    <div className="flex items-center gap-4">
-                                                        <p className="text-xs font-semibold text-gray-400 flex items-center gap-1">
-                                                            Score: <span className="text-purple-600">{progress.quizScore}%</span>
-                                                        </p>
-                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3 relative z-10">
