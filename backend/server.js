@@ -156,7 +156,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 404 handler for unknown API routes
-app.use('/api/*', notFoundHandler);
+app.use('/api/{*path}', notFoundHandler);
 
 // --------------- Global Error Handler ---------------
 app.use((err, req, res, next) => {
