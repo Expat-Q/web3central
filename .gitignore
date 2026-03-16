@@ -21,11 +21,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Test Files
-*.test.js
-*.spec.js
-test-*.js
-backend/test-*.js
-temp-pwa/**/*.test.js
-Coverage/
+# Test coverage
 coverage/
+
+# Temporary files
+*.tmp
+*.temp
