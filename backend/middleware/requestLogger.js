@@ -29,7 +29,7 @@ function requestLogger(req, res, next) {
       statusCode,
       latencyMs,
       userAgent: req.headers['user-agent'],
-      ip: req.ip || req.connection?.remoteAddress
+      ip: req.ip || req.socket?.remoteAddress
     };
 
     if (statusCode >= 500) {

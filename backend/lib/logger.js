@@ -34,7 +34,11 @@ const LOG_LEVELS = {
   error: 3
 };
 
-const currentLogLevel = LOG_LEVELS[process.env.LOG_LEVEL] ?? LOG_LEVELS.info;
+const envLogLevel = process.env.LOG_LEVEL?.toLowerCase();
+const currentLogLevel = LOG_LEVELS[envLogLevel] ?? LOG_LEVELS.info;
+if (envLogLevel && LOG_LEVELS[envLogLevel] === undefined) {
+  console.warn(`Invalid LOG_LEVEL "${process.env.LOG_LEVEL}", defaulting to "info"`);
+}
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'web3central-backend';
 const NODE_ENV = process.env.NODE_ENV || 'development';
