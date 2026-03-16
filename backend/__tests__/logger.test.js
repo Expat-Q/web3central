@@ -69,7 +69,7 @@ describe('Logger - Sensitive Data Filtering', () => {
         user: {
           name: 'John',
           password: 'secret123',
-          credentials: {
+          info: {
             token: 'abc123',
             email: 'john@example.com'
           }
@@ -80,8 +80,8 @@ describe('Logger - Sensitive Data Filtering', () => {
 
       expect(result.user.name).toBe('John');
       expect(result.user.password).toBe('[REDACTED]');
-      expect(result.user.credentials.token).toBe('[REDACTED]');
-      expect(result.user.credentials.email).toBe('john@example.com');
+      expect(result.user.info.token).toBe('[REDACTED]');
+      expect(result.user.info.email).toBe('john@example.com');
     });
 
     it('should sanitize arrays', () => {
