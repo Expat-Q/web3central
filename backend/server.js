@@ -20,6 +20,7 @@ for (const key of REQUIRED_ENV) {
 
 const connectDB = require('./config/db');
 const { fetchLlamaData } = require('./services/llamaService');
+const { errorHandler, requestIdMiddleware, notFoundHandler } = require('./errors');
 
 // Route imports
 const toolsRouter = require('./routes/tools');
@@ -105,6 +106,9 @@ app.use(cors({
 // Body parser with size limit to prevent payload attacks
 app.use(express.json({ limit: '10kb' }));
 
+// Request ID middleware for tracing
+app.use(requestIdMiddleware);
+
 // --------------- API Routes ---------------
 app.get('/api/health', (req, res) => {
   res.json({
@@ -134,14 +138,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// 404 handler for unknown API routes
+app.use('/api/*', notFoundHandler);
+
 // --------------- Global Error Handler ---------------
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err.message);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message // Temporarily showing error message in prod for debugging
-  });
-});
+app.use(errorHandler);
 
 // --------------- Background Workers ---------------
 
