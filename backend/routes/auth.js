@@ -3,15 +3,16 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { validate, schemas } = require('../middleware/validate');
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', validate(schemas.register), async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email: email.toLowerCase() });
 
         if (user) {
             return res.status(400).json({ success: false, message: 'User already exists' });
@@ -19,13 +20,14 @@ router.post('/register', async (req, res) => {
 
         user = await User.create({
             name,
-            email,
+            email: email.toLowerCase(),
             password
         });
 
         sendTokenResponse(user, 201, res);
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Registration error:', err.message);
+        res.status(500).json({ success: false, message: 'Registration failed' });
     }
 });
 
@@ -93,17 +95,12 @@ const handleOAuthSuccess = (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', async (req, res) => {
+router.post('/login', validate(schemas.login), async (req, res) => {
     const { email, password } = req.body;
-
-    // Validate email & password
-    if (!email || !password) {
-        return res.status(400).json({ success: false, message: 'Please provide an email and password' });
-    }
 
     try {
         // Check for user
-        const user = await User.findOne({ email }).select('+password');
+        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -118,7 +115,8 @@ router.post('/login', async (req, res) => {
 
         sendTokenResponse(user, 200, res);
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('Login error:', err.message);
+        res.status(500).json({ success: false, message: 'Login failed' });
     }
 });
 
@@ -161,20 +159,28 @@ const sendTokenResponse = (user, statusCode, res) => {
 router.get('/me', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found' });
+        }
         res.status(200).json({
             success: true,
             user
         });
     } catch (err) {
-        res.status(401).json({ success: false, message: 'Not authorized' });
+        console.error('Get user error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to get user data' });
     }
 });
 
 // Update Profile details
-router.put('/profile', protect, async (req, res) => {
+router.put('/profile', protect, validate(schemas.profileUpdate), async (req, res) => {
     try {
         const { bio, twitter, name } = req.body;
         const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found' });
+        }
 
         if (bio !== undefined) user.bio = bio;
         if (twitter !== undefined) user.twitter = twitter;
@@ -182,8 +188,9 @@ router.put('/profile', protect, async (req, res) => {
 
         await user.save();
         res.status(200).json({ success: true, user });
-    } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to update profile' });
+    } catch (err) {
+        console.error('Profile update error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to update profile' });
     }
 });
 
