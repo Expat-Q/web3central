@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react';
+import { ApiError, getUserFriendlyMessage } from '../lib/errors';
 
 const AuthContext = createContext();
 
@@ -10,30 +11,58 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-    // Load user from localStorage on mount
     useEffect(() => {
+        mountedRef.current = true;
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
 
         if (storedUser && token) {
-            setUser(JSON.parse(storedUser));
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+            }
         }
         setLoading(false);
+
+        return () => {
+            mountedRef.current = false;
+        };
     }, []);
 
-    // Register User
-    const register = async (userData) => {
+    const handleAuthResponse = useCallback(async (response) => {
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            const error = data?.error || {};
+            throw new ApiError(
+                error.code || 'AUTH_ERROR',
+                error.message || data.message || 'Authentication failed'
+            );
+        }
+
+        return data;
+    }, []);
+
+    const register = useCallback(async (userData) => {
+        if (!mountedRef.current) return { success: false };
+
         setLoading(true);
         setError(null);
+
         try {
-            const res = await fetch(`${API_BASE_URL}/auth/register`, {
+            const response = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
             });
 
-            const data = await res.json();
+            const data = await handleAuthResponse(response);
+
+            if (!mountedRef.current) return { success: false };
 
             if (data.success) {
                 localStorage.setItem('token', data.token);
@@ -45,25 +74,32 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: data.message };
             }
         } catch (err) {
-            setError('Server error');
-            return { success: false, message: 'Server error' };
-        } finally {
-            setLoading(false);
-        }
-    };
+            if (!mountedRef.current) return { success: false };
 
-    // Login User
-    const login = async (userData) => {
+            const message = getUserFriendlyMessage(err);
+            setError(message);
+            return { success: false, message };
+        } finally {
+            if (mountedRef.current) setLoading(false);
+        }
+    }, [handleAuthResponse]);
+
+    const login = useCallback(async (userData) => {
+        if (!mountedRef.current) return { success: false };
+
         setLoading(true);
         setError(null);
+
         try {
-            const res = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
             });
 
-            const data = await res.json();
+            const data = await handleAuthResponse(response);
+
+            if (!mountedRef.current) return { success: false };
 
             if (data.success) {
                 localStorage.setItem('token', data.token);
@@ -75,26 +111,30 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: data.message };
             }
         } catch (err) {
-            setError('Server error');
-            return { success: false, message: 'Server error' };
+            if (!mountedRef.current) return { success: false };
+
+            const message = getUserFriendlyMessage(err);
+            setError(message);
+            return { success: false, message };
         } finally {
-            setLoading(false);
+            if (mountedRef.current) setLoading(false);
         }
-    };
+    }, [handleAuthResponse]);
 
-    // OAuth Login (Initiates the redirect to the backend)
-    const oauthLogin = (provider) => {
-        // We use window.location.href because Passport OAuth requires a full browser 
-        // redirect to the provider's consent screen (Google, Discord, Twitter).
+    const oauthLogin = useCallback((provider) => {
         window.location.href = `${API_BASE_URL}/auth/${provider}`;
-    };
+    }, []);
 
-    // Logout User
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
-    };
+        setError(null);
+    }, []);
+
+    const clearError = useCallback(() => {
+        setError(null);
+    }, []);
 
     return (
         <AuthContext.Provider
@@ -105,7 +145,8 @@ export const AuthProvider = ({ children }) => {
                 register,
                 login,
                 oauthLogin,
-                logout
+                logout,
+                clearError
             }}
         >
             {children}

@@ -36,4 +36,5 @@ Coverage/
 
 # Temporary test artifacts at root level (not in __tests__ directories)
 /test-*.js
+backend/test-*.js
 /temp-pwa/**/*.test.js
