@@ -3,23 +3,55 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
-const { AppError, asyncHandler } = require('../errors');
+const { validate } = require('../middleware/validate');
 
-router.post('/register', asyncHandler(async (req, res) => {
+const registerSchema = {
+    body: {
+        name: ['required', { type: 'string', minLength: 2, maxLength: 50 }],
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 6, maxLength: 100 }]
+    }
+};
+
+const loginSchema = {
+    body: {
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 1 }]
+    }
+};
+
+const profileUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 50 }],
+        bio: [{ type: 'string', maxLength: 500 }],
+        twitter: [{ type: 'string', maxLength: 50 }]
+    }
+};
+
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+router.post('/register', validate(registerSchema), async (req, res) => {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        throw AppError.validation('Please provide name, email and password');
-    }
+    try {
+        let user = await User.findOne({ email });
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-        throw AppError.conflict('User with this email already exists');
-    }
+        if (user) {
+            return res.status(400).json({ success: false, message: 'User already exists' });
+        }
 
-    const user = await User.create({ name, email, password });
-    sendTokenResponse(user, 201, res);
-}));
+        user = await User.create({
+            name,
+            email,
+            password
+        });
+
+        sendTokenResponse(user, 201, res);
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 const passport = require('passport');
 
@@ -82,25 +114,32 @@ const handleOAuthSuccess = (req, res) => {
     res.redirect(`${frontendUrl}/oauth/callback?token=${token}`);
 };
 
-router.post('/login', asyncHandler(async (req, res) => {
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
+router.post('/login', validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        throw AppError.validation('Please provide an email and password');
-    }
+    try {
+        // Check for user
+        const user = await User.findOne({ email }).select('+password');
 
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-        throw AppError.auth('Invalid credentials');
-    }
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-        throw AppError.auth('Invalid credentials');
-    }
+        // Check if password matches
+        const isMatch = await user.matchPassword(password);
 
-    sendTokenResponse(user, 200, res);
-}));
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+
+        sendTokenResponse(user, 200, res);
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -135,28 +174,36 @@ const sendTokenResponse = (user, statusCode, res) => {
         });
 };
 
-router.get('/me', protect, asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-        throw AppError.notFound('User');
+// @desc    Get current logged in user
+// @route   GET /api/auth/me
+// @access  Private
+router.get('/me', protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } catch (err) {
+        res.status(401).json({ success: false, message: 'Not authorized' });
     }
-    res.status(200).json({ success: true, user });
-}));
+});
 
-router.put('/profile', protect, asyncHandler(async (req, res) => {
-    const { bio, twitter, name } = req.body;
-    const user = await User.findById(req.user.id);
+// Update Profile details
+router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) => {
+    try {
+        const { bio, twitter, name } = req.body;
+        const user = await User.findById(req.user.id);
 
-    if (!user) {
-        throw AppError.notFound('User');
+        if (bio !== undefined) user.bio = bio;
+        if (twitter !== undefined) user.twitter = twitter;
+        if (name !== undefined) user.name = name;
+
+        await user.save();
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to update profile' });
     }
-
-    if (bio !== undefined) user.bio = bio;
-    if (twitter !== undefined) user.twitter = twitter;
-    if (name !== undefined) user.name = name;
-
-    await user.save();
-    res.status(200).json({ success: true, user });
-}));
+});
 
 module.exports = router;

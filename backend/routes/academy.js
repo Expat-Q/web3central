@@ -3,97 +3,171 @@ const router = express.Router();
 const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
 const User = require('../models/User');
-const { protect } = require('../utils/authMiddleware');
-const { AppError, asyncHandler } = require('../errors');
+const { protect, admin } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
 
-router.get('/lessons', asyncHandler(async (req, res) => {
-    const lessons = await Lesson.find();
-    res.status(200).json({ success: true, count: lessons.length, data: lessons });
-}));
-
-router.post('/', protect, asyncHandler(async (req, res) => {
-    const newLesson = await Lesson.create(req.body);
-    res.status(201).json({ success: true, data: newLesson });
-}));
-
-router.get('/lessons/:slug', asyncHandler(async (req, res) => {
-    const lesson = await Lesson.findOne({ slug: req.params.slug });
-
-    if (!lesson) {
-        throw AppError.notFound('Lesson');
+const lessonCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        description: ['required', { type: 'string', minLength: 10, maxLength: 1000 }],
+        module: ['required', { type: 'string', maxLength: 100 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }],
+        contentMarkdown: ['required', { type: 'string', minLength: 50 }]
     }
+};
 
-    res.status(200).json({ success: true, data: lesson });
-}));
-
-router.post('/progress/:id', protect, asyncHandler(async (req, res) => {
-    const lesson = await Lesson.findOne({ id: req.params.id });
-
-    if (!lesson) {
-        throw AppError.notFound('Lesson');
+const progressSchema = {
+    body: {
+        score: ['required', { type: 'number', min: 0, max: 100, integer: true }]
     }
+};
 
-    const { score } = req.body;
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-        throw AppError.notFound('User');
+const courseCreateSchema = {
+    body: {
+        title: ['required', { type: 'string', minLength: 3, maxLength: 200 }],
+        url: ['required', 'url'],
+        platform: [{ type: 'string', maxLength: 50 }],
+        level: [{ type: 'enum', values: ['Beginner', 'Intermediate', 'Advanced'] }]
     }
+};
 
-    if (!user.learningProgress) {
-        user.learningProgress = new Map();
+// @desc    Get all lessons
+// @route   GET /api/academy/lessons
+// @access  Public
+router.get('/lessons', async (req, res) => {
+    try {
+        const lessons = await Lesson.find();
+        res.status(200).json({ success: true, count: lessons.length, data: lessons });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
+});
 
-    const existingProgress = user.learningProgress.get(lesson.id);
-    const alreadyCompleted = existingProgress?.completed;
-
-    const passed = score >= 80;
-
-    let xpGained = 0;
-    if (passed && !alreadyCompleted) {
-        xpGained = lesson.xpReward || 100;
-        user.totalXP = (user.totalXP || 0) + xpGained;
-
-        if (user.totalXP >= 1000) user.rank = 'Grandmaster';
-        else if (user.totalXP >= 500) user.rank = 'Specialist';
-        else if (user.totalXP >= 200) user.rank = 'Explorer';
-        else user.rank = 'Novice';
+// @desc    Create a new lesson
+// @route   POST /api/academy
+// @access  Private/Admin
+router.post('/', protect, admin, validate(lessonCreateSchema), async (req, res) => {
+    try {
+        const newLesson = await Lesson.create(req.body);
+        res.status(201).json({ success: true, data: newLesson });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
+});
 
-    user.learningProgress.set(lesson.id, {
-        completed: passed || alreadyCompleted,
-        quizScore: Math.max(score, existingProgress?.quizScore || 0),
-        completedAt: new Date()
-    });
+// @desc    Get single lesson
+// @route   GET /api/academy/lessons/:slug
+// @access  Public
+router.get('/lessons/:slug', async (req, res) => {
+    try {
+        const lesson = await Lesson.findOne({ slug: req.params.slug });
 
-    await user.save();
+        if (!lesson) {
+            return res.status(404).json({ success: false, message: 'Lesson not found' });
+        }
 
-    res.status(200).json({
-        success: true,
-        passed,
-        xpGained,
-        newTotalXP: user.totalXP,
-        newRank: user.rank,
-        user
-    });
-}));
-
-router.get('/courses', asyncHandler(async (req, res) => {
-    const courses = await Course.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: courses.length, data: courses });
-}));
-
-router.post('/courses', protect, asyncHandler(async (req, res) => {
-    const course = await Course.create(req.body);
-    res.status(201).json({ success: true, data: course });
-}));
-
-router.delete('/courses/:id', protect, asyncHandler(async (req, res) => {
-    const course = await Course.findByIdAndDelete(req.params.id);
-    if (!course) {
-        throw AppError.notFound('Course');
+        res.status(200).json({ success: true, data: lesson });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
-    res.status(200).json({ success: true, message: 'Course deleted' });
-}));
+});
+
+// @desc    Complete a lesson / Quiz
+// @route   POST /api/academy/progress/:id
+// @access  Private
+router.post('/progress/:id', protect, validate(progressSchema), async (req, res) => {
+    try {
+        const lesson = await Lesson.findOne({ id: req.params.id });
+
+        if (!lesson) {
+            return res.status(404).json({ success: false, message: 'Lesson not found' });
+        }
+
+        const { score } = req.body; // e.g., 100 for 100%
+        const user = await User.findById(req.user.id);
+
+        if (!user.learningProgress) {
+            user.learningProgress = new Map();
+        }
+
+        // Check if user already passed this before to prevent infinite XP farming
+        const existingProgress = user.learningProgress.get(lesson.id);
+        const alreadyCompleted = existingProgress && existingProgress.completed;
+
+        const passed = score >= 80; // 80% to pass
+
+        let xpGained = 0;
+        if (passed && !alreadyCompleted) {
+            xpGained = lesson.xpReward || 100;
+            user.totalXP = (user.totalXP || 0) + xpGained;
+
+            // Basic Rank System Thresholds
+            if (user.totalXP >= 1000) user.rank = 'Grandmaster';
+            else if (user.totalXP >= 500) user.rank = 'Specialist';
+            else if (user.totalXP >= 200) user.rank = 'Explorer';
+            else user.rank = 'Novice';
+        }
+
+        user.learningProgress.set(lesson.id, {
+            completed: passed || alreadyCompleted, // keep true if already true
+            quizScore: Math.max(score, existingProgress?.quizScore || 0), // keep highest score
+            completedAt: new Date()
+        });
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            passed,
+            xpGained,
+            newTotalXP: user.totalXP,
+            newRank: user.rank,
+            user
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ──────────────────────────────────────────
+// CURATED COURSES (3rd-party external links)
+// ──────────────────────────────────────────
+
+// @desc    Get all curated courses
+// @route   GET /api/academy/courses
+// @access  Public
+router.get('/courses', async (req, res) => {
+    try {
+        const courses = await Course.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, count: courses.length, data: courses });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Create a curated course
+// @route   POST /api/academy/courses
+// @access  Private (password-gated admin)
+router.post('/courses', protect, admin, validate(courseCreateSchema), async (req, res) => {
+    try {
+        const course = await Course.create(req.body);
+        res.status(201).json({ success: true, data: course });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Delete a curated course
+// @route   DELETE /api/academy/courses/:id
+// @access  Private/Admin
+router.delete('/courses/:id', protect, admin, async (req, res) => {
+    try {
+        const course = await Course.findByIdAndDelete(req.params.id);
+        if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        res.status(200).json({ success: true, message: 'Course deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 module.exports = router;
