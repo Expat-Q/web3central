@@ -1,8 +1,30 @@
 const express = require('express');
 const Spotlight = require('../models/Spotlight');
 const { protect, admin } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
 
 const router = express.Router();
+
+const spotlightUpdateSchema = {
+    body: {
+        builderSpotlight: [{ type: 'object' }]
+    }
+};
+
+const projectSchema = {
+    body: {
+        id: ['required', { type: 'string', minLength: 1, maxLength: 50 }],
+        name: ['required', { type: 'string', minLength: 2, maxLength: 100 }],
+        description: [{ type: 'string', maxLength: 500 }]
+    }
+};
+
+const projectUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 100 }],
+        description: [{ type: 'string', maxLength: 500 }]
+    }
+};
 
 // GET community spotlight
 router.get('/', async (req, res) => {
@@ -22,7 +44,7 @@ router.get('/', async (req, res) => {
 });
 
 // PUT update community spotlight (Builder Spotlight generally)
-router.put('/', protect, async (req, res) => {
+router.put('/', protect, admin, validate(spotlightUpdateSchema), async (req, res) => {
   try {
     const updatedData = req.body;
 
@@ -51,7 +73,7 @@ router.put('/', protect, async (req, res) => {
 });
 
 // POST add a new project to spotlight
-router.post('/projects', protect, async (req, res) => {
+router.post('/projects', protect, admin, validate(projectSchema), async (req, res) => {
   try {
     const newProject = req.body;
 
@@ -71,7 +93,7 @@ router.post('/projects', protect, async (req, res) => {
 });
 
 // PUT update a project in spotlight
-router.put('/projects/:id', protect, async (req, res) => {
+router.put('/projects/:id', protect, admin, validate(projectUpdateSchema), async (req, res) => {
   try {
     const id = req.params.id;
     const updatedProject = req.body;
@@ -97,7 +119,7 @@ router.put('/projects/:id', protect, async (req, res) => {
 });
 
 // DELETE a project from spotlight
-router.delete('/projects/:id', protect, async (req, res) => {
+router.delete('/projects/:id', protect, admin, async (req, res) => {
   try {
     const id = req.params.id;
 

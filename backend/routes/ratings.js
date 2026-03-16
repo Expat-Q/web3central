@@ -2,7 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Rating = require('../models/Rating');
 const Tool = require('../models/Tool');
-const { protect } = require('../utils/authMiddleware');
+const { protect } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+
+const ratingSchema = {
+    body: {
+        score: ['required', { type: 'number', min: 1, max: 5, integer: true }],
+        comment: [{ type: 'string', maxLength: 1000 }]
+    },
+    params: {
+        toolId: ['required', { type: 'string', minLength: 1, maxLength: 100 }]
+    }
+};
 
 // @desc    Get ratings for a specific tool
 // @route   GET /api/ratings/:toolId
@@ -22,7 +33,7 @@ router.get('/:toolId', async (req, res) => {
 // @desc    Add or update rating for a tool
 // @route   POST /api/ratings/:toolId
 // @access  Private
-router.post('/:toolId', protect, async (req, res) => {
+router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
     try {
         const { score, comment } = req.body;
         const toolId = req.params.toolId;
