@@ -77,9 +77,6 @@ export default function LessonDetail() {
             <Link to="/academy" className="text-purple-600 hover:underline">Return to Academy</Link>
         </div>
     );
-
-    const currentQ = lesson.quiz?.questions?.[currentQuestionIndex];
-
     return (
         <div className="min-h-screen pt-32 pb-32 px-6 bg-white relative overflow-x-hidden">
             {/* Background Decorative Elements */}
