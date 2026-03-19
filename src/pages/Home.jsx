@@ -79,12 +79,12 @@ export default function Home() {
   }
 
   const services = [
-    { title: "Decentralized exchanges", icon: <ArrowLeftRight className="w-6 h-6" />, desc: "Swap assets securely through top-tier peer-to-peer protocols.", path: "/apps/dex" },
-    { title: "Perpetual protocols", icon: <TrendingUp className="w-6 h-6" />, desc: "Trade with leverage on decentralized derivative platforms.", path: "/apps/perps" },
-    { title: "Interoperability bridges", icon: <Network className="w-6 h-6" />, desc: "Move your assets seamlessly across different blockchains.", path: "/apps/interoperability" },
-    { title: "Autonomous protocol", icon: <Bot className="w-6 h-6" />, desc: "Experience the power of self-governing on-chain systems.", path: "/apps/onchain-autonomy" },
-    { title: "Community tools", icon: <Users className="w-6 h-6" />, desc: "Essential utilities for decentralized collaboration and voting.", path: "/apps/community-tools" },
-    { title: "Bounty Hub", icon: <Target className="w-6 h-6" />, desc: "Discover and complete Web3 bounties to earn rewards.", path: "/apps/bounty-hub" },
+    { title: "DEX & Trading",      icon: <ArrowLeftRight className="w-6 h-6" />, desc: "Swap assets securely through top-tier peer-to-peer protocols.", path: "/apps/trading" },
+    { title: "Perpetuals",         icon: <TrendingUp className="w-6 h-6" />,      desc: "Trade with leverage on decentralized derivative platforms.",   path: "/apps/trading" },
+    { title: "Layer 2",            icon: <Network className="w-6 h-6" />,          desc: "Scale your onchain activity on Arbitrum, Optimism and Base.",  path: "/apps/l2" },
+    { title: "DeFi",               icon: <Bot className="w-6 h-6" />,              desc: "Lending, borrowing, yield strategies and stablecoin protocols.", path: "/apps/defi" },
+    { title: "Community",          icon: <Users className="w-6 h-6" />,             desc: "Essential utilities for decentralized collaboration and voting.", path: "/apps/community" },
+    { title: "Security",           icon: <Target className="w-6 h-6" />,            desc: "Protect your wallet from scams, exploits and bad contracts.",   path: "/apps/security" },
   ];
 
   const allTools = appsData ? Object.values(appsData).flat() : [];

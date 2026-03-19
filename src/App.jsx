@@ -27,6 +27,7 @@ import Interoperability from "./pages/apps/Interoperability";
 import CommunityTools from "./pages/apps/CommunityTools";
 import Web3Chat from "./pages/apps/Web3Chat";
 import BountyHub from "./pages/apps/BountyHub";
+import CategoryPage from "./pages/apps/CategoryPage";
 
 const ConditionalFooter = () => {
   const location = useLocation();
@@ -57,12 +58,15 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/oauth/callback" element={<OAuthCallback />} />
 
+              {/* Legacy category routes — redirect to new dynamic routes */}
               <Route path="/apps/dex" element={<Dex />} />
               <Route path="/apps/onchain-autonomy" element={<OnchainAutonomy />} />
               <Route path="/apps/interoperability" element={<Interoperability />} />
               <Route path="/apps/community-tools" element={<CommunityTools />} />
               <Route path="/apps/perps" element={<Web3Chat />} />
               <Route path="/apps/bounty-hub" element={<BountyHub />} />
+              {/* New dynamic category routes */}
+              <Route path="/apps/:categoryKey" element={<CategoryPage />} />
               <Route path="*" element={
                 <div className="min-h-screen flex flex-col items-center justify-center bg-white pt-20">
                   <h1 className="text-6xl font-black text-slate-900">404</h1>

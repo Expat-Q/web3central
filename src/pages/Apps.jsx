@@ -89,15 +89,28 @@ export default function Apps() {
   const [appsData, setAppsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const filters = ["All", "DEX", "Perps", "Interoperability", "Bounty Hub", "Onchain Autonomy", "Community Tools"];
+  const filters = [
+    "All",
+    "Trading", "Bridges", "DeFi", "Staking", "RWA",
+    "Security", "Analytics", "Wallets", "L2",
+    "NFT", "Gaming", "Privacy", "Predictions", "Community"
+  ];
 
   const catMap = {
-    "DEX": "dex",
-    "Perps": "perps",
-    "Interoperability": "interoperability",
-    "Bounty Hub": "bountyHub",
-    "Onchain Autonomy": "onchainAutonomy",
-    "Community Tools": "communityTools"
+    "Trading": "trading",
+    "Bridges": "bridges",
+    "DeFi": "defi",
+    "Staking": "staking",
+    "RWA": "rwa",
+    "Security": "security",
+    "Analytics": "analytics",
+    "Wallets": "wallets",
+    "L2": "l2",
+    "NFT": "nft",
+    "Gaming": "gaming",
+    "Privacy": "privacy",
+    "Predictions": "predictions",
+    "Community": "community",
   };
 
   useEffect(() => {
@@ -159,7 +172,7 @@ export default function Apps() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-5 py-2.5 rounded-[14px] text-[13px] font-bold transition-all ${filter === f ? 'bg-[#7042F8] text-white shadow-[0_4px_12px_rgba(112,66,248,0.25)]' : 'bg-[#F4F5F7] text-[#4b5563] hover:bg-[#EBECEF]'}`}
+              className={`px-5 py-2.5 rounded-[14px] text-[13px] font-bold transition-all whitespace-nowrap ${filter === f ? 'bg-[#7042F8] text-white shadow-[0_4px_12px_rgba(112,66,248,0.25)]' : 'bg-[#F4F5F7] text-[#4b5563] hover:bg-[#EBECEF]'}`}
             >
               {f}
             </button>

@@ -133,6 +133,31 @@ const scaleIn = {
   })
 };
 
+const CATEGORY_META = {
+  // --- Live categories ---
+  trading:     { title: 'Trading',           desc: 'DEX and perpetual trading protocols', color: 'purple',  comingSoon: false },
+  bridges:     { title: 'Bridges',            desc: 'Cross-chain asset transfers and messaging', color: 'blue',    comingSoon: false },
+  defi:        { title: 'DeFi',               desc: 'Lending, yield, and stablecoins',   color: 'emerald', comingSoon: false },
+  staking:     { title: 'Staking',            desc: 'Liquid staking and validator protocols', color: 'indigo',  comingSoon: false },
+  rwa:         { title: 'Real World Assets',  desc: 'Tokenized real-world assets',        color: 'amber',   comingSoon: true  },
+  security:    { title: 'Security',           desc: 'Wallet protection and scam prevention', color: 'red',     comingSoon: false },
+  analytics:   { title: 'Analytics',          desc: 'Onchain data and portfolio tracking', color: 'cyan',    comingSoon: false },
+  wallets:     { title: 'Wallets',            desc: 'Wallet tools and infrastructure',    color: 'slate',   comingSoon: false },
+  l2:          { title: 'Layer 2',            desc: 'Scaling solutions built on L1 networks', color: 'violet',  comingSoon: false },
+  nft:         { title: 'NFT',                desc: 'NFT minting, trading and management', color: 'pink',    comingSoon: false },
+  gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: true  },
+  privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: true  },
+  predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: true  },
+  community:   { title: 'Community',          desc: 'DAO tools and decentralized coordination', color: 'teal',    comingSoon: false },
+  // --- Legacy support ---
+  dex:              { title: 'DEX',                    desc: 'Decentralized exchanges',           color: 'purple',  comingSoon: false },
+  perps:            { title: 'Perpetuals',             desc: 'Derivatives and perpetual trading', color: 'purple',  comingSoon: false },
+  interoperability: { title: 'Interoperability',       desc: 'Cross-chain protocols',             color: 'blue',    comingSoon: false },
+  bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 contributions', color: 'amber',   comingSoon: false },
+  onchainAutonomy:  { title: 'Onchain Automation',     desc: 'Automated smart contract protocols', color: 'indigo',  comingSoon: false },
+  communityTools:   { title: 'Community Tools',        desc: 'DAO and coordination tools',         color: 'teal',    comingSoon: false },
+};
+
 const heroImages = {
   dex: '/images/heroes/hero-dex.png',
   perps: '/images/heroes/hero-perps.png',
@@ -140,12 +165,16 @@ const heroImages = {
   interoperability: '/images/heroes/hero-interoperability.png',
   onchainAutonomy: '/images/heroes/hero-onchain-autonomy.png',
   communityTools: '/images/heroes/hero-community-tools.png',
-  bountyHub: '/images/heroes/hero-onchain-autonomy.png', // fallback until dedicated image is generated
+  bountyHub: '/images/heroes/hero-onchain-autonomy.png',
 };
 
-export default function CategoryPage({ categoryKey: propCategoryKey, title, description }) {
+export default function CategoryPage({ categoryKey: propCategoryKey, title: propTitle, description: propDescription }) {
   const params = useParams();
   const categoryKey = propCategoryKey || params.categoryKey;
+  const meta = CATEGORY_META[categoryKey] || {};
+  const title = propTitle || meta.title || categoryKey;
+  const description = propDescription || meta.desc || '';
+  const isComingSoon = meta.comingSoon === true;
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -370,6 +399,54 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title, desc
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin" />
         <p className="text-gray-400 text-sm font-medium">Loading protocols...</p>
+      </div>
+    );
+  }
+
+  // ── Coming Soon Gate ──
+  if (isComingSoon) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        {/* Header */}
+        <div className="pt-20 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+          <div className="flex items-center gap-3">
+            <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+              <ChevronLeft size={18} />
+            </Link>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 leading-none">{title}</h1>
+              <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+            </div>
+          </div>
+        </div>
+        {/* Coming Soon Body */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-24 text-center">
+          <div className="w-24 h-24 rounded-[28px] bg-purple-50 flex items-center justify-center mb-8 border border-purple-100 shadow-inner">
+            <span className="text-5xl">🚀</span>
+          </div>
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            Coming Soon
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight">{title}</h2>
+          <p className="text-gray-500 text-base max-w-md leading-relaxed mb-10">
+            We're curating the best <strong>{title}</strong> protocols for Web3Central. Check back soon — or submit one yourself.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link
+              to="/submit-tool"
+              className="px-8 py-3.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 hover:scale-105"
+            >
+              Submit a Protocol
+            </Link>
+            <Link
+              to="/apps"
+              className="px-8 py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all"
+            >
+              Browse Other Categories
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
