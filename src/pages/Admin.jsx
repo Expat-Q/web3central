@@ -13,13 +13,24 @@ import {
 const ADMIN_PASSWORD = '213478';
 
 const CATEGORIES = [
-  { id: 'dex', name: 'Decentralized Exchanges (DEX)' },
-  { id: 'interoperability', name: 'Interoperability Bridges' },
+  { id: 'dex',             name: 'Trading — DEX' },
+  { id: 'web3Chat',        name: 'Trading — Perpetuals' },
+  { id: 'defi',            name: 'DeFi' },
+  { id: 'staking',         name: 'Staking' },
+  { id: 'interoperability',name: 'Bridges' },
+  { id: 'security',        name: 'Security' },
+  { id: 'analytics',       name: 'Analytics' },
+  { id: 'wallets',         name: 'Wallets' },
+  { id: 'l2',              name: 'Layer 2' },
+  { id: 'nft',             name: 'NFT' },
+  { id: 'gaming',          name: 'Gaming' },
+  { id: 'privacy',         name: 'Privacy' },
+  { id: 'predictions',     name: 'Predictions' },
+  { id: 'communityTools',  name: 'Community Tools' },
+  { id: 'bountyHub',       name: 'Bounty Hub' },
+  { id: 'rwa',             name: 'RWA' },
   { id: 'onchainAutonomy', name: 'Onchain Autonomy' },
-  { id: 'bountyHub', name: 'Bounty Hub' },
-  { id: 'web3Chat', name: 'Perpetual Protocols' },
-  { id: 'communityTools', name: 'Community Tools' },
-  { id: 'researchFiles', name: 'Research Platforms' },
+  { id: 'researchFiles',   name: 'Research Platforms' },
 ];
 
 export default function Admin() {
@@ -805,47 +816,6 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Builder Spotlight Editor */}
-        {spotlightData && spotlightData.builderSpotlight && (
-          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mt-8">
-            <div className="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Users size={20} className="text-indigo-500" />
-                Edit Builder Spotlight
-              </h2>
-            </div>
-            <form onSubmit={handleSpotlightUpdate} className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Builder Name</label>
-                  <input type="text" value={spotlightData.builderSpotlight.name || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, name: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Role</label>
-                  <input type="text" value={spotlightData.builderSpotlight.role || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, role: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Twitter URL</label>
-                  <input type="text" value={spotlightData.builderSpotlight.twitter || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, twitter: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Avatar Image URL</label>
-                  <input type="text" value={spotlightData.builderSpotlight.xProfileImageUrl || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, xProfileImageUrl: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Biography / Description</label>
-                <textarea rows={3} value={spotlightData.builderSpotlight.description || ''} onChange={e => setSpotlightData({ ...spotlightData, builderSpotlight: { ...spotlightData.builderSpotlight, description: e.target.value } })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium custom-scrollbar" />
-              </div>
-              <button disabled={updatingSpotlight} type="submit" className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
-                {updatingSpotlight ? 'Saving Spotlight...' : 'Publish Spotlight Update'}
-              </button>
-            </form>
-          </div>
-        )}
-
         {/* Curated Courses Manager */}
         <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mt-8">
           <div className="p-6 border-b border-slate-100 bg-purple-50/50 flex justify-between items-center">
@@ -903,26 +873,117 @@ export default function Admin() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
 
-            {curatedCourses.length > 0 && (
-              <div className="border-t border-slate-100 pt-6">
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Existing Courses</h3>
-                <ul className="space-y-3">
-                  {curatedCourses.map(course => (
-                    <li key={course._id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-900 text-sm truncate">{course.title}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{course.platform} · {course.level} · {course.isFree ? 'Free' : 'Paid'}</p>
-                      </div>
-                      <div className="flex items-center gap-3 ml-4">
-                        <a href={course.url} target="_blank" rel="noreferrer" className="text-indigo-500 hover:text-indigo-700"><ExternalLink size={15} /></a>
-                        <button onClick={() => handleDeleteCourse(course._id, course.title)} className="text-slate-400 hover:text-red-600 transition-colors"><Trash2 size={15} /></button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+        {/* ── Builder Spotlight Manager ── */}
+        <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white">
+              <Users size={18} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Builder Spotlight</h2>
+              <p className="text-sm text-slate-400">Manage the featured builder on the homepage</p>
+            </div>
+          </div>
+          <div className="p-6 space-y-6">
+            {(() => {
+              const bs = spotlightData?.[0]?.builderSpotlight || spotlightData?.builderSpotlight || {};
+              return (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setUpdatingSpotlight(true);
+                  try {
+                    const form = e.target;
+                    const featuredTools = [];
+                    for (let i = 0; i < 2; i++) {
+                      const name = form[`ft_name_${i}`]?.value;
+                      if (name) {
+                        featuredTools.push({
+                          name,
+                          description: form[`ft_desc_${i}`]?.value || '',
+                          initial: form[`ft_init_${i}`]?.value || name.charAt(0),
+                        });
+                      }
+                    }
+                    await updateCommunitySpotlight({
+                      builderSpotlight: {
+                        name: form.bs_name.value,
+                        role: form.bs_role.value,
+                        description: form.bs_description.value,
+                        story: form.bs_story.value,
+                        twitter: form.bs_twitter.value,
+                        xProfileImageUrl: form.bs_pfp.value,
+                        featuredTools,
+                      }
+                    });
+                    alert('Builder Spotlight updated!');
+                  } catch (err) {
+                    alert('Failed to update: ' + err.message);
+                  } finally {
+                    setUpdatingSpotlight(false);
+                  }
+                }} className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Builder Name</label>
+                      <input name="bs_name" defaultValue={bs.name || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Zun20" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Role / Title</label>
+                      <input name="bs_role" defaultValue={bs.role || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Security Researcher & Builder" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">X / Twitter URL</label>
+                      <input name="bs_twitter" defaultValue={bs.twitter || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://x.com/zun20" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Profile Image URL</label>
+                      <input name="bs_pfp" defaultValue={bs.xProfileImageUrl || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://..." />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Short Description</label>
+                    <textarea name="bs_description" defaultValue={bs.description || ''} rows={2} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium resize-none" placeholder="A brief tagline about the builder..." />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Story / Biography</label>
+                    <textarea name="bs_story" defaultValue={bs.story || ''} rows={6} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium resize-none" placeholder="Write the builder's full story here. This will appear when users click 'Read Their Story'..." />
+                  </div>
+
+                  {/* Featured Tools */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Featured Projects (max 2)</p>
+                    {[0, 1].map(i => {
+                      const ft = bs.featuredTools?.[i] || {};
+                      return (
+                        <div key={i} className="grid grid-cols-[60px_1fr_1fr] gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase">Initial</label>
+                            <input name={`ft_init_${i}`} defaultValue={ft.initial || ''} maxLength={3} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-center font-black text-sm" placeholder="AD" />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase">Name</label>
+                            <input name={`ft_name_${i}`} defaultValue={ft.name || ''} className="w-full bg-white border border-slate-200 p-2 rounded-lg font-medium text-sm" placeholder="Tool name" />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase">Description</label>
+                            <input name={`ft_desc_${i}`} defaultValue={ft.description || ''} className="w-full bg-white border border-slate-200 p-2 rounded-lg font-medium text-sm" placeholder="Brief description" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button type="submit" disabled={updatingSpotlight} className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
+                    {updatingSpotlight ? 'Saving...' : 'Save Spotlight'}
+                  </button>
+                </form>
+              );
+            })()}
           </div>
         </div>
 

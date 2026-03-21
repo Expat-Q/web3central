@@ -56,11 +56,40 @@ router.get('/my-tools', protect, async (req, res) => {
   }
 });
 
+// Category alias map — maps new frontend keys to old DB category values
+// If a key maps to an array, we query ALL of those DB categories
+const CATEGORY_ALIASES = {
+  trading:         ['dex', 'perps', 'trading', 'web3Chat'],
+  bridges:         ['interoperability', 'bridges'],
+  defi:            ['defi'],
+  staking:         ['staking'],
+  security:        ['security'],
+  analytics:       ['analytics'],
+  wallets:         ['wallets'],
+  l2:              ['l2'],
+  nft:             ['nft'],
+  gaming:          ['gaming'],
+  privacy:         ['privacy'],
+  predictions:     ['predictions'],
+  community:       ['communityTools', 'community'],
+  'bounty-hub':    ['bountyHub', 'bounty-hub'],
+  'rwa':           ['rwa'],
+  // Legacy keys still work directly
+  dex:             ['dex'],
+  perps:           ['perps'],
+  interoperability:['interoperability'],
+  communityTools:  ['communityTools'],
+  bountyHub:       ['bountyHub'],
+  onchainAutonomy: ['onchainAutonomy', 'onchain-autonomy'],
+  'onchain-autonomy': ['onchainAutonomy', 'onchain-autonomy'],
+};
+
 // GET tools by category
 router.get('/:category', async (req, res) => {
   try {
     const category = req.params.category;
-    const tools = await Tool.find({ category });
+    const aliases = CATEGORY_ALIASES[category] || [category];
+    const tools = await Tool.find({ category: { $in: aliases } });
     res.json(tools);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -150,7 +179,13 @@ router.post('/submit', protect, async (req, res) => {
 });
 
 // POST a new tool (Admin creation)
-router.post('/:category', protect, async (req, res) => {
+router.post('/:category', async (req, res) => {
+  // Simple admin-key gate (matches Admin page password)
+  const adminKey = req.headers['x-admin-key'];
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '213478';
+  if (adminKey !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   try {
     const category = req.params.category;
     const toolData = req.body;

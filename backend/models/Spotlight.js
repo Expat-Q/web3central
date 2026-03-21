@@ -13,6 +13,7 @@ const SpotlightSchema = new mongoose.Schema({
         name: String,
         role: String,
         description: String,
+        story: String,
         twitter: String,
         github: String,
         xProfileImageUrl: String,
