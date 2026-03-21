@@ -173,7 +173,7 @@ export default function ClaudeBot() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-sm">Web3Central AI</h3>
-                                    <p className="text-[11px] text-purple-300">AI assistant powered by Gemini</p>
+                                    <p className="text-[11px] text-purple-300">AI assistant powered by OpenAI</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function ClaudeBot() {
                                         </div>
                                         {msg.provider && (
                                             <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
-                                                via {msg.provider === 'grok' ? 'Grok' : msg.provider === 'offline-fallback' ? 'Offline Fallback' : 'Gemini'}
+                                                via {msg.provider === 'openai' ? 'OpenAI' : msg.provider === 'grok' ? 'Grok' : msg.provider === 'offline-fallback' ? 'Offline Fallback' : 'Gemini'}
                                             </div>
                                         )}
                                     </div>
