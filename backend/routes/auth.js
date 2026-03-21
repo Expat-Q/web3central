@@ -3,11 +3,35 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+
+const registerSchema = {
+    body: {
+        name: ['required', { type: 'string', minLength: 2, maxLength: 50 }],
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 6, maxLength: 100 }]
+    }
+};
+
+const loginSchema = {
+    body: {
+        email: ['required', 'email'],
+        password: ['required', { type: 'string', minLength: 1 }]
+    }
+};
+
+const profileUpdateSchema = {
+    body: {
+        name: [{ type: 'string', minLength: 2, maxLength: 50 }],
+        bio: [{ type: 'string', maxLength: 500 }],
+        twitter: [{ type: 'string', maxLength: 50 }]
+    }
+};
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', validate(registerSchema), async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
@@ -93,13 +117,8 @@ const handleOAuthSuccess = (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
-
-    // Validate email & password
-    if (!email || !password) {
-        return res.status(400).json({ success: false, message: 'Please provide an email and password' });
-    }
 
     try {
         // Check for user
@@ -171,7 +190,7 @@ router.get('/me', protect, async (req, res) => {
 });
 
 // Update Profile details
-router.put('/profile', protect, async (req, res) => {
+router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) => {
     try {
         const { bio, twitter, name } = req.body;
         const user = await User.findById(req.user.id);
