@@ -33,6 +33,16 @@ backend/insertBounties.js
 eslint_out.txt
 build_out.txt
 *.out.txt
+all_slugs.txt
+coins_response*.txt
+gecko_response*.txt
+gecko_markets.txt
+parent_*.txt
+verify_results.txt
+seed.log
+seed_error.json
+backend.log
+backend/server_error.log
 
 # ── Debug logs ────────────────────────────────────────────────────────────────
 npm-debug.log*
