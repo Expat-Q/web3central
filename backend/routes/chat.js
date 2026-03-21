@@ -42,6 +42,63 @@ Guidelines:
 - If asked about non-Web3 topics, politely redirect to Web3-related help
 - Keep responses focused and under 500 words unless a longer explanation is needed`;
 
+function buildOfflineFallbackReply(messages) {
+    const latestUserMessage = [...messages]
+        .reverse()
+        .find((m) => m.role === 'user' && m.content)?.content?.toLowerCase() || '';
+
+    if (latestUserMessage.includes('liquidity') || latestUserMessage.includes('lp')) {
+        return `DeFi liquidity provision means depositing token pairs into a protocol pool so traders can swap assets instantly.
+
+How it works:
+- You deposit tokens (e.g., ETH/USDC) into a pool
+- Traders pay swap fees when using that pool
+- You earn a share of fees proportional to your pool share
+
+Main risks:
+- Impermanent loss when token prices diverge
+- Smart contract risk
+- Pool-specific risk (oracle, governance, exploit)
+
+Quick checklist:
+- Start with blue-chip pools/protocols
+- Compare fee APR vs IL risk
+- Avoid thin-liquidity pools unless you understand volatility.`;
+    }
+
+    if (latestUserMessage.includes('dex')) {
+        return `A DEX (decentralized exchange) lets users trade directly from their wallets using smart contracts.
+
+Core model:
+- AMM DEXs (e.g., Uniswap): swaps against liquidity pools
+- Orderbook DEXs (e.g., dYdX style): bids/asks on-chain or hybrid
+
+Pros: self-custody, permissionless access.
+Tradeoffs: slippage, MEV, and gas costs depending on chain.`;
+    }
+
+    if (latestUserMessage.includes('bridge') || latestUserMessage.includes('cross-chain')) {
+        return `Cross-chain bridges move value/messages between blockchains.
+
+Typical flow:
+- Asset is locked/burned on source chain
+- Equivalent asset is minted/released on destination chain
+
+Watchouts:
+- Bridge contracts are high-value attack targets
+- Confirm canonical bridge vs third-party bridge
+- Check finality times and withdrawal assumptions.`;
+    }
+
+    return `I can help with Web3 basics right now:
+- DEXs and AMMs
+- Liquidity provision and yield
+- L2s and bridges
+- Smart contract security fundamentals
+
+Ask a specific question (e.g., “How does impermanent loss work?”) and I’ll give a concise breakdown.`;
+}
+
 // Grok (xAI) API call
 async function callGrok(messages) {
     const apiKey = process.env.GROK_API_KEY;
@@ -212,7 +269,8 @@ router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
             console.error('[Chat] Both AI providers failed.');
             console.error('  Gemini:', geminiErr.message);
             console.error('  Grok:', grokErr.message);
-            throw AppError.externalService('AI', `AI service unavailable. Reason: ${geminiErr.message.slice(0, MAX_ERROR_MESSAGE_LENGTH)}`);
+            provider = 'offline-fallback';
+            reply = buildOfflineFallbackReply(sanitized);
         }
     }
 

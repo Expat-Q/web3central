@@ -216,7 +216,7 @@ export default function ClaudeBot() {
                                         </div>
                                         {msg.provider && (
                                             <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
-                                                via {msg.provider === 'grok' ? 'Grok' : 'Gemini'}
+                                                via {msg.provider === 'grok' ? 'Grok' : msg.provider === 'offline-fallback' ? 'Offline Fallback' : 'Gemini'}
                                             </div>
                                         )}
                                     </div>
