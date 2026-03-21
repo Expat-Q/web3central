@@ -99,6 +99,44 @@ Watchouts:
 Ask a specific question (e.g., “How does impermanent loss work?”) and I’ll give a concise breakdown.`;
 }
 
+// OpenAI API call (primary)
+async function callOpenAI(messages) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+
+    const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model,
+            messages: [
+                { role: 'system', content: WEB3_SYSTEM_PROMPT },
+                ...messages
+            ],
+            temperature: 0.7,
+            max_tokens: 1024
+        })
+    });
+
+    if (!response.ok) {
+        const errBody = await response.text();
+        throw new Error(`OpenAI API error (${model}) ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+    const text = data?.choices?.[0]?.message?.content;
+    if (!text) {
+        throw new Error(`OpenAI returned an empty response (${model})`);
+    }
+
+    return text;
+}
+
 // Grok (xAI) API call
 async function callGrok(messages) {
     const apiKey = process.env.GROK_API_KEY;
@@ -245,7 +283,7 @@ async function callGemini(messages) {
     throw lastError || new Error('Gemini request failed');
 }
 
-// POST /api/chat — Gemini primary, Grok fallback
+// POST /api/chat — OpenAI primary, Gemini/Grok fallback
 router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
     const { messages } = req.body;
 
@@ -256,21 +294,28 @@ router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
     }));
 
     let reply;
-    let provider = 'gemini';
+    let provider = 'openai';
 
     try {
-        reply = await callGemini(sanitized);
-    } catch (geminiErr) {
-        console.warn('Gemini failed:', geminiErr.message);
-        provider = 'grok';
+        reply = await callOpenAI(sanitized);
+    } catch (openaiErr) {
+        console.warn('OpenAI failed:', openaiErr.message);
+        provider = 'gemini';
         try {
-            reply = await callGrok(sanitized);
-        } catch (grokErr) {
-            console.error('[Chat] Both AI providers failed.');
-            console.error('  Gemini:', geminiErr.message);
-            console.error('  Grok:', grokErr.message);
-            provider = 'offline-fallback';
-            reply = buildOfflineFallbackReply(sanitized);
+            reply = await callGemini(sanitized);
+        } catch (geminiErr) {
+            console.warn('Gemini failed:', geminiErr.message);
+            provider = 'grok';
+            try {
+                reply = await callGrok(sanitized);
+            } catch (grokErr) {
+                console.error('[Chat] All AI providers failed.');
+                console.error('  OpenAI:', openaiErr.message);
+                console.error('  Gemini:', geminiErr.message);
+                console.error('  Grok:', grokErr.message);
+                provider = 'offline-fallback';
+                reply = buildOfflineFallbackReply(sanitized);
+            }
         }
     }
 
