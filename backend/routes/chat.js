@@ -12,6 +12,9 @@ const chatSchema = {
 };
 
 const GEMINI_FREE_TIER_MODELS = [
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
+    'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
     'gemini-1.5-flash'
 ];
@@ -73,7 +76,9 @@ async function callGemini(messages) {
     const modelCandidates = [
         process.env.GEMINI_MODEL,
         ...GEMINI_FREE_TIER_MODELS
-    ].filter(Boolean);
+    ]
+        .filter(Boolean)
+        .filter((model, index, arr) => arr.indexOf(model) === index);
 
     // Convert chat messages to Gemini format
     const geminiContents = [];

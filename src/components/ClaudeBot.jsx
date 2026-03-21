@@ -71,10 +71,12 @@ export default function ClaudeBot() {
                     provider: data.provider
                 }]);
             } else {
+                const backendMessage = data?.error?.message || data?.message || 'Something went wrong. Please try again.';
+                const requestRef = data?.requestId ? `\n(ref: ${data.requestId})` : '';
                 setMessages(prev => [...prev, {
                     id: Date.now(),
                     role: 'assistant',
-                    content: '⚠️ ' + (data.message || 'Something went wrong. Please try again.')
+                    content: `⚠️ ${backendMessage}${requestRef}`
                 }]);
             }
         } catch (err) {
