@@ -18,7 +18,7 @@ const bounties = [
     {
         id: 'stallion',
         name: 'Stallion',
-        url: 'https://x.com/stallionsearn',
+        url: 'https://www.earnstallions.xyz/',
         description: 'Connecting global talents to Stellar opportunities. Earn $20–$300 for short threads or videos.',
         category: 'bountyHub',
         builder: {
@@ -30,7 +30,7 @@ const bounties = [
     {
         id: 'first-dollar',
         name: 'First Dollar',
-        url: 'https://x.com/earnfirstdollar',
+        url: 'https://app.firstdollar.money/',
         description: 'Beginner-friendly platform powered by InnerCircle. Earn $20–$300 for submitted threads or videos.',
         category: 'bountyHub',
         builder: {
@@ -78,7 +78,7 @@ const bounties = [
     {
         id: 'cre8core',
         name: 'Cre8core Labs',
-        url: 'https://x.com/Cre8core_Labs',
+        url: 'https://cre8core.fun',
         description: 'The creative layer of Base. One Platform, Infinite Campaigns, Endless Rewards. Typical payouts: $20–$300+.',
         category: 'bountyHub',
         builder: {

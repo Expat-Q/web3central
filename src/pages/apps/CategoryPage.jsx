@@ -190,6 +190,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [chainFilter, setChainFilter] = useState("all");
+  const [tradingSubFilter, setTradingSubFilter] = useState("all"); // 'all' | 'dex' | 'perps'
 
   // Comparison Bench State (Synced with URL for ToolComparison compatibility)
   const [bench, setBench] = useState([]);
@@ -238,7 +239,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   }, [categoryKey]);
 
   // ── App Store derived data ──
-  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default';
+  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all';
 
   // Featured = highest rated (or first if no ratings)
   const featured = useMemo(() => {
@@ -274,6 +275,16 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     
     let result = [...data];
 
+    // Trading sub-filter (DEX vs Perps)
+    if (categoryKey === 'trading' && tradingSubFilter !== 'all') {
+      const subFilterMap = {
+        dex: ['dex', 'trading'],
+        perps: ['perps', 'web3Chat'],
+      };
+      const matchCats = subFilterMap[tradingSubFilter] || [tradingSubFilter];
+      result = result.filter(t => matchCats.includes(t.category));
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(t => 
@@ -294,7 +305,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     }
 
     return result;
-  }, [data, isFiltered, searchQuery, chainFilter, sortBy]);
+  }, [data, isFiltered, searchQuery, chainFilter, sortBy, categoryKey, tradingSubFilter]);
 
   const StarRating = ({ value = 0, count }) => (
     <div className="flex items-center gap-1">
@@ -419,33 +430,114 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             </div>
           </div>
         </div>
-        {/* Coming Soon Body */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-24 text-center">
-          <div className="w-24 h-24 rounded-[28px] bg-purple-50 flex items-center justify-center mb-8 border border-purple-100 shadow-inner">
-            <span className="text-5xl">🚀</span>
-          </div>
-          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+        {/* Coming Soon Body — Animated */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center relative overflow-hidden">
+
+          {/* Animated background orbs */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            className="absolute w-[400px] h-[400px] pointer-events-none"
+          >
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-purple-400/40 blur-[1px]" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-indigo-400/30 blur-[1px]" />
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-fuchsia-400/30 blur-[1px]" />
+          </motion.div>
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+            className="absolute w-[300px] h-[300px] pointer-events-none"
+          >
+            <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-cyan-400/40 blur-[1px]" />
+            <div className="absolute bottom-0 left-0 w-2 h-2 rounded-full bg-violet-400/30 blur-[1px]" />
+          </motion.div>
+
+          {/* Pulsing glow background */}
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute w-72 h-72 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full blur-[80px] pointer-events-none"
+          />
+
+          {/* Icon */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-10 mb-8"
+          >
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-24 h-24 rounded-[28px] bg-gradient-to-br from-purple-100 to-indigo-100 border border-purple-200/50 flex items-center justify-center shadow-xl shadow-purple-200/30"
+            >
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="relative z-10 inline-flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-700 text-xs font-bold px-5 py-2.5 rounded-full mb-6 uppercase tracking-widest shadow-sm"
+          >
+            <motion.span
+              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-2 h-2 rounded-full bg-amber-500"
+            />
             Coming Soon
-          </div>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight">{title}</h2>
-          <p className="text-gray-500 text-base max-w-md leading-relaxed mb-10">
-            We're curating the best <strong>{title}</strong> protocols for Web3Central. Check back soon — or submit one yourself.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+          </motion.div>
+
+          {/* Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="relative z-10 text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight"
+          >
+            {title}
+          </motion.h2>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="relative z-10 text-gray-500 text-base max-w-lg leading-relaxed mb-10"
+          >
+            We're carefully curating the best <strong className="text-gray-700">{title}</strong> protocols for Web3Central.
+            Be the first to know — or submit a protocol yourself.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="relative z-10 flex flex-col sm:flex-row items-center gap-3"
+          >
             <Link
               to="/submit-tool"
-              className="px-8 py-3.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 hover:scale-105"
+              className="px-8 py-3.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20 hover:scale-105 hover:-translate-y-0.5"
             >
               Submit a Protocol
             </Link>
             <Link
               to="/apps"
-              className="px-8 py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all"
+              className="px-8 py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all"
             >
               Browse Other Categories
             </Link>
-          </div>
+          </motion.div>
         </div>
       </div>
     );
@@ -505,6 +597,30 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
       {/* ── Section 2: Search + Filter Pills ── */}
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-6 space-y-3">
+
+        {/* Trading Sub-Filter (DEX / Perps) */}
+        {categoryKey === 'trading' && (
+          <div className="flex gap-2">
+            {[
+              { label: 'All Trading', value: 'all' },
+              { label: 'DEX', value: 'dex' },
+              { label: 'Perps', value: 'perps' },
+            ].map(sf => (
+              <button
+                key={sf.value}
+                onClick={() => setTradingSubFilter(sf.value)}
+                className={`px-5 py-2 rounded-full text-sm font-bold transition-all border ${
+                  tradingSubFilter === sf.value
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-200'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:text-purple-600'
+                }`}
+              >
+                {sf.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row gap-3">
           {/* Search */}
           <div className="relative flex-grow">

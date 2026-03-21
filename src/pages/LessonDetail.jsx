@@ -21,7 +21,7 @@ import {
 export default function LessonDetail() {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     const [lesson, setLesson] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -56,6 +56,11 @@ export default function LessonDetail() {
                 // Directly submit 100% since there's no quiz anymore
                 const result = await submitLessonProgress(lesson.id, 100, token);
                 setSubmitResult(result);
+                
+                if (result?.success && result.user) {
+                    setUser(result.user);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                }
             } catch (err) {
                 console.error('Error saving progress:', err);
             }
