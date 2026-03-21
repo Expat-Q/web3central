@@ -11,6 +11,11 @@ const chatSchema = {
     }
 };
 
+const GEMINI_FREE_TIER_MODELS = [
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash'
+];
+
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
 
 - DeFi protocols (DEXs, lending, yield farming, liquid staking)
@@ -65,6 +70,11 @@ async function callGemini(messages) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
+    const modelCandidates = [
+        process.env.GEMINI_MODEL,
+        ...GEMINI_FREE_TIER_MODELS
+    ].filter(Boolean);
+
     // Convert chat messages to Gemini format
     const geminiContents = [];
 
@@ -86,33 +96,42 @@ async function callGemini(messages) {
         });
     }
 
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: geminiContents,
-                generationConfig: {
-                    maxOutputTokens: 1024,
-                    temperature: 0.7
-                }
-            })
+    let lastError = null;
+
+    for (const model of modelCandidates) {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: geminiContents,
+                    generationConfig: {
+                        maxOutputTokens: 1024,
+                        temperature: 0.7
+                    }
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.warn(`[Gemini:${model}] HTTP ${response.status}:`, errBody);
+            lastError = new Error(`Gemini API error (${model}) ${response.status}`);
+            continue;
         }
-    );
 
-    if (!response.ok) {
-        const errBody = await response.text();
-        console.error(`[Gemini] HTTP ${response.status}:`, errBody);
-        throw new Error(`Gemini API error ${response.status}: ${errBody}`);
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+            return text;
+        }
+
+        console.warn(`[Gemini:${model}] Empty response payload`);
+        lastError = new Error(`Gemini returned an empty response (${model})`);
     }
 
-    const data = await response.json();
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        console.error('[Gemini] Unexpected response:', JSON.stringify(data));
-        throw new Error('Gemini returned an empty response');
-    }
-    return data.candidates[0].content.parts[0].text;
+    throw lastError || new Error('Gemini request failed');
 }
 
 // POST /api/chat — Gemini primary, Grok fallback
