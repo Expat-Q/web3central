@@ -25,30 +25,19 @@ export const reviewTool = async (category, toolId, actionData) => {
 };
 
 export const createTool = async (category, toolData) => {
-<<<<<<< HEAD
-  const token = localStorage.getItem('token');
-  try {
-    const response = await fetch(`${API_BASE_URL}/tools/${category}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-key': sessionStorage.getItem('admin_unlocked') === 'true' ? '213478' : ''
-      },
-      body: JSON.stringify(toolData)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error creating tool:', error);
-    throw error;
-  }
-=======
-  return apiClient.post(`/tools/${category}`, toolData, { auth: true });
->>>>>>> d79c8d18a95671428d126fb3bf544da1a88aaf59
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? '/api'
+    : (process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
+  const response = await fetch(`${API_BASE_URL}/tools/${category}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-key': sessionStorage.getItem('admin_unlocked') === 'true' ? '213478' : ''
+    },
+    body: JSON.stringify(toolData)
+  });
+  if (!response.ok) throw new Error(`Failed to add tool. Error: HTTP error ${response.status}`);
+  return await response.json();
 };
 
 export const fetchCommunitySpotlight = async () => {
