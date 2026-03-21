@@ -19,6 +19,11 @@ const GEMINI_FREE_TIER_MODELS = [
     'gemini-1.5-flash'
 ];
 
+let geminiModelsCache = {
+    expiresAt: 0,
+    models: []
+};
+
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
 
 - DeFi protocols (DEXs, lending, yield farming, liquid staking)
@@ -69,13 +74,57 @@ async function callGrok(messages) {
 }
 
 // Gemini API call
+async function getAvailableGeminiModels(apiKey) {
+    const now = Date.now();
+    if (geminiModelsCache.expiresAt > now && geminiModelsCache.models.length > 0) {
+        return geminiModelsCache.models;
+    }
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+            { method: 'GET' }
+        );
+
+        if (!response.ok) {
+            return [];
+        }
+
+        const data = await response.json();
+        const models = (data.models || [])
+            .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+            .map(m => (m.name || '').replace('models/', ''))
+            .filter(Boolean);
+
+        geminiModelsCache = {
+            expiresAt: now + 10 * 60 * 1000,
+            models
+        };
+
+        return models;
+    } catch {
+        return [];
+    }
+}
+
 async function callGemini(messages) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
+    const availableModels = await getAvailableGeminiModels(apiKey);
+
+    const preferred = [process.env.GEMINI_MODEL, ...GEMINI_FREE_TIER_MODELS].filter(Boolean);
+
+    const preferredAvailable = preferred.filter(model => availableModels.includes(model));
+
+    const discoveredFlash = availableModels.filter(model =>
+        model.includes('flash') && !preferredAvailable.includes(model)
+    );
+
     const modelCandidates = [
-        process.env.GEMINI_MODEL,
-        ...GEMINI_FREE_TIER_MODELS
+        ...preferredAvailable,
+        ...discoveredFlash,
+        ...preferred
     ]
         .filter(Boolean)
         .filter((model, index, arr) => arr.indexOf(model) === index);
