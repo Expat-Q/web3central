@@ -5,6 +5,26 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 
+// Twitter usernames: alphanumeric + underscore, 1-15 chars
+const TWITTER_HANDLE_RE = /^[A-Za-z0-9_]{1,15}$/;
+
+/**
+ * Extract and validate a Twitter handle from various input formats.
+ * Supports: "@handle", "handle", "https://x.com/handle", "https://twitter.com/handle"
+ * Returns the clean handle if valid, or an empty string otherwise.
+ */
+function extractTwitterHandle(input) {
+    if (!input) return '';
+    const cleaned = input
+        .trim()
+        .replace(/^@/, '')
+        .replace(/^https?:\/\/(www\.)?(twitter\.com|x\.com)\//, '')
+        .split('/')[0]
+        .split('?')[0]
+        .trim();
+    return TWITTER_HANDLE_RE.test(cleaned) ? cleaned : '';
+}
+
 const registerSchema = {
     body: {
         name: ['required', { type: 'string', minLength: 2, maxLength: 50 }],
@@ -169,6 +189,11 @@ const sendTokenResponse = (user, statusCode, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                bio: user.bio,
+                twitter: user.twitter,
+                rank: user.rank,
+                totalXP: user.totalXP,
+                avatarUrl: user.avatarUrl,
                 learningProgress: user.learningProgress
             }
         });
@@ -196,8 +221,17 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
         const user = await User.findById(req.user.id);
 
         if (bio !== undefined) user.bio = bio;
-        if (twitter !== undefined) user.twitter = twitter;
         if (name !== undefined) user.name = name;
+
+        if (twitter !== undefined) {
+            user.twitter = twitter;
+            if (twitter) {
+                const handle = extractTwitterHandle(twitter);
+                user.avatarUrl = handle ? `https://unavatar.io/twitter/${handle}` : '';
+            } else {
+                user.avatarUrl = '';
+            }
+        }
 
         await user.save();
         res.status(200).json({ success: true, user });

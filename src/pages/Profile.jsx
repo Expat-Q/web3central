@@ -42,7 +42,7 @@ const ToolLogo = ({ tool }) => {
 };
 
 export default function Profile() {
-    const { user, login, logout, loading: authLoading } = useAuth(); // assume login can update context cache
+    const { user, setUser, logout, loading: authLoading } = useAuth();
     const { bookmarks, toggleBookmark } = useBookmarks();
     const navigate = useNavigate();
 
@@ -56,6 +56,8 @@ export default function Profile() {
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({ name: '', bio: '', twitter: '' });
     const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
+    const [avatarError, setAvatarError] = useState(false);
 
     useEffect(() => {
         if (!authLoading && (!user || user.email === 'guest@web3central.internal')) {
@@ -70,6 +72,8 @@ export default function Profile() {
                 bio: user.bio || '',
                 twitter: user.twitter || ''
             });
+
+            setAvatarError(false);
 
             let completed = 0;
 
@@ -93,18 +97,20 @@ export default function Profile() {
 
     const handleSaveProfile = async () => {
         setSaving(true);
+        setSaveError('');
         try {
             const updatedUser = await updateProfile(editForm);
-            // Optimistically update the page and localStorage
             if (updatedUser.user) {
-                localStorage.setItem('user', JSON.stringify(updatedUser.user));
-                window.location.reload();
+                const userData = updatedUser.user;
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+                setIsEditing(false);
             }
         } catch (error) {
-            console.error(error);
+            console.error('Failed to save profile:', error);
+            setSaveError('Failed to save profile. Please try again.');
         } finally {
             setSaving(false);
-            setIsEditing(false);
         }
     };
 
@@ -132,9 +138,18 @@ export default function Profile() {
 
                     <div className="flex flex-col items-center md:items-start md:flex-row gap-6">
                         <div className="relative shrink-0">
-                            <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
-                                {user.name.charAt(0).toUpperCase()}
-                            </div>
+                            {user.avatarUrl && !avatarError ? (
+                                <img
+                                    src={user.avatarUrl}
+                                    alt={user.name}
+                                    className="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10"
+                                    onError={() => setAvatarError(true)}
+                                />
+                            ) : (
+                                <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                            )}
                             <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-purple-600 border-3 border-white flex items-center justify-center text-white shadow-md z-20">
                                 <Zap size={14} fill="currentColor" />
                             </div>
@@ -222,6 +237,9 @@ export default function Profile() {
                                         </div>
                                     </div>
                                 </div>
+                                {saveError && (
+                                    <p className="text-red-500 text-xs font-medium text-center">{saveError}</p>
+                                )}
                                 <div className="flex items-center gap-3 pt-2">
                                     <button onClick={handleSaveProfile} disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition text-sm">
                                         {saving ? 'Saving...' : <><Save size={16} /> Save Profile</>}

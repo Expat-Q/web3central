@@ -28,6 +28,7 @@ export default function LessonDetail() {
 
     const [finishing, setFinishing] = useState(false);
     const [submitResult, setSubmitResult] = useState(null);
+    const [completeError, setCompleteError] = useState('');
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -50,11 +51,10 @@ export default function LessonDetail() {
 
     const handleCompleteLesson = async () => {
         setFinishing(true);
+        setCompleteError('');
         if (user) {
             try {
-                const token = localStorage.getItem('token');
-                // Directly submit 100% since there's no quiz anymore
-                const result = await submitLessonProgress(lesson.id, 100, token);
+                const result = await submitLessonProgress(lesson.id, 100);
                 setSubmitResult(result);
                 
                 if (result?.success && result.user) {
@@ -63,6 +63,7 @@ export default function LessonDetail() {
                 }
             } catch (err) {
                 console.error('Error saving progress:', err);
+                setCompleteError('Failed to save your progress. Please try again.');
             }
         } else {
             setSubmitResult({ passed: true, isGuest: true }); // Fallback for unauthenticated viewers
@@ -128,7 +129,7 @@ export default function LessonDetail() {
                         </div>
 
                         {/* Complete Lesson Action */}
-                        <div className="p-6 md:p-8 border-t border-gray-100 flex justify-center bg-purple-50/30">
+                        <div className="p-6 md:p-8 border-t border-gray-100 flex flex-col items-center gap-3 bg-purple-50/30">
                             <button
                                 onClick={handleCompleteLesson}
                                 disabled={finishing}
@@ -136,6 +137,9 @@ export default function LessonDetail() {
                             >
                                 {finishing ? 'Saving Progress...' : 'Mark as Completed'} <CheckCircle2 size={18} />
                             </button>
+                            {completeError && (
+                                <p className="text-red-500 text-sm font-medium">{completeError}</p>
+                            )}
                         </div>
                     </motion.div>
                 ) : (
@@ -153,14 +157,25 @@ export default function LessonDetail() {
                             {submitResult?.isGuest ? (
                                 <p className="text-gray-500 mb-8 max-w-md mx-auto">Great job completing the reading! Sign in or create an account to start earning XP and tracking your progress across modules.</p>
                             ) : submitResult?.passed ? (
-                                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 inline-block text-left max-w-md mx-auto">
-                                    <h4 className="font-bold text-emerald-700 flex items-center gap-2 justify-center mb-2">
-                                        <Sparkles size={18} /> Experience Gained
-                                    </h4>
-                                    <p className="text-emerald-800 text-sm text-center">
-                                        You earned <strong>{submitResult.xpGained} XP!</strong> Your total is now {submitResult.newTotalXP} XP. You hold the rank of <strong>{submitResult.newRank}</strong>.
-                                    </p>
-                                </div>
+                                submitResult.xpGained > 0 ? (
+                                    <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 inline-block text-left max-w-md mx-auto">
+                                        <h4 className="font-bold text-emerald-700 flex items-center gap-2 justify-center mb-2">
+                                            <Sparkles size={18} /> Experience Gained
+                                        </h4>
+                                        <p className="text-emerald-800 text-sm text-center">
+                                            You earned <strong>+{submitResult.xpGained} XP!</strong> Your total is now <strong>{submitResult.newTotalXP} XP</strong>. You hold the rank of <strong>{submitResult.newRank}</strong>.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 inline-block text-left max-w-md mx-auto">
+                                        <h4 className="font-bold text-blue-700 flex items-center gap-2 justify-center mb-2">
+                                            <CheckCircle2 size={18} /> Already Mastered
+                                        </h4>
+                                        <p className="text-blue-800 text-sm text-center">
+                                            You've already completed this lesson. Your XP total is <strong>{submitResult.newTotalXP} XP</strong>.
+                                        </p>
+                                    </div>
+                                )
                             ) : null}
 
                             <div>
