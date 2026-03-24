@@ -122,11 +122,13 @@ app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'Backend is live',
-    version: '1.0.3',
+    version: '1.0.4',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV,
     db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    correlationId: req.correlationId
+    correlationId: req.correlationId,
+    chatProviderChain: 'openai>grok>offline-fallback',
+    release: process.env.RENDER_GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || 'local'
   });
 });
 
