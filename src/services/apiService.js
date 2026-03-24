@@ -102,3 +102,20 @@ export const submitToolForReview = async (toolData) => {
 export const mockOAuthLogin = async (provider) => {
   return apiClient.post('/auth/oauth-mock', { provider });
 };
+
+export const fetchCommunityLessons = async () => {
+  const data = await apiClient.get('/academy/community', { requestKey: 'fetchCommunityLessons' });
+  return data.data || [];
+};
+
+export const createCommunityLesson = async (lessonData) => {
+  return apiClient.post('/academy/community', lessonData, { auth: true });
+};
+
+export const upvoteCommunityLesson = async (lessonId) => {
+  return apiClient.post(`/academy/community/${lessonId}/upvote`, {}, { auth: true });
+};
+
+export const rateCommunityLesson = async (lessonId, rating) => {
+  return apiClient.post(`/academy/community/${lessonId}/rate`, { rating }, { auth: true });
+};

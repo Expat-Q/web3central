@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
-import { fetchLessonById, submitLessonProgress } from '../services/apiService';
+import { fetchLessonById, submitLessonProgress, rateCommunityLesson } from '../services/apiService';
 import {
     ArrowLeft,
     BookOpen,
     Award,
-    ChevronRight,
     CheckCircle2,
-    XCircle,
     Trophy,
     Sparkles,
-    Timer,
     Unlock,
-    ArrowLeftCircle
+    ThumbsUp,
+    ThumbsDown,
+    Zap
 } from 'lucide-react';
+
+
 
 export default function LessonDetail() {
     const { slug } = useParams();
@@ -25,18 +26,16 @@ export default function LessonDetail() {
 
     const [lesson, setLesson] = useState(null);
     const [loading, setLoading] = useState(true);
-
     const [finishing, setFinishing] = useState(false);
     const [submitResult, setSubmitResult] = useState(null);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [rating, setRating] = useState(null); // 'up' | 'down' | null
 
     useEffect(() => {
         const fetchLesson = async () => {
             try {
                 const data = await fetchLessonById(slug);
                 if (data) {
-                    if (data.quiz && Array.isArray(data.quiz) && data.quiz.length > 0) {
-                        data.quiz = data.quiz[0];
-                    }
                     setLesson(data);
                 }
             } catch (err) {
@@ -48,31 +47,57 @@ export default function LessonDetail() {
         fetchLesson();
     }, [slug]);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalScroll = document.documentElement.scrollTop;
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            setScrollProgress(windowHeight > 0 ? totalScroll / windowHeight : 0);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Listen for external open-claude event
+    useEffect(() => {
+        const openClaude = () => window.dispatchEvent(new CustomEvent('open-claude'));
+        return () => {};
+    }, []);
+
     const handleCompleteLesson = async () => {
         setFinishing(true);
         if (user) {
             try {
-                const token = localStorage.getItem('token');
-                // Directly submit 100% since there's no quiz anymore
-                const result = await submitLessonProgress(lesson.id, 100, token);
+                // Always use slug as the consistent key
+                const result = await submitLessonProgress(lesson.slug || slug, 100);
                 setSubmitResult(result);
-                
-                if (result?.success && result.user) {
+                if (result?.user) {
                     setUser(result.user);
                     localStorage.setItem('user', JSON.stringify(result.user));
                 }
             } catch (err) {
                 console.error('Error saving progress:', err);
+                setSubmitResult({ passed: true, xpGained: 0 });
             }
         } else {
-            setSubmitResult({ passed: true, isGuest: true }); // Fallback for unauthenticated viewers
+            setSubmitResult({ passed: true, isGuest: true });
         }
         setFinishing(false);
     };
 
+    const handleRate = async (value) => {
+        if (!user || !lesson?._id) return;
+        try {
+            const newRating = rating === value ? null : value;
+            setRating(newRating);
+            if (newRating) await rateCommunityLesson(lesson._id, newRating);
+        } catch (err) {
+            console.error('Rating error:', err);
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-white">
-            <div className="w-12 h-12 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
         </div>
     );
 
@@ -82,98 +107,168 @@ export default function LessonDetail() {
             <Link to="/academy" className="text-purple-600 hover:underline">Return to Academy</Link>
         </div>
     );
+
+    const isCompleted = user?.learningProgress?.[lesson.slug]?.completed;
+
     return (
-        <div className="min-h-screen pt-32 pb-32 px-6 bg-white relative overflow-x-hidden">
-            {/* Background Decorative Elements */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-                <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-60" />
-            </div>
+        <div className="min-h-screen bg-white relative">
+            {/* Reading Progress bar */}
+            <div
+                className="fixed top-0 left-0 h-0.5 bg-gray-900 z-50 transition-all duration-100"
+                style={{ width: `${scrollProgress * 100}%` }}
+            />
 
-            <div className="max-w-4xl mx-auto relative z-10">
-                {/* Header Navigation */}
-                <div className="mb-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <button
-                        onClick={() => navigate('/academy')}
-                        className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-purple-600 transition-colors bg-gray-50 hover:bg-purple-50 px-4 py-2 rounded-xl"
-                    >
-                        <ArrowLeft size={16} /> Back to Curriculum
-                    </button>
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-24">
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl border border-purple-100 font-bold text-xs uppercase tracking-wider">
-                            <BookOpen size={14} /> {lesson.module}
+                {/* ── Back nav ── */}
+                <button
+                    onClick={() => navigate('/academy')}
+                    className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors mb-10 font-medium"
+                >
+                    <ArrowLeft size={15} /> Back to Academy
+                </button>
+
+                {/* ── Author / Meta row (X-style) ── */}
+                <div className="flex items-start gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-black text-lg shrink-0">
+                        W3
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                            <span className="font-bold text-gray-900 text-[15px]">Web3Central</span>
+                            <span className="text-gray-400 text-sm">@web3central</span>
+                            <span className="text-gray-300">·</span>
+                            <span className="text-gray-400 text-sm">
+                                {new Date(lesson.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-600 rounded-xl border border-yellow-100 font-bold text-xs uppercase tracking-wider">
-                            <Award size={14} /> +{lesson.xpReward} XP
-                        </div>
+                        {isCompleted && (
+                            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                <span className="inline-flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                    <CheckCircle2 size={10} /> Mastered
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {!submitResult ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_60px_rgba(0,0,0,0.04)] overflow-hidden"
+                {/* ── Title ── */}
+                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight tracking-tight mb-3">
+                    {lesson.title}
+                </h1>
+
+                {lesson.description && (
+                    <p className="text-gray-500 text-base leading-relaxed mb-8 border-b border-gray-100 pb-8">
+                        {lesson.description}
+                    </p>
+                )}
+
+                {/* ── Lesson body (Flat text as typed) ── */}
+                <div className="text-[15px] leading-[1.85] text-gray-900 whitespace-pre-wrap font-medium">
+                    {lesson.contentMarkdown}
+                </div>
+
+                {/* ── Action bar (X-style with functional buttons) ── */}
+                <div className="mt-8 pt-5 border-t border-gray-100 flex items-center justify-between max-w-[280px]">
+                    {/* Comment (Ask AI) */}
+                    <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('open-claude'))}
+                        className="flex items-center gap-1.5 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                        title="Comment / Ask AI"
                     >
-                        {/* Title Section */}
-                        <div className="p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight tracking-tight">
-                                {lesson.title}
-                            </h1>
-                        </div>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </button>
 
-                        {/* Markdown Content */}
-                        <div className="p-5 md:p-12 max-w-none lesson-content">
-                            <ReactMarkdown>{lesson.contentMarkdown}</ReactMarkdown>
-                        </div>
+                    {/* Like (On-chain planned) */}
+                    <button
+                        onClick={() => handleRate('up')}
+                        className={`flex items-center gap-1.5 p-2 rounded-full transition-all ${
+                            rating === 'up' || lesson.ratings?.thumbsUpBy?.includes(user?.id) 
+                            ? 'text-pink-500 bg-pink-50' 
+                            : 'text-gray-500 hover:text-pink-500 hover:bg-pink-50'
+                        }`}
+                        title="Like (On-chain planned)"
+                    >
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill={rating === 'up' || lesson.ratings?.thumbsUpBy?.includes(user?.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                        {(lesson.ratings?.thumbsUp || 0) > 0 && (
+                            <span className="text-[13px] tabular-nums">{lesson.ratings?.thumbsUp}</span>
+                        )}
+                    </button>
 
-                        {/* Complete Lesson Action */}
-                        <div className="p-6 md:p-8 border-t border-gray-100 flex justify-center bg-purple-50/30">
+                    {/* Share */}
+                    <button
+                        onClick={() => navigator.clipboard.writeText(`${window.location.origin}/academy/${lesson.slug}`)}
+                        className="flex items-center gap-1.5 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                        title="Copy link"
+                    >
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                            <polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {/* ── Complete / XP section ── */}
+                <div className="mt-8 border border-gray-100 rounded-2xl p-6 bg-gray-50">
+                    {!submitResult ? (
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Award size={16} className="text-amber-500" />
+                                    <span className="font-bold text-gray-900 text-sm">Earn {lesson.xpReward || 100} XP</span>
+                                </div>
+                                <p className="text-gray-500 text-xs">
+                                    {scrollProgress < 0.75 ? 'Read to the bottom to unlock completion.' : 'Ready to mark as completed!'}
+                                </p>
+                            </div>
                             <button
                                 onClick={handleCompleteLesson}
-                                disabled={finishing}
-                                className="px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-base transition-all shadow-md hover:shadow-purple-200 flex items-center gap-2 disabled:opacity-50"
+                                disabled={finishing || scrollProgress < 0.75}
+                                className="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white font-bold text-sm rounded-xl hover:bg-purple-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-900 shadow-sm"
                             >
-                                {finishing ? 'Saving Progress...' : 'Mark as Completed'} <CheckCircle2 size={18} />
+                                {finishing ? 'Saving...' : scrollProgress < 0.75
+                                    ? <><Unlock size={14} className="opacity-60" /> Keep Reading</>
+                                    : <><CheckCircle2 size={14} /> Mark as Completed</>
+                                }
                             </button>
                         </div>
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_60px_rgba(0,0,0,0.04)] overflow-hidden"
-                    >
-                        <div className="p-12 md:p-20 text-center">
-                            <div className="inline-flex items-center justify-center w-24 h-24 bg-green-50 rounded-full mb-8 shadow-inner border border-green-100">
-                                <Trophy size={48} className="text-green-500" />
-                            </div>
-                            <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">Lesson Completed!</h2>
-
-                            {submitResult?.isGuest ? (
-                                <p className="text-gray-500 mb-8 max-w-md mx-auto">Great job completing the reading! Sign in or create an account to start earning XP and tracking your progress across modules.</p>
-                            ) : submitResult?.passed ? (
-                                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 inline-block text-left max-w-md mx-auto">
-                                    <h4 className="font-bold text-emerald-700 flex items-center gap-2 justify-center mb-2">
-                                        <Sparkles size={18} /> Experience Gained
-                                    </h4>
-                                    <p className="text-emerald-800 text-sm text-center">
-                                        You earned <strong>{submitResult.xpGained} XP!</strong> Your total is now {submitResult.newTotalXP} XP. You hold the rank of <strong>{submitResult.newRank}</strong>.
-                                    </p>
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <Trophy size={18} className="text-green-600" />
                                 </div>
-                            ) : null}
-
-                            <div>
-                                <button
-                                    onClick={() => navigate('/academy')}
-                                    className="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-2 mx-auto"
-                                >
-                                    Return to Curriculum <ArrowLeftCircle size={18} />
-                                </button>
+                                <div>
+                                    <p className="font-bold text-gray-900 text-sm">
+                                        {submitResult.isGuest ? 'Lesson Read!' : 'Lesson Completed!'}
+                                    </p>
+                                    {submitResult.xpGained > 0 && (
+                                        <p className="text-green-600 text-xs font-bold">+{submitResult.xpGained} XP · {submitResult.newRank}</p>
+                                    )}
+                                    {submitResult.isGuest && (
+                                        <p className="text-gray-500 text-xs">
+                                            <Link to="/signup" className="text-purple-600 font-semibold hover:underline">Create an account</Link> to track progress & earn XP.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
-                )}
+                            <button
+                                onClick={() => navigate('/academy')}
+                                className="shrink-0 px-4 py-2 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                            >
+                                Continue Learning →
+                            </button>
+                        </motion.div>
+                    )}
+                </div>
             </div>
         </div>
     );

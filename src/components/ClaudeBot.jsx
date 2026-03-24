@@ -37,6 +37,12 @@ export default function ClaudeBot() {
         scrollToBottom();
     }, [messages, isTyping, isOpen, isFullScreen]);
 
+    useEffect(() => {
+        const handleOpenClaude = () => setIsOpen(true);
+        window.addEventListener('open-claude', handleOpenClaude);
+        return () => window.removeEventListener('open-claude', handleOpenClaude);
+    }, []);
+
     const sendMessage = async (text) => {
         if (!text?.trim() || isTyping) return;
 
