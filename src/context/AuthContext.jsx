@@ -28,6 +28,24 @@ export const AuthProvider = ({ children }) => {
         }
         setLoading(false);
 
+        // Re-sync user from backend on app boot to avoid stale XP/profile/progress state.
+        if (token) {
+            fetch(`${API_BASE_URL}/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (!mountedRef.current) return;
+                    if (data?.success && data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        setUser(data.user);
+                    }
+                })
+                .catch(() => {
+                    // Keep local state if sync fails.
+                });
+        }
+
         return () => {
             mountedRef.current = false;
         };

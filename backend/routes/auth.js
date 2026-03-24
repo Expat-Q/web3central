@@ -24,9 +24,34 @@ const profileUpdateSchema = {
     body: {
         name: [{ type: 'string', minLength: 2, maxLength: 50 }],
         bio: [{ type: 'string', maxLength: 500 }],
-        twitter: [{ type: 'string', maxLength: 50 }]
+        twitter: [{ type: 'string', maxLength: 255 }]
     }
 };
+
+const normalizeTwitterHandle = (input = '') => {
+    const value = String(input || '').trim();
+    if (!value) return '';
+
+    // Accept full URLs, @handle, or plain handle.
+    const match = value.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]{1,15})/i);
+    const handle = match ? match[1] : value.replace(/^@/, '').split('/').pop();
+    const clean = String(handle || '').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 15);
+
+    return clean ? `@${clean}` : '';
+};
+
+const serializeUser = (user) => ({
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    bio: user.bio || '',
+    twitter: user.twitter || '',
+    avatarUrl: user.avatarUrl || '',
+    totalXP: user.totalXP || 0,
+    rank: user.rank || 'Novice',
+    learningProgress: Object.fromEntries(user.learningProgress || new Map())
+});
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -164,18 +189,7 @@ const sendTokenResponse = (user, statusCode, res) => {
         .json({
             success: true,
             token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                bio: user.bio || '',
-                twitter: user.twitter || '',
-                avatarUrl: user.avatarUrl || '',
-                totalXP: user.totalXP || 0,
-                rank: user.rank || 'Novice',
-                learningProgress: Object.fromEntries(user.learningProgress || new Map())
-            }
+            user: serializeUser(user)
         });
 };
 
@@ -187,7 +201,7 @@ router.get('/me', protect, async (req, res) => {
         const user = await User.findById(req.user.id);
         res.status(200).json({
             success: true,
-            user
+            user: serializeUser(user)
         });
     } catch (err) {
         res.status(401).json({ success: false, message: 'Not authorized' });
@@ -201,11 +215,21 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
         const user = await User.findById(req.user.id);
 
         if (bio !== undefined) user.bio = bio;
-        if (twitter !== undefined) user.twitter = twitter;
+        if (twitter !== undefined) {
+            const nextTwitter = normalizeTwitterHandle(twitter);
+            const prevTwitter = normalizeTwitterHandle(user.twitter || '');
+            user.twitter = nextTwitter;
+
+            // Update avatar only when user updates X/Twitter handle.
+            if (nextTwitter && nextTwitter !== prevTwitter) {
+                const handle = nextTwitter.replace(/^@/, '');
+                user.avatarUrl = `https://unavatar.io/twitter/${handle}`;
+            }
+        }
         if (name && name.trim().length > 0) user.name = name.trim();
 
         await user.save();
-        res.status(200).json({ success: true, user });
+        res.status(200).json({ success: true, user: serializeUser(user) });
     } catch (error) {
         console.error("Profile Save Error:", error);
         res.status(500).json({ success: false, error: error.message || 'Failed to update profile' });
