@@ -28,6 +28,7 @@ export default function LessonDetail() {
     const [loading, setLoading] = useState(true);
     const [finishing, setFinishing] = useState(false);
     const [submitResult, setSubmitResult] = useState(null);
+    const [submitError, setSubmitError] = useState('');
     const [scrollProgress, setScrollProgress] = useState(0);
     const [rating, setRating] = useState(null); // 'up' | 'down' | null
 
@@ -65,6 +66,7 @@ export default function LessonDetail() {
 
     const handleCompleteLesson = async () => {
         setFinishing(true);
+        setSubmitError('');
         if (user) {
             try {
                 // Always use slug as the consistent key
@@ -76,7 +78,7 @@ export default function LessonDetail() {
                 }
             } catch (err) {
                 console.error('Error saving progress:', err);
-                setSubmitResult({ passed: true, xpGained: 0 });
+                setSubmitError('Could not save completion progress. Please retry.');
             }
         } else {
             setSubmitResult({ passed: true, isGuest: true });
@@ -257,6 +259,9 @@ export default function LessonDetail() {
                                 <p className="text-gray-500 text-xs">
                                     {scrollProgress < 0.75 ? 'Read to the bottom to unlock completion.' : 'Ready to mark as completed!'}
                                 </p>
+                                {submitError && (
+                                    <p className="text-red-600 text-xs font-semibold mt-2">{submitError}</p>
+                                )}
                             </div>
                             <button
                                 onClick={handleCompleteLesson}

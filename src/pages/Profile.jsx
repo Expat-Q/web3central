@@ -60,6 +60,20 @@ export default function Profile() {
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState('');
 
+    const getTwitterHandle = (value = '') => {
+        const text = String(value || '').trim();
+        if (!text) return '';
+        const match = text.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]{1,15})/i);
+        if (match?.[1]) return match[1];
+        return text.replace(/^@/, '').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 15);
+    };
+
+    const avatarFromTwitter = (() => {
+        const handle = getTwitterHandle(user?.twitter || '');
+        return handle ? `https://unavatar.io/twitter/${handle}` : '';
+    })();
+    const effectiveAvatar = user?.avatarUrl || avatarFromTwitter;
+
     useEffect(() => {
         if (!authLoading && (!user || user.email === 'guest@web3central.internal')) {
             navigate('/login');
@@ -106,7 +120,7 @@ export default function Profile() {
             }
         } catch (error) {
             console.error(error);
-            setSaveError('Failed to save profile. Please try again.');
+            setSaveError(error?.message || 'Failed to save profile. Please try again.');
         } finally {
             setSaving(false);
         }
@@ -136,8 +150,8 @@ export default function Profile() {
 
                     <div className="flex flex-col items-center md:items-start md:flex-row gap-6">
                         <div className="relative shrink-0">
-                            {user.avatarUrl ? (
-                                <img src={user.avatarUrl} alt={user.name} className="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10" />
+                            {effectiveAvatar ? (
+                                <img src={effectiveAvatar} alt={user.name} className="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10" />
                             ) : (
                                 <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
                                     {user.name.charAt(0).toUpperCase()}
@@ -238,6 +252,9 @@ export default function Profile() {
                                         Cancel
                                     </button>
                                 </div>
+                                {saveError && (
+                                    <p className="text-red-600 text-sm font-medium">{saveError}</p>
+                                )}
                             </div>
                         </div>
                     )}
