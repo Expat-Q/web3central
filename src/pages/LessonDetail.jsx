@@ -163,9 +163,42 @@ export default function LessonDetail() {
                     </p>
                 )}
 
-                {/* ── Lesson body (Flat text as typed) ── */}
-                <div className="text-[15px] leading-[1.85] text-gray-900 whitespace-pre-wrap font-medium">
-                    {lesson.contentMarkdown}
+                {/* ── Lesson body (Markdown rendered) ── */}
+                <div className="text-[15px] leading-[1.85] text-gray-900 font-medium">
+                    <ReactMarkdown
+                        components={{
+                            h1: ({ children }) => <h1 className="text-2xl font-black text-gray-900 mt-8 mb-4">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-xl font-black text-gray-900 mt-7 mb-3">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-lg font-bold text-gray-900 mt-6 mb-3">{children}</h3>,
+                            p: ({ children }) => <p className="mb-5">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc pl-6 mb-5 space-y-2">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-6 mb-5 space-y-2">{children}</ol>,
+                            li: ({ children }) => <li>{children}</li>,
+                            strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+                            em: ({ children }) => <em className="italic">{children}</em>,
+                            blockquote: ({ children }) => (
+                                <blockquote className="border-l-4 border-purple-300 pl-4 italic text-gray-700 mb-5">{children}</blockquote>
+                            ),
+                            code: ({ inline, className, children, ...props }) => {
+                                const match = /language-(\w+)/.exec(className || '');
+                                if (inline) {
+                                    return (
+                                        <code className="bg-gray-100 text-purple-700 px-1.5 py-0.5 rounded text-[13px] font-mono" {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                }
+                                return (
+                                    <pre className="bg-gray-900 text-green-300 rounded-xl p-4 mb-5 overflow-x-auto text-[13px] leading-6 font-mono">
+                                        {match?.[1] && <div className="text-gray-400 text-[10px] uppercase tracking-wider mb-2">{match[1]}</div>}
+                                        <code {...props}>{children}</code>
+                                    </pre>
+                                );
+                            },
+                        }}
+                    >
+                        {lesson.contentMarkdown || ''}
+                    </ReactMarkdown>
                 </div>
 
                 {/* ── Action bar (X-style with functional buttons) ── */}
