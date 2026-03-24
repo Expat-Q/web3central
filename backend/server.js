@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const path = require('path');
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 // Load environment variables FIRST — before anything else
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -128,7 +129,12 @@ app.get('/api/health', (req, res) => {
     db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     correlationId: req.correlationId,
     chatProviderChain: 'openai>grok>offline-fallback',
-    release: process.env.RENDER_GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || 'local'
+    release: process.env.RENDER_GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || 'local',
+    chatConfig: {
+      openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
+      grokConfigured: Boolean(process.env.GROK_API_KEY),
+      openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini'
+    }
   });
 });
 
@@ -149,12 +155,23 @@ app.use('/api/ratings', ratingsRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/chat', chatRouter);
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Web3Central backend is running',
+    release: process.env.RENDER_GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || 'local'
+  });
+});
+
 // Serve frontend in production only
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../build')));
-  app.get('{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build', 'index.html'));
-  });
+  const buildPath = path.join(__dirname, '../build');
+  if (fs.existsSync(buildPath)) {
+    app.use(express.static(buildPath));
+    app.get('{*path}', (req, res) => {
+      res.sendFile(path.join(buildPath, 'index.html'));
+    });
+  }
 }
 
 // 404 handler for unknown API routes
