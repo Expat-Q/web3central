@@ -7,6 +7,7 @@ import {
     Bookmark, ExternalLink, Trash2, Edit3, Save, X, Twitter, FolderGit2, Settings
 } from 'lucide-react';
 import { useBookmarks } from '../hooks/useBookmarks';
+import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import SafeLink from '../components/SafeLink';
 import { updateProfile, fetchMyTools } from '../services/apiService';
 
@@ -42,8 +43,9 @@ const ToolLogo = ({ tool }) => {
 };
 
 export default function Profile() {
-    const { user, login, logout, loading: authLoading } = useAuth(); // assume login can update context cache
+    const { user, setUser, logout, loading: authLoading } = useAuth();
     const { bookmarks, toggleBookmark } = useBookmarks();
+    const { bookmarks: courseBookmarks, toggleBookmark: toggleCourseBookmark } = useCourseBookmarks();
     const navigate = useNavigate();
 
     const [stats, setStats] = useState({
@@ -56,6 +58,7 @@ export default function Profile() {
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({ name: '', bio: '', twitter: '' });
     const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState('');
 
     useEffect(() => {
         if (!authLoading && (!user || user.email === 'guest@web3central.internal')) {
@@ -93,18 +96,19 @@ export default function Profile() {
 
     const handleSaveProfile = async () => {
         setSaving(true);
+        setSaveError('');
         try {
             const updatedUser = await updateProfile(editForm);
-            // Optimistically update the page and localStorage
             if (updatedUser.user) {
                 localStorage.setItem('user', JSON.stringify(updatedUser.user));
-                window.location.reload();
+                setUser(updatedUser.user); // update context without reload
+                setIsEditing(false);
             }
         } catch (error) {
             console.error(error);
+            setSaveError('Failed to save profile. Please try again.');
         } finally {
             setSaving(false);
-            setIsEditing(false);
         }
     };
 
@@ -132,9 +136,13 @@ export default function Profile() {
 
                     <div className="flex flex-col items-center md:items-start md:flex-row gap-6">
                         <div className="relative shrink-0">
-                            <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
-                                {user.name.charAt(0).toUpperCase()}
-                            </div>
+                            {user.avatarUrl ? (
+                                <img src={user.avatarUrl} alt={user.name} className="w-20 h-20 rounded-2xl object-cover shadow-xl relative z-10" />
+                            ) : (
+                                <div className="w-20 h-20 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-3xl font-bold shadow-xl relative z-10">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                            )}
                             <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-purple-600 border-3 border-white flex items-center justify-center text-white shadow-md z-20">
                                 <Zap size={14} fill="currentColor" />
                             </div>
@@ -374,69 +382,118 @@ export default function Profile() {
 
                     </div>
 
-                    {/* Right Column (Saved Protocols) */}
+                    {/* Right Column (Saved Content) */}
                     <div className="bg-white p-6 md:p-8 border border-gray-100 rounded-2xl shadow-sm flex flex-col h-full lg:max-h-[850px]">
-                        <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center justify-between mb-6">
                             <h2 className="text-base font-bold tracking-tight text-gray-900 flex items-center gap-3">
                                 <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
                                     <Bookmark size={14} className="fill-current" />
                                 </div>
-                                Saved Tools
+                                Saved Items
                             </h2>
                         </div>
 
-                        <div className="space-y-4 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-                            {bookmarks.length > 0 ? (
-                                bookmarks.map((tool) => (
-                                    <div key={tool.id || tool._id} className="p-4 rounded-3xl bg-white border border-gray-100 flex flex-col hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/40 transition-all group">
-                                        <div className="flex items-center gap-4 mb-3">
-                                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 p-2 flex-shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
-                                                <ToolLogo tool={tool} />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h4 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors text-sm flex items-center gap-1.5">
-                                                    {tool.name}
-                                                    {tool.verified && (
-                                                        <span title="Verified Protocol">
-                                                            <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                            </svg>
-                                                        </span>
-                                                    )}
-                                                </h4>
-                                                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{tool.category}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 mt-auto">
-                                            <SafeLink
-                                                url={tool.url}
-                                                verified={false}
-                                                hideDomain={true}
-                                                className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider relative group/link"
-                                            >
-                                                <div className="flex flex-row items-center justify-center gap-2 w-full absolute inset-0">
-                                                    Launch <ExternalLink size={14} className="opacity-70 group-hover/link:opacity-100" />
+                        <div className="space-y-8 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                            {/* Tools Section */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2">Tools</h3>
+                                {bookmarks.length > 0 ? (
+                                    bookmarks.map((tool) => (
+                                        <div key={tool.id || tool._id} className="p-4 rounded-3xl bg-white border border-gray-100 flex flex-col hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/40 transition-all group">
+                                            <div className="flex items-center gap-4 mb-3">
+                                                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 p-2 flex-shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+                                                    <ToolLogo tool={tool} />
                                                 </div>
-                                            </SafeLink>
-                                            <button
-                                                onClick={() => toggleBookmark(tool)}
-                                                className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:shadow-md hover:shadow-red-200 transition-all shrink-0"
-                                                title="Remove Bookmark"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
+                                                <div className="min-w-0">
+                                                    <h4 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors text-sm flex items-center gap-1.5">
+                                                        {tool.name}
+                                                        {tool.verified && (
+                                                            <span title="Verified Protocol">
+                                                                <svg className="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                        )}
+                                                    </h4>
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{tool.category}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-auto">
+                                                <SafeLink
+                                                    url={tool.url}
+                                                    verified={false}
+                                                    hideDomain={true}
+                                                    className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider relative group/link"
+                                                >
+                                                    <div className="flex flex-row items-center justify-center gap-2 w-full absolute inset-0">
+                                                        Launch <ExternalLink size={14} className="opacity-70 group-hover/link:opacity-100" />
+                                                    </div>
+                                                </SafeLink>
+                                                <button
+                                                    onClick={() => toggleBookmark(tool)}
+                                                    className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:shadow-md hover:shadow-red-200 transition-all shrink-0"
+                                                    title="Remove Tool"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-6 px-4 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                                        <p className="text-slate-500 text-xs font-medium">No tools saved yet</p>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-16 px-4 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 h-full flex flex-col items-center justify-center">
-                                    <Bookmark className="mx-auto text-slate-300 mb-4" size={40} />
-                                    <p className="text-slate-800 font-bold mb-2">No tools saved yet</p>
-                                    <Link to="/apps" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 font-bold uppercase tracking-wider text-[10px] rounded-xl shadow-sm border border-slate-200 hover:border-indigo-200 hover:shadow-md hover:text-indigo-700 transition-all mt-4">
-                                        Directory
-                                    </Link>
-                                </div>
-                            )}
+                                )}
+                            </div>
+
+                            {/* Courses Section */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest pl-2">Courses</h3>
+                                {courseBookmarks.length > 0 ? (
+                                    courseBookmarks.map((course) => (
+                                        <div key={course.id || course._id} className="p-4 rounded-3xl bg-white border border-gray-100 flex flex-col hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/40 transition-all group">
+                                            <div className="flex items-center gap-4 mb-3">
+                                                <div className="w-16 h-12 rounded-xl flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden bg-slate-50 flex items-center justify-center p-1 border border-slate-100">
+                                                    {course.thumbnail ? (
+                                                        <img src={course.thumbnail} alt="" className="max-w-full max-h-full object-contain" onError={e => e.target.style.display = 'none'} />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-xl">🎓</div>
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors text-sm">
+                                                        {course.title}
+                                                    </h4>
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">{course.platform}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-auto">
+                                                <a
+                                                    href={course.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider relative group/link"
+                                                >
+                                                    <div className="flex flex-row items-center justify-center gap-2 w-full absolute inset-0">
+                                                        Watch <ExternalLink size={14} className="opacity-70 group-hover/link:opacity-100" />
+                                                    </div>
+                                                </a>
+                                                <button
+                                                    onClick={() => toggleCourseBookmark(course)}
+                                                    className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:shadow-md hover:shadow-red-200 transition-all shrink-0"
+                                                    title="Remove Course"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-6 px-4 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                                        <p className="text-slate-500 text-xs font-medium">No courses saved yet</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

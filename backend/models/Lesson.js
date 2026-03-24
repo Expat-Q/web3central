@@ -23,6 +23,24 @@ const LessonSchema = new mongoose.Schema({
         enum: ['Beginner', 'Intermediate', 'Advanced'],
         default: 'Beginner'
     },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    isUserGenerated: {
+        type: Boolean,
+        default: false
+    },
+    upvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    ratings: {
+        thumbsUp: { type: Number, default: 0 },
+        thumbsDown: { type: Number, default: 0 },
+        thumbsUpBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        thumbsDownBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    },
     createdAt: {
         type: Date,
         default: Date.now
