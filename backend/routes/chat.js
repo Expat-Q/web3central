@@ -156,6 +156,7 @@ async function callGrok(messages) {
 // POST /api/chat — OpenAI primary, Grok fallback
 router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
     const { messages } = req.body;
+    res.setHeader('X-Chat-Provider-Chain', 'openai>grok>offline-fallback');
 
     // Sanitize messages to only include role and content
     const sanitized = messages.map(m => ({
