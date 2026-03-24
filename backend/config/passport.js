@@ -57,10 +57,14 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
 // ============================================
 // GOOGLE STRATEGY
 // ============================================
+const getAbsoluteCallback = (path) => {
+    return process.env.BACKEND_URL ? `${process.env.BACKEND_URL}${path}` : `http://localhost:5000${path}`;
+}
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'placeholder_google_id',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'placeholder_google_secret',
-    callbackURL: '/api/auth/google/callback',
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || getAbsoluteCallback('/api/auth/google/callback'),
     proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
     try {

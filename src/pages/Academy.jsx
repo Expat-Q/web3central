@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
-import { fetchCuratedCourses } from '../services/apiService';
+import { fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
 import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
-    Play, Globe, Bookmark, Search
+    Play, Globe, Bookmark, Search, Users, Plus, Star, Heart, Edit3,
+    ThumbsUp, ThumbsDown, Zap, Eye, PenLine
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 
@@ -22,12 +24,20 @@ const PLATFORM_COLORS = {
 export default function Academy() {
     const [lessons, setLessons] = useState([]);
     const [courses, setCourses] = useState([]);
+    const [communityLessons, setCommunityLessons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
     const [activeTab, setActiveTab] = useState('lessons');
     const [searchQuery, setSearchQuery] = useState('');
     const [priceFilter, setPriceFilter] = useState('All'); // 'All', 'Free', 'Paid'
+    const [levelFilter, setLevelFilter] = useState('All'); 
+    const [platformFilter, setPlatformFilter] = useState('All');
     const [dropOpen, setDropOpen] = useState(false);
+    
+    // Community Feed specific state
+    const [showCommunityModal, setShowCommunityModal] = useState(false);
+    const [submittingPost, setSubmittingPost] = useState(false);
+    const [newPostData, setNewPostData] = useState({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
 
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
@@ -38,12 +48,14 @@ export default function Academy() {
         const fetchAll = async () => {
             try {
                 const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
-                const [lessonsRes, coursesData] = await Promise.all([
+                const [lessonsRes, coursesData, communityData] = await Promise.all([
                     fetch(`${baseUrl}/academy/lessons`).then(r => r.json()),
-                    fetchCuratedCourses().catch(() => [])
+                    fetchCuratedCourses().catch(() => []),
+                    fetchCommunityLessons().catch(() => [])
                 ]);
                 if (lessonsRes.success) setLessons(lessonsRes.data);
                 setCourses(coursesData);
+                setCommunityLessons(communityData);
             } catch (err) {
                 console.error('Error fetching academy data:', err);
             } finally {
@@ -98,11 +110,18 @@ export default function Academy() {
     }
 
     const LESSON_MODULES = [
-        { name: 'All', icon: <Layers size={18} /> },
-        { name: 'Web3 Foundations', icon: <BookOpen size={18} /> },
-        { name: 'DeFi Architecture', icon: <Coins size={18} /> },
-        { name: 'Smart Contract Security', icon: <Shield size={18} /> }
+        { name: 'All', icon: <Layers size={16} />, color: 'bg-gray-900 text-white border-gray-900', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900' },
+        { name: 'Web3 Foundations', icon: <BookOpen size={16} />, color: 'bg-blue-600 text-white border-blue-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-700', dot: 'bg-blue-500' },
+        { name: 'DeFi Architecture', icon: <Coins size={16} />, color: 'bg-emerald-600 text-white border-emerald-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-700', dot: 'bg-emerald-500' },
+        { name: 'Smart Contract Security', icon: <Shield size={16} />, color: 'bg-purple-600 text-white border-purple-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-700', dot: 'bg-purple-500' },
     ];
+
+    const MODULE_COLORS = {
+        'Web3 Foundations': { bg: 'bg-blue-50', text: 'text-blue-600', icon: <BookOpen size={22} className="text-blue-600" /> },
+        'DeFi Architecture': { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: <Coins size={22} className="text-emerald-600" /> },
+        'Smart Contract Security': { bg: 'bg-purple-50', text: 'text-purple-600', icon: <Shield size={22} className="text-purple-600" /> },
+    };
+    const defaultModule = { bg: 'bg-gray-50', text: 'text-gray-600', icon: <BookOpen size={22} className="text-gray-500" /> };
 
     const filteredLessons = activeCategory === 'All'
         ? lessons
@@ -120,10 +139,72 @@ export default function Academy() {
             (course.description && course.description.toLowerCase().includes(query)) ||
             (course.tags && course.tags.some(tag => tag.toLowerCase().includes(query)));
 
-        if (priceFilter === 'Free') return matchesSearch && course.isFree;
-        if (priceFilter === 'Paid') return matchesSearch && !course.isFree;
-        return matchesSearch;
+        let matchesPrice = true;
+        if (priceFilter === 'Free') matchesPrice = course.isFree;
+        if (priceFilter === 'Paid') matchesPrice = !course.isFree;
+
+        const matchesLevel = levelFilter === 'All' || course.level === levelFilter;
+        const matchesPlatform = platformFilter === 'All' || course.platform === platformFilter;
+
+        return matchesSearch && matchesPrice && matchesLevel && matchesPlatform;
     });
+
+    const uniquePlatforms = ['All', ...new Set(courses.map(c => c.platform).filter(Boolean))];
+    const uniqueLevels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+
+    const handleUpvote = async (lessonId) => {
+        if (!user) return navigate('/login');
+        try {
+            await upvoteCommunityLesson(lessonId);
+            setCommunityLessons(prev => prev.map(l => {
+                if (l._id !== lessonId) return l;
+                const alreadyUpvoted = l.upvotes?.includes(user.id);
+                return {
+                    ...l,
+                    upvotes: alreadyUpvoted
+                        ? l.upvotes.filter(id => id !== user.id)
+                        : [...(l.upvotes || []), user.id]
+                };
+            }));
+        } catch (err) {
+            console.error('Failed to upvote:', err);
+        }
+    };
+
+    const handleRate = async (lessonId, rating) => {
+        if (!user) return navigate('/login');
+        try {
+            const res = await rateCommunityLesson(lessonId, rating);
+            if (res.success) {
+                setCommunityLessons(prev => prev.map(l =>
+                    l._id === lessonId ? { ...l, ratings: res.ratings } : l
+                ));
+            }
+        } catch (err) {
+            console.error('Failed to rate:', err);
+        }
+    };
+
+    const handleCreatePost = async (e) => {
+        e.preventDefault();
+        setSubmittingPost(true);
+        try {
+            const res = await createCommunityLesson({
+                ...newPostData,
+                level: 'Intermediate' 
+            });
+            if (res.success) {
+                const refreshed = await fetchCommunityLessons();
+                setCommunityLessons(refreshed);
+                setShowCommunityModal(false);
+                setNewPostData({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
+            }
+        } catch (err) {
+            console.error("Failed to create post:", err);
+        } finally {
+            setSubmittingPost(false);
+        }
+    };
 
     return (
         <div className="bg-white min-h-screen text-gray-900 pt-32 pb-32 px-6 relative overflow-x-hidden">
@@ -177,6 +258,15 @@ export default function Academy() {
                             <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full font-bold">{courses.length}</span>
                         )}
                     </button>
+                    <button
+                        onClick={() => setActiveTab('community')}
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'community'
+                            ? 'bg-blue-600 text-white shadow-md border-blue-600'
+                            : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border-gray-200 shadow-sm'
+                            }`}
+                    >
+                        <Users size={15} /> Community Feed
+                    </button>
                 </div>
 
                 {/* ── LESSONS TAB ── */}
@@ -215,22 +305,24 @@ export default function Academy() {
                             )}
                         </div>
 
-                        {/* Desktop: Buttons */}
+                        {/* Desktop: Colourized pill filters */}
                         <motion.div
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="hidden sm:flex sm:flex-wrap gap-3 mb-12"
+                            className="hidden sm:flex sm:flex-wrap gap-2 mb-12"
                         >
                             {LESSON_MODULES.map(cat => (
                                 <button
                                     key={cat.name}
                                     onClick={() => setActiveCategory(cat.name)}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all border shadow-sm ${activeCategory === cat.name
-                                        ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                                        : 'bg-white border-gray-100 text-gray-500 hover:border-purple-200 hover:text-purple-600'
-                                        }`}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all border shadow-sm ${
+                                        activeCategory === cat.name ? cat.color : cat.inactive
+                                    }`}
                                 >
+                                    {activeCategory === cat.name && cat.dot && (
+                                        <span className={`w-2 h-2 rounded-full bg-white opacity-70`} />
+                                    )}
                                     {cat.icon} {cat.name}
                                 </button>
                             ))}
@@ -253,41 +345,51 @@ export default function Academy() {
                                         transition={{ delay: (i % 3) * 0.1, duration: 0.6 }}
                                         className="group"
                                     >
-                                        <div className="bg-white border border-gray-100 p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.06)] hover:border-purple-100 transition-all duration-500 flex flex-col h-full relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-[100px] -translate-y-4 translate-x-4 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                                            <div className="mb-8 flex justify-between items-start relative z-10">
-                                                <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-3xl group-hover:scale-110 shadow-sm transition-transform duration-500 text-purple-600">
-                                                    <BookOpen size={28} />
+                                        <div className="bg-white border border-gray-100 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(109,40,217,0.08)] hover:border-purple-100 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
+                                            {/* Completed overlay badge */}
+                                            {user?.learningProgress?.[lesson.slug]?.completed && (
+                                                <div className="absolute top-4 right-4 flex items-center gap-1 bg-green-50 border border-green-100 text-green-600 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+                                                    <CheckCircle2 size={9} /> Mastered
                                                 </div>
-                                                <div className="flex flex-col items-end gap-2">
-                                                    <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider border border-purple-100">{lesson.level}</span>
+                                            )}
+                                            <div className="mb-6 flex items-start gap-4">
+                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0 ${(MODULE_COLORS[lesson.module] || defaultModule).bg}`}>
+                                                    {(MODULE_COLORS[lesson.module] || defaultModule).icon}
+                                                </div>
+                                                <div>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${(MODULE_COLORS[lesson.module] || defaultModule).text}`}>
+                                                        {lesson.module}
+                                                    </span>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">{lesson.level}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="relative z-10 flex-grow">
-                                                <h3 className="text-lg md:text-xl font-bold mb-3 tracking-tight text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">{lesson.title}</h3>
-                                                <p className="text-gray-500 text-sm mb-6 line-clamp-3 leading-relaxed font-medium">{lesson.description}</p>
+                                            <div className="flex-grow">
+                                                <h3 className="text-base md:text-lg font-black mb-2 tracking-tight text-gray-900 group-hover:text-purple-700 transition-colors leading-snug">{lesson.title}</h3>
+                                                <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed">{lesson.description}</p>
                                             </div>
-                                            <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between relative z-10">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="p-1.5 rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-100 shadow-sm"><Award size={14} /></div>
-                                                    <span className="text-xs font-bold text-gray-900">+{lesson.xpReward} XP</span>
+                                            <div className="mt-auto pt-5 border-t border-gray-50 flex items-center justify-between">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Zap size={13} className="text-amber-500" />
+                                                    <span className="text-xs font-black text-gray-900">+{lesson.xpReward} XP</span>
                                                 </div>
-                                                {user?.learningProgress?.[lesson.id]?.completed ? (
-                                                    <div className="flex items-center gap-2 text-green-500 bg-green-50 pl-2 pr-4 py-1.5 rounded-full border border-green-100">
-                                                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center"><CheckCircle2 size={12} className="text-white" /></div>
-                                                        <span className="font-bold text-[10px] uppercase tracking-widest">Mastered</span>
+                                                {user?.learningProgress?.[lesson.slug]?.completed ? (
+                                                    <div className="flex items-center gap-1.5 text-green-600 bg-green-50 pl-2 pr-3 py-1.5 rounded-full border border-green-100">
+                                                        <CheckCircle2 size={12} />
+                                                        <span className="font-bold text-[10px] uppercase tracking-wide">Done</span>
                                                     </div>
                                                 ) : isLocked(lesson.prerequisites) ? (
-                                                    <div className="flex items-center gap-2 text-gray-400 bg-gray-50 pl-2 pr-4 py-1.5 rounded-full border border-gray-100">
-                                                        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center"><Shield size={12} className="text-gray-500" /></div>
-                                                        <span className="font-bold text-[10px] uppercase tracking-widest">Locked</span>
+                                                    <div className="flex items-center gap-1.5 text-gray-400 bg-gray-50 pl-2 pr-3 py-1.5 rounded-full border border-gray-200">
+                                                        <Lock size={11} />
+                                                        <span className="font-bold text-[10px] uppercase tracking-wide">Locked</span>
                                                     </div>
                                                 ) : (
                                                     <Link
                                                         to={`/academy/${lesson.slug}`}
-                                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-purple-600 transition-all shadow-lg shadow-gray-200"
+                                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-purple-600 transition-all shadow-md"
                                                     >
-                                                        Start Lesson <ChevronRight size={14} />
+                                                        Start <ChevronRight size={12} />
                                                     </Link>
                                                 )}
                                             </div>
@@ -307,30 +409,57 @@ export default function Academy() {
                         transition={{ duration: 0.5 }}
                     >
                         {/* Search and Filters */}
-                        <div className="flex flex-col md:flex-row gap-4 mb-8 relative z-20">
-                            <div className="flex-grow relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Search courses by title, description, or tags..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] focus:border-purple-300 focus:ring-4 focus:ring-purple-50 transition-all font-medium text-sm outline-none"
-                                />
+                        <div className="flex flex-col gap-4 mb-8 relative z-20">
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex-grow relative">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search courses by title, description, or tags..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] focus:border-purple-300 focus:ring-4 focus:ring-purple-50 transition-all font-medium text-sm outline-none"
+                                    />
+                                </div>
+                                <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                                    {['All', 'Free', 'Paid'].map(filter => (
+                                        <button
+                                            key={filter}
+                                            onClick={() => setPriceFilter(filter)}
+                                            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
+                                                ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                                                : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
+                                                }`}
+                                        >
+                                            {filter}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-                                {['All', 'Free', 'Paid'].map(filter => (
-                                    <button
-                                        key={filter}
-                                        onClick={() => setPriceFilter(filter)}
-                                        className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
-                                            ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                                            : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
-                                            }`}
+                            
+                            <div className="flex flex-col sm:flex-row gap-3 items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 w-full md:w-auto">
+                                <span className="hidden sm:inline-block text-xs font-bold text-gray-400 uppercase tracking-widest px-2">Filters</span>
+                                <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
+                                    <select 
+                                        value={levelFilter}
+                                        onChange={(e) => setLevelFilter(e.target.value)}
+                                        className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
                                     >
-                                        {filter}
-                                    </button>
-                                ))}
+                                        {uniqueLevels.map(level => (
+                                            <option key={level} value={level}>{level === 'All' ? 'All Levels' : level}</option>
+                                        ))}
+                                    </select>
+                                    
+                                    <select 
+                                        value={platformFilter}
+                                        onChange={(e) => setPlatformFilter(e.target.value)}
+                                        className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
+                                    >
+                                        {uniquePlatforms.map(platform => (
+                                            <option key={platform} value={platform}>{platform === 'All' ? 'All Platforms' : platform}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -346,7 +475,7 @@ export default function Academy() {
                                 <p className="font-bold text-lg text-gray-900">No courses found.</p>
                                 <p className="text-sm mt-1">Try adjusting your search or filters.</p>
                                 <button
-                                    onClick={() => { setSearchQuery(''); setPriceFilter('All'); }}
+                                    onClick={() => { setSearchQuery(''); setPriceFilter('All'); setLevelFilter('All'); setPlatformFilter('All'); }}
                                     className="mt-4 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl font-bold text-sm hover:bg-purple-100 transition-colors"
                                 >
                                     Clear Filters
@@ -363,7 +492,23 @@ export default function Academy() {
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
                                             transition={{ delay: (i % 3) * 0.1, duration: 0.5 }}
+                                            className="relative"
                                         >
+                                            {/* Bookmark Button — outside overflow-hidden so it's always visible */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    toggleBookmark(course);
+                                                }}
+                                                className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
+                                                title={isBookmarked(course._id) ? 'Remove Bookmark' : 'Bookmark Course'}
+                                            >
+                                                <Bookmark
+                                                    size={16}
+                                                    fill={isBookmarked(course._id) ? 'currentColor' : 'none'}
+                                                    className={isBookmarked(course._id) ? 'text-purple-600' : ''}
+                                                />
+                                            </button>
                                             <a
                                                 href={course.url}
                                                 target="_blank"
@@ -451,7 +596,215 @@ export default function Academy() {
                         )}
                     </motion.div>
                 )}
+
+                {/* ── COMMUNITY FEED TAB ── */}
+                {activeTab === 'community' && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-900">Community</h2>
+                            <button
+                                onClick={() => user ? setShowCommunityModal(true) : navigate('/login')}
+                                className="hidden sm:flex px-5 py-2 bg-gray-900 text-white font-bold rounded-full text-[14px] items-center gap-2 hover:bg-gray-700 transition-colors"
+                            >
+                                <PenLine size={14} /> Post
+                            </button>
+                        </div>
+
+                        {communityLessons.length === 0 ? (
+                            <div className="text-center py-20 text-gray-400 max-w-[600px] mx-auto border border-gray-200 rounded-2xl bg-white">
+                                <Users size={40} className="mx-auto mb-3 opacity-20" />
+                                <p className="font-bold text-base text-gray-900">Nothing here yet.</p>
+                                <p className="text-sm mt-1">Be the first to share your Web3 knowledge!</p>
+                            </div>
+                        ) : (
+                            <div className="max-w-[600px] mx-auto border border-gray-200 rounded-2xl overflow-hidden bg-white divide-y divide-gray-100">
+                                {communityLessons.map((lesson, i) => {
+                                    const initials = lesson.author?.name
+                                        ? lesson.author.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+                                        : '?';
+                                    const isLiked = lesson.upvotes?.includes(user?.id);
+                                    const diff = Date.now() - new Date(lesson.createdAt).getTime();
+                                    const timeAgo = diff < 3600000
+                                        ? `${Math.floor(diff / 60000)}m`
+                                        : diff < 86400000
+                                            ? `${Math.floor(diff / 3600000)}h`
+                                            : `${Math.floor(diff / 86400000)}d`;
+
+                                    return (
+                                        <div
+                                            key={lesson._id}
+                                            className="flex gap-3 px-4 py-3 hover:bg-gray-50/80 transition-colors cursor-pointer"
+                                            onClick={() => navigate(`/academy/${lesson.slug}`)}
+                                        >
+                                            {/* Avatar */}
+                                            <div className="shrink-0 pt-0.5">
+                                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm text-gray-600 overflow-hidden">
+                                                    {lesson.author?.avatarUrl
+                                                        ? <img src={lesson.author.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                                                        : <span>{initials}</span>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            {/* Right column */}
+                                            <div className="flex-grow min-w-0">
+                                                {/* Header: Name · @handle · time · ··· */}
+                                                <div className="flex items-center justify-between mb-0.5">
+                                                    <div className="flex items-baseline gap-1 flex-wrap min-w-0">
+                                                        <span className="font-bold text-[15px] text-gray-900 leading-none">{lesson.author?.name || 'Anonymous'}</span>
+                                                        <span className="text-gray-500 text-[14px] hidden sm:inline">@{(lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
+                                                        <span className="text-gray-400 text-[14px]">·</span>
+                                                        <span className="text-gray-500 text-[14px]">{timeAgo}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={e => e.stopPropagation()}
+                                                        className="shrink-0 ml-1 p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                                                        title="More"
+                                                    >
+                                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+
+                                                {/* Post text */}
+                                                <p className="text-[15px] text-gray-900 leading-relaxed mb-3">
+                                                    {lesson.title}
+                                                    {lesson.description && (
+                                                        <span className="text-gray-500"> — {lesson.description}</span>
+                                                    )}
+                                                </p>
+
+                                                {/* Action bar — 3 buttons only: comment, like, share */}
+                                                <div
+                                                    className="flex items-center gap-1 -ml-2"
+                                                    onClick={e => e.stopPropagation()}
+                                                >
+                                                    {/* Comment — opens the lesson */}
+                                                    <button
+                                                        onClick={() => navigate(`/academy/${lesson.slug}`)}
+                                                        className="flex items-center gap-1 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                                                        title="Read lesson"
+                                                    >
+                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                                        </svg>
+                                                    </button>
+
+                                                    {/* Like */}
+                                                    <button
+                                                        onClick={() => handleUpvote(lesson._id)}
+                                                        className={`flex items-center gap-1 p-2 rounded-full transition-all ${isLiked ? 'text-pink-500 bg-pink-50' : 'text-gray-500 hover:text-pink-500 hover:bg-pink-50'}`}
+                                                        title="Like"
+                                                    >
+                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                                        </svg>
+                                                        {(lesson.upvotes?.length || 0) > 0 && (
+                                                            <span className="text-[13px] tabular-nums">{lesson.upvotes.length}</span>
+                                                        )}
+                                                    </button>
+
+                                                    {/* Share — copy link */}
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(`${window.location.origin}/academy/${lesson.slug}`);
+                                                        }}
+                                                        className="flex items-center gap-1 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                                                        title="Copy link"
+                                                    >
+                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                                            <polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Mobile FAB */}
+                        <button
+                            onClick={() => user ? setShowCommunityModal(true) : navigate('/login')}
+                            className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-600 transition-colors"
+                        >
+                            <PenLine size={22} />
+                        </button>
+                    </motion.div>
+                )}
             </div>
+
+            {/* Post Creation Modal */}
+            {showCommunityModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowCommunityModal(false)} />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white rounded-3xl w-full max-w-2xl relative z-10 p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+                    >
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <Plus size={24} className="text-blue-500" /> Publish a Lesson
+                        </h2>
+                        <form onSubmit={handleCreatePost} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Title</label>
+                                <input 
+                                    required
+                                    type="text" 
+                                    value={newPostData.title}
+                                    onChange={e => setNewPostData(prev => ({...prev, title: e.target.value}))}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium" 
+                                    placeholder="e.g. A Deep Dive into Zero-Knowledge Proofs"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Short Description (Optional)</label>
+                                <input 
+                                    type="text" 
+                                    value={newPostData.description}
+                                    onChange={e => setNewPostData(prev => ({...prev, description: e.target.value}))}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium" 
+                                    placeholder="A brief summary of what this covers."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1 mt-2">Lesson Content (Markdown Supported)</label>
+                                <textarea 
+                                    required
+                                    value={newPostData.contentMarkdown}
+                                    onChange={e => setNewPostData(prev => ({...prev, contentMarkdown: e.target.value}))}
+                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium resize-none font-mono text-sm leading-relaxed" 
+                                    placeholder="Write your lesson content here... Use markdown for headers, lists, code, etc."
+                                />
+                            </div>
+                            <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCommunityModal(false)}
+                                    className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submittingPost}
+                                    className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                >
+                                    {submittingPost ? 'Publishing...' : 'Publish Lesson'}
+                                </button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }

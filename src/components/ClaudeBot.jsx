@@ -37,6 +37,12 @@ export default function ClaudeBot() {
         scrollToBottom();
     }, [messages, isTyping, isOpen, isFullScreen]);
 
+    useEffect(() => {
+        const handleOpenClaude = () => setIsOpen(true);
+        window.addEventListener('open-claude', handleOpenClaude);
+        return () => window.removeEventListener('open-claude', handleOpenClaude);
+    }, []);
+
     const sendMessage = async (text) => {
         if (!text?.trim() || isTyping) return;
 
@@ -63,7 +69,7 @@ export default function ClaudeBot() {
             const data = await response.json();
 
             if (data.success) {
-                setLastProvider(data.provider || 'gemini');
+                setLastProvider(data.provider || 'openai');
                 setMessages(prev => [...prev, {
                     id: Date.now(),
                     role: 'assistant',
@@ -216,7 +222,7 @@ export default function ClaudeBot() {
                                         </div>
                                         {msg.provider && (
                                             <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
-                                                via {msg.provider === 'openai' ? 'OpenAI' : msg.provider === 'grok' ? 'Grok' : msg.provider === 'offline-fallback' ? 'Offline Fallback' : 'Gemini'}
+                                                via {msg.provider === 'openai' ? 'OpenAI' : msg.provider === 'grok' ? 'Grok' : 'Offline Fallback'}
                                             </div>
                                         )}
                                     </div>

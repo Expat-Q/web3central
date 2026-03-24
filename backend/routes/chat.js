@@ -1,27 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { AppError, asyncHandler } = require('../errors');
+const { asyncHandler } = require('../errors');
 const { validate } = require('../middleware/validate');
-
-const MAX_ERROR_MESSAGE_LENGTH = 150;
 
 const chatSchema = {
     body: {
         messages: ['required', { type: 'array', minLength: 1, maxLength: 50 }]
     }
-};
-
-const GEMINI_FREE_TIER_MODELS = [
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-lite',
-    'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-1.5-flash'
-];
-
-let geminiModelsCache = {
-    expiresAt: 0,
-    models: []
 };
 
 const WEB3_SYSTEM_PROMPT = `You are Web3Central AI, an expert Web3 development assistant embedded in the web3central platform. You specialize in:
@@ -168,122 +153,7 @@ async function callGrok(messages) {
     return data.choices[0].message.content;
 }
 
-// Gemini API call
-async function getAvailableGeminiModels(apiKey) {
-    const now = Date.now();
-    if (geminiModelsCache.expiresAt > now && geminiModelsCache.models.length > 0) {
-        return geminiModelsCache.models;
-    }
-
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
-            { method: 'GET' }
-        );
-
-        if (!response.ok) {
-            return [];
-        }
-
-        const data = await response.json();
-        const models = (data.models || [])
-            .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-            .map(m => (m.name || '').replace('models/', ''))
-            .filter(Boolean);
-
-        geminiModelsCache = {
-            expiresAt: now + 10 * 60 * 1000,
-            models
-        };
-
-        return models;
-    } catch {
-        return [];
-    }
-}
-
-async function callGemini(messages) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
-
-    const availableModels = await getAvailableGeminiModels(apiKey);
-
-    const preferred = [process.env.GEMINI_MODEL, ...GEMINI_FREE_TIER_MODELS].filter(Boolean);
-
-    const preferredAvailable = preferred.filter(model => availableModels.includes(model));
-
-    const discoveredFlash = availableModels.filter(model =>
-        model.includes('flash') && !preferredAvailable.includes(model)
-    );
-
-    const modelCandidates = [
-        ...preferredAvailable,
-        ...discoveredFlash,
-        ...preferred
-    ]
-        .filter(Boolean)
-        .filter((model, index, arr) => arr.indexOf(model) === index);
-
-    // Convert chat messages to Gemini format
-    const geminiContents = [];
-
-    // Add system instruction as first user turn context
-    geminiContents.push({
-        role: 'user',
-        parts: [{ text: WEB3_SYSTEM_PROMPT + '\n\nPlease acknowledge and follow these instructions.' }]
-    });
-    geminiContents.push({
-        role: 'model',
-        parts: [{ text: 'Understood. I am Web3Central AI, ready to assist with all Web3-related questions.' }]
-    });
-
-    // Add conversation history
-    for (const msg of messages) {
-        geminiContents.push({
-            role: msg.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: msg.content }]
-        });
-    }
-
-    let lastError = null;
-
-    for (const model of modelCandidates) {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: geminiContents,
-                    generationConfig: {
-                        maxOutputTokens: 1024,
-                        temperature: 0.7
-                    }
-                })
-            }
-        );
-
-        if (!response.ok) {
-            const errBody = await response.text();
-            console.warn(`[Gemini:${model}] HTTP ${response.status}:`, errBody);
-            lastError = new Error(`Gemini API error (${model}) ${response.status}`);
-            continue;
-        }
-
-        const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-            return text;
-        }
-
-        console.warn(`[Gemini:${model}] Empty response payload`);
-        lastError = new Error(`Gemini returned an empty response (${model})`);
-    }
-
-    throw lastError || new Error('Gemini request failed');
-}
-
-// POST /api/chat — OpenAI primary, Gemini/Grok fallback
+// POST /api/chat — OpenAI primary, Grok fallback
 router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
     const { messages } = req.body;
 
@@ -300,22 +170,15 @@ router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
         reply = await callOpenAI(sanitized);
     } catch (openaiErr) {
         console.warn('OpenAI failed:', openaiErr.message);
-        provider = 'gemini';
+        provider = 'grok';
         try {
-            reply = await callGemini(sanitized);
-        } catch (geminiErr) {
-            console.warn('Gemini failed:', geminiErr.message);
-            provider = 'grok';
-            try {
-                reply = await callGrok(sanitized);
-            } catch (grokErr) {
-                console.error('[Chat] All AI providers failed.');
-                console.error('  OpenAI:', openaiErr.message);
-                console.error('  Gemini:', geminiErr.message);
-                console.error('  Grok:', grokErr.message);
-                provider = 'offline-fallback';
-                reply = buildOfflineFallbackReply(sanitized);
-            }
+            reply = await callGrok(sanitized);
+        } catch (grokErr) {
+            console.error('[Chat] AI providers failed.');
+            console.error('  OpenAI:', openaiErr.message);
+            console.error('  Grok:', grokErr.message);
+            provider = 'offline-fallback';
+            reply = buildOfflineFallbackReply(sanitized);
         }
     }
 
