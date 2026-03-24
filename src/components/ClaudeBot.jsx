@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'
@@ -125,35 +126,42 @@ export default function ClaudeBot() {
         }
     };
 
-    // Format message content — handle code blocks
-    const formatMessage = (content) => {
-        const parts = content.split(/(```[\s\S]*?```)/g);
-        return parts.map((part, i) => {
-            if (part.startsWith('```') && part.endsWith('```')) {
-                const codeContent = part.slice(3, -3);
-                const firstNewline = codeContent.indexOf('\n');
-                const lang = firstNewline > 0 ? codeContent.slice(0, firstNewline).trim() : '';
-                const code = firstNewline > 0 ? codeContent.slice(firstNewline + 1) : codeContent;
-                return (
-                    <pre key={i} className="bg-slate-900 text-green-400 rounded-lg p-3 my-2 overflow-x-auto text-xs font-mono">
-                        {lang && <div className="text-slate-500 text-[10px] mb-1 uppercase">{lang}</div>}
-                        <code>{code}</code>
-                    </pre>
-                );
-            }
-            // Handle inline code
-            const inlineParts = part.split(/(`[^`]+`)/g);
-            return (
-                <span key={i}>
-                    {inlineParts.map((ip, j) =>
-                        ip.startsWith('`') && ip.endsWith('`')
-                            ? <code key={j} className="bg-slate-200 text-purple-700 px-1 py-0.5 rounded text-xs font-mono">{ip.slice(1, -1)}</code>
-                            : <span key={j}>{ip}</span>
-                    )}
-                </span>
-            );
-        });
-    };
+    const renderMarkdownMessage = (content) => (
+        <ReactMarkdown
+            components={{
+                h1: ({ children }) => <h1 className="text-base font-extrabold text-slate-900 mt-2 mb-2">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-[15px] font-bold text-slate-900 mt-2 mb-2">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-sm font-bold text-slate-900 mt-2 mb-1.5">{children}</h3>,
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc pl-5 my-2 space-y-1">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-5 my-2 space-y-1">{children}</ol>,
+                li: ({ children }) => <li>{children}</li>,
+                blockquote: ({ children }) => (
+                    <blockquote className="border-l-2 border-purple-300 pl-3 italic text-gray-700 my-2">{children}</blockquote>
+                ),
+                strong: ({ children }) => <strong className="font-bold text-slate-900">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                code: ({ inline, className, children, ...props }) => {
+                    const match = /language-(\w+)/.exec(className || '');
+                    if (inline) {
+                        return (
+                            <code className="bg-slate-200 text-purple-700 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                                {children}
+                            </code>
+                        );
+                    }
+                    return (
+                        <pre className="bg-slate-900 text-green-400 rounded-lg p-3 my-2 overflow-x-auto text-xs font-mono">
+                            {match?.[1] && <div className="text-slate-500 text-[10px] mb-1 uppercase">{match[1]}</div>}
+                            <code {...props}>{children}</code>
+                        </pre>
+                    );
+                },
+            }}
+        >
+            {content || ''}
+        </ReactMarkdown>
+    );
 
     return (
         <>
@@ -217,8 +225,10 @@ export default function ClaudeBot() {
                                         ? 'bg-purple-600 text-white rounded-br-none'
                                         : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
                                         }`}>
-                                        <div className="whitespace-pre-wrap break-words">
-                                            {msg.role === 'assistant' ? formatMessage(msg.content) : msg.content}
+                                        <div className="break-words">
+                                            {msg.role === 'assistant'
+                                                ? renderMarkdownMessage(msg.content)
+                                                : <span className="whitespace-pre-wrap">{msg.content}</span>}
                                         </div>
                                         {msg.provider && (
                                             <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
