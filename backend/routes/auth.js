@@ -169,7 +169,12 @@ const sendTokenResponse = (user, statusCode, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                learningProgress: user.learningProgress
+                bio: user.bio || '',
+                twitter: user.twitter || '',
+                avatarUrl: user.avatarUrl || '',
+                totalXP: user.totalXP || 0,
+                rank: user.rank || 'Novice',
+                learningProgress: Object.fromEntries(user.learningProgress || new Map())
             }
         });
 };
@@ -197,12 +202,13 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
 
         if (bio !== undefined) user.bio = bio;
         if (twitter !== undefined) user.twitter = twitter;
-        if (name !== undefined) user.name = name;
+        if (name && name.trim().length > 0) user.name = name.trim();
 
         await user.save();
         res.status(200).json({ success: true, user });
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to update profile' });
+        console.error("Profile Save Error:", error);
+        res.status(500).json({ success: false, error: error.message || 'Failed to update profile' });
     }
 });
 
