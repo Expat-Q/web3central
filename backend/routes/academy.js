@@ -5,6 +5,7 @@ const Course = require('../models/Course');
 const User = require('../models/User');
 const { protect, admin } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
+const { normalizeLearningProgressMap, serializeLearningProgress } = require('../utils/learningProgress');
 
 const lessonCreateSchema = {
     body: {
@@ -217,9 +218,7 @@ router.post('/progress/:id', protect, validate(progressSchema), async (req, res)
         const { score } = req.body;
         const user = await User.findById(req.user.id);
 
-        if (!user.learningProgress) {
-            user.learningProgress = new Map();
-        }
+        normalizeLearningProgressMap(user);
 
         // Use slug as the consistent key — it never changes
         const progressKey = lesson.slug;
@@ -263,7 +262,7 @@ router.post('/progress/:id', protect, validate(progressSchema), async (req, res)
                 avatarUrl: user.avatarUrl || '',
                 totalXP: user.totalXP || 0,
                 rank: user.rank || 'Novice',
-                learningProgress: Object.fromEntries(user.learningProgress || new Map())
+                learningProgress: serializeLearningProgress(user.learningProgress)
             }
         });
     } catch (err) {
