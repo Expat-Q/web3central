@@ -200,10 +200,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 router.get('/me', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        const { changed } = normalizeLearningProgressMap(user);
-        if (changed) {
-            await user.save();
-        }
+        normalizeLearningProgressMap(user);
         res.status(200).json({
             success: true,
             user: serializeUser(user)
@@ -218,23 +215,35 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
     try {
         const { bio, twitter, name } = req.body;
         const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-        if (bio !== undefined) user.bio = bio;
+        const updates = {};
+
+        if (bio !== undefined) updates.bio = bio;
         if (twitter !== undefined) {
             const nextTwitter = normalizeTwitterHandle(twitter);
             const prevTwitter = normalizeTwitterHandle(user.twitter || '');
-            user.twitter = nextTwitter;
+            updates.twitter = nextTwitter;
 
             // Update avatar only when user updates X/Twitter handle.
             if (nextTwitter && nextTwitter !== prevTwitter) {
                 const handle = nextTwitter.replace(/^@/, '');
-                user.avatarUrl = `https://unavatar.io/twitter/${handle}`;
+                updates.avatarUrl = `https://unavatar.io/twitter/${handle}`;
             }
         }
-        if (name && name.trim().length > 0) user.name = name.trim();
+        if (name && name.trim().length > 0) updates.name = name.trim();
 
-        await user.save();
-        res.status(200).json({ success: true, user: serializeUser(user) });
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: updates },
+            { new: true, runValidators: true }
+        );
+
+        normalizeLearningProgressMap(updatedUser);
+
+        res.status(200).json({ success: true, user: serializeUser(updatedUser) });
     } catch (error) {
         console.error("Profile Save Error:", error);
         res.status(500).json({ success: false, error: error.message || 'Failed to update profile' });
