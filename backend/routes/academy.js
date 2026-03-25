@@ -217,12 +217,15 @@ router.post('/progress/:id', protect, validate(progressSchema), async (req, res)
 
         const { score } = req.body;
         const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-        normalizeLearningProgressMap(user);
+        const { map: progressMap } = normalizeLearningProgressMap(user);
 
         // Use slug as the consistent key — it never changes
         const progressKey = lesson.slug;
-        const existingProgress = user.learningProgress.get(progressKey);
+        const existingProgress = progressMap.get(progressKey);
         const alreadyCompleted = existingProgress && existingProgress.completed;
 
         const passed = score >= 80;
@@ -238,31 +241,45 @@ router.post('/progress/:id', protect, validate(progressSchema), async (req, res)
             else user.rank = 'Novice';
         }
 
-        user.learningProgress.set(progressKey, {
+        progressMap.set(progressKey, {
             completed: passed || alreadyCompleted,
             quizScore: Math.max(score, existingProgress?.quizScore || 0),
             completedAt: new Date()
         });
 
-        await user.save();
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                $set: {
+                    totalXP: user.totalXP,
+                    rank: user.rank,
+                    learningProgress: Object.fromEntries(progressMap.entries())
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found after update' });
+        }
 
         res.status(200).json({
             success: true,
             passed,
             xpGained,
-            newTotalXP: user.totalXP,
-            newRank: user.rank,
+            newTotalXP: updatedUser.totalXP,
+            newRank: updatedUser.rank,
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                bio: user.bio || '',
-                twitter: user.twitter || '',
-                avatarUrl: user.avatarUrl || '',
-                totalXP: user.totalXP || 0,
-                rank: user.rank || 'Novice',
-                learningProgress: serializeLearningProgress(user.learningProgress)
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                bio: updatedUser.bio || '',
+                twitter: updatedUser.twitter || '',
+                avatarUrl: updatedUser.avatarUrl || '',
+                totalXP: updatedUser.totalXP || 0,
+                rank: updatedUser.rank || 'Novice',
+                learningProgress: serializeLearningProgress(updatedUser.learningProgress)
             }
         });
     } catch (err) {
