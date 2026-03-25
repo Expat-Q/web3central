@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
+const { normalizeLearningProgressMap, serializeLearningProgress } = require('../utils/learningProgress');
 
 const registerSchema = {
     body: {
@@ -50,7 +51,7 @@ const serializeUser = (user) => ({
     avatarUrl: user.avatarUrl || '',
     totalXP: user.totalXP || 0,
     rank: user.rank || 'Novice',
-    learningProgress: Object.fromEntries(user.learningProgress || new Map())
+    learningProgress: serializeLearningProgress(user.learningProgress)
 });
 
 // @desc    Register user
@@ -199,6 +200,10 @@ const sendTokenResponse = (user, statusCode, res) => {
 router.get('/me', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
+        const { changed } = normalizeLearningProgressMap(user);
+        if (changed) {
+            await user.save();
+        }
         res.status(200).json({
             success: true,
             user: serializeUser(user)
