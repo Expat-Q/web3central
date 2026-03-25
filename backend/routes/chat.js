@@ -89,37 +89,55 @@ async function callOpenAI(messages) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
 
-    const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    const modelCandidates = (
+        process.env.OPENAI_MODELS
+            ? process.env.OPENAI_MODELS.split(',').map(m => m.trim()).filter(Boolean)
+            : [process.env.OPENAI_MODEL, 'gpt-4o-mini', 'gpt-4.1-mini', 'gpt-4.1-nano']
+    ).filter(Boolean);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            model,
-            messages: [
-                { role: 'system', content: WEB3_SYSTEM_PROMPT },
-                ...messages
-            ],
-            temperature: 0.7,
-            max_tokens: 1024
-        })
-    });
+    const tried = [];
 
-    if (!response.ok) {
-        const errBody = await response.text();
-        throw new Error(`OpenAI API error (${model}) ${response.status}: ${errBody}`);
+    for (const model of modelCandidates) {
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        { role: 'system', content: WEB3_SYSTEM_PROMPT },
+                        ...messages
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1024
+                })
+            });
+
+            if (!response.ok) {
+                const errBody = await response.text();
+                tried.push(`${model}:${response.status}`);
+                console.warn(`OpenAI failed on model ${model}:`, errBody.slice(0, 300));
+                continue;
+            }
+
+            const data = await response.json();
+            const text = data?.choices?.[0]?.message?.content;
+            if (!text) {
+                tried.push(`${model}:empty-response`);
+                continue;
+            }
+
+            return text;
+        } catch (err) {
+            tried.push(`${model}:network-error`);
+            console.warn(`OpenAI request failed on model ${model}:`, err.message);
+        }
     }
 
-    const data = await response.json();
-    const text = data?.choices?.[0]?.message?.content;
-    if (!text) {
-        throw new Error(`OpenAI returned an empty response (${model})`);
-    }
-
-    return text;
+    throw new Error(`OpenAI API failed for all candidate models: ${tried.join(', ') || 'none-tried'}`);
 }
 
 // Grok (xAI) API call

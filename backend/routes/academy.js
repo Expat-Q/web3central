@@ -65,7 +65,7 @@ router.post('/community', protect, async (req, res) => {
     try {
         const { title, description, contentMarkdown, level, module } = req.body;
         
-        if (!title || !description || !contentMarkdown || !module) {
+        if (!title || !contentMarkdown || !module) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
 
@@ -75,7 +75,7 @@ router.post('/community', protect, async (req, res) => {
             id: slug,
             slug,
             title,
-            description,
+            description: description || '',
             contentMarkdown,
             level: level || 'Beginner',
             module,

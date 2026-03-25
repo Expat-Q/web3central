@@ -133,7 +133,8 @@ app.get('/api/health', (req, res) => {
     chatConfig: {
       openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
       grokConfigured: Boolean(process.env.GROK_API_KEY),
-      openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini'
+      openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      openaiModels: process.env.OPENAI_MODELS || null
     }
   });
 });
