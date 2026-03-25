@@ -38,6 +38,7 @@ export default function Academy() {
     const [showCommunityModal, setShowCommunityModal] = useState(false);
     const [submittingPost, setSubmittingPost] = useState(false);
     const [newPostData, setNewPostData] = useState({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
+    const [communityPostError, setCommunityPostError] = useState('');
 
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
@@ -188,6 +189,7 @@ export default function Academy() {
     const handleCreatePost = async (e) => {
         e.preventDefault();
         setSubmittingPost(true);
+        setCommunityPostError('');
         try {
             const res = await createCommunityLesson({
                 ...newPostData,
@@ -201,6 +203,7 @@ export default function Academy() {
             }
         } catch (err) {
             console.error("Failed to create post:", err);
+            setCommunityPostError(err?.message || 'Failed to publish lesson. Please try again.');
         } finally {
             setSubmittingPost(false);
         }
@@ -786,6 +789,9 @@ export default function Academy() {
                                 />
                             </div>
                             <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
+                                {communityPostError && (
+                                    <p className="mr-auto text-sm font-medium text-red-600">{communityPostError}</p>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => setShowCommunityModal(false)}
