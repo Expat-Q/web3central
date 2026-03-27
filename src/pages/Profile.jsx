@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { ProfileSkeleton } from '../components/Skeleton';
+
 import { Link, useNavigate } from 'react-router-dom';
 import {
     User, Mail, LogOut, Award, BookOpen, Target, Zap, ChevronRight, TrendingUp,
@@ -49,8 +51,7 @@ export default function Profile() {
     const navigate = useNavigate();
 
     const [stats, setStats] = useState({
-        completedLessons: 0,
-        totalXP: 0
+        completedLessons: 0
     });
 
     const [myTools, setMyTools] = useState([]);
@@ -99,8 +100,7 @@ export default function Profile() {
             }
 
             setStats({
-                completedLessons: completed,
-                totalXP: user.totalXP || 0
+                completedLessons: completed
             });
 
             // fetch listed tools
@@ -127,12 +127,9 @@ export default function Profile() {
     };
 
     if (authLoading || !user || user.email === 'guest@web3central.internal') {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-            </div>
-        );
+        return <ProfileSkeleton />;
     }
+
 
     return (
         <div className="bg-white min-h-screen text-gray-900 pt-32 pb-32 px-6 relative overflow-x-hidden">
@@ -157,18 +154,14 @@ export default function Profile() {
                                     {user.name.charAt(0).toUpperCase()}
                                 </div>
                             )}
-                            <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-purple-600 border-3 border-white flex items-center justify-center text-white shadow-md z-20">
-                                <Zap size={14} fill="currentColor" />
-                            </div>
                         </div>
-
                         <div className="text-center md:text-left flex-grow space-y-4">
                                 <>
                                     <div className="flex flex-col md:flex-row items-center gap-4">
                                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 leading-none">{user.name}</h1>
                                         <div className="flex flex-wrap gap-2">
                                             <span className="px-4 py-1.5 rounded-xl bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest border border-purple-100 flex items-center gap-2">
-                                                <Award size={12} /> {user.rank || 'Novice'}
+                                                <Award size={12} /> {user.rank || 'Member'}
                                             </span>
                                             {user.role === 'admin' && (
                                                 <span className="px-4 py-1.5 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-widest border border-orange-100">Admin</span>
@@ -285,10 +278,9 @@ export default function Profile() {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-10">
+                <div className="grid grid-cols-1 gap-4 mb-10">
                     {[
-                        { label: 'Lessons Completed', value: stats.completedLessons, icon: <BookOpen size={18} />, color: 'purple' },
-                        { label: 'Total XP Earned', value: stats.totalXP, icon: <Award size={18} />, color: 'indigo' }
+                        { label: 'Lessons Completed', value: stats.completedLessons, icon: <BookOpen size={18} />, color: 'purple' }
                     ].map((stat, i) => (
                         <motion.div
                             key={i}
@@ -344,7 +336,7 @@ export default function Profile() {
                                     <div className="text-center py-10">
                                         <p className="text-gray-500 mb-6 font-medium text-lg leading-relaxed">You haven't completed any lessons yet.</p>
                                         <Link to="/academy" className="inline-flex items-center gap-3 px-6 py-3 bg-purple-600 text-white font-bold text-sm rounded-xl transition-all shadow-lg hover:bg-purple-700">
-                                            Start Learning <ChevronRight size={16} />
+                                            Start Reading <ChevronRight size={16} />
                                         </Link>
                                     </div>
                                 )}

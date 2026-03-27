@@ -2,30 +2,39 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { CardSkeleton } from "../components/Skeleton";
 import {
-  PlusCircle,
-  Globe,
-  Tag,
-  User,
-  FileText,
-  CheckCircle,
-  XCircle,
-  ArrowLeft,
-  ChevronDown,
-  Rocket
+  PlusCircle, Globe, Tag, User, FileText, CheckCircle,
+  XCircle, ArrowLeft, ChevronDown, Rocket, GitBranch, Link2, ShieldCheck
 } from "lucide-react";
 
-const slideFromLeft = {
-  hidden: { opacity: 0, x: -50 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
-};
+const CHAINS = [
+  "Ethereum", "Base", "Solana", "Polygon", "Arbitrum", "Optimism",
+  "Avalanche", "BNB Chain", "Sui", "Aptos", "Other"
+];
 
-const slideFromRight = {
-  hidden: { opacity: 0, x: 50 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
-};
+const CATEGORIES = [
+  { id: "dex", name: "Decentralized Exchange (DEX)" },
+  { id: "interoperability", name: "Bridges & Interoperability" },
+  { id: "onchainAutonomy", name: "Onchain Automation" },
+  { id: "bountyHub", name: "Bounty / Grants" },
+  { id: "communityTools", name: "Community Tools" },
+  { id: "researchFiles", name: "Research & Analytics" },
+  { id: "defi", name: "DeFi (Lending / Yield)" },
+  { id: "nft", name: "NFT" },
+  { id: "gaming", name: "Gaming / GameFi" },
+  { id: "wallets", name: "Wallets" },
+  { id: "security", name: "Security" },
+  { id: "other", name: "Other" },
+];
 
-export default function SubmitTool() {
+const CRITERIA = [
+  "Live, real product with verifiable onchain activity",
+  "Active community or social presence",
+  "No rugs, honeypots, or abandoned projects",
+];
+
+export default function ListDapp() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
 
@@ -36,201 +45,131 @@ export default function SubmitTool() {
   }, [user, authLoading, navigate]);
 
   const [formData, setFormData] = useState({
-    name: "",
-    link: "",
-    category: "dex",
-    builderHandle: "",
-    description: ""
+    name: "", link: "", category: "dex", chain: "Ethereum",
+    builderHandle: "", description: "", auditLink: ""
   });
-
-  const [status, setStatus] = useState(""); // "" | "sending" | "success" | "error"
-  const [catDropOpen, setCatDropOpen] = useState(false);
-
-  const categories = [
-    { id: "dex", name: "Decentralized Exchanges (DEX)" },
-    { id: "interoperability", name: "Interoperability Bridges" },
-    { id: "onchainAutonomy", name: "Onchain Autonomy" },
-    { id: "bountyHub", name: "Bounty Hub" },
-    { id: "web3Chat", name: "Perps" },
-    { id: "communityTools", name: "Community Tools" },
-    { id: "researchFiles", name: "Research Platforms" }
-  ];
+  const [status, setStatus] = useState("");
+  const [catOpen, setCatOpen] = useState(false);
+  const [chainOpen, setChainOpen] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("sending");
-
     try {
       const token = localStorage.getItem('token');
-      const API_BASE_URL = window.location.hostname === 'localhost'
-        ? 'http://localhost:5000/api'
-        : '/api';
-
-      const response = await fetch(`${API_BASE_URL}/tools/submit`, {
+      const API = window.location.hostname === 'localhost'
+        ? 'http://localhost:5000/api' : '/api';
+      const res = await fetch(`${API}/tools/submit`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(formData)
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit tool");
-      }
-
+      if (!res.ok) throw new Error("Failed");
       setStatus("success");
-      setFormData({
-        name: "",
-        link: "",
-        category: "dex",
-        builderHandle: "",
-        description: ""
-      });
+      setFormData({ name: "", link: "", category: "dex", chain: "Ethereum", builderHandle: "", description: "", auditLink: "" });
     } catch (err) {
-      console.error("Submission error:", err);
       setStatus("error");
     }
   };
 
   if (authLoading || !user || user.email === 'guest@web3central.internal') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-white pt-28 px-6 max-w-2xl mx-auto space-y-4">
+        <CardSkeleton /><CardSkeleton />
       </div>
     );
   }
 
+  const inputCls = "w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 outline-none focus:border-purple-500 focus:bg-white transition-all placeholder:text-gray-300 shadow-sm text-sm";
+  const labelCls = "text-xs font-semibold text-gray-500 mb-2 flex items-center gap-2";
+
   return (
-    <div className="relative min-h-screen pt-24 pb-24 px-6 bg-white overflow-x-hidden">
-      {/* Background Decorative Blurs */}
+    <div className="relative min-h-screen pt-20 pb-24 px-6 bg-white overflow-x-hidden">
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-60" />
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[120px] translate-y-1/2 translate-x-1/2 opacity-60" />
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header Section */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={slideFromLeft}
-          className="text-center mb-16"
-        >
-
-          <h1 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight text-gray-900 leading-tight">
-            Submit a <span className="text-purple-600">Protocol</span>
+      <div className="max-w-3xl mx-auto relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-gray-900">
+            List Your <span className="text-purple-600">Dapp</span>
           </h1>
-          <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-normal leading-relaxed">
-            Expand the web3central ecosystem. Apply for your protocol to be indexed in our institutional-grade discovery hub.
+          <p className="text-gray-500 text-base max-w-xl mx-auto">
+            Get your protocol in front of Web3Central's growing community of builders and researchers.
           </p>
         </motion.div>
 
-        {/* Success / Form Container */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={slideFromRight}
-          className="bg-white border border-gray-100 p-8 md:p-14 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.04)] mb-16 relative overflow-hidden"
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="mb-8 rounded-2xl border border-gray-100 bg-gray-50 p-5"
+        >
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <ShieldCheck size={13} className="text-purple-500" /> Listing Criteria
+          </p>
+          <ul className="space-y-2">
+            {CRITERIA.map((c, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="text-green-500 font-bold">✓</span> {c}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white border border-gray-100 p-8 md:p-12 rounded-[2rem] shadow-sm mb-10"
         >
           {status === "success" ? (
             <div className="text-center py-10">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] bg-green-50 text-green-500 mb-8 border border-green-100 shadow-[0_10px_30px_rgba(34,197,94,0.1)]">
-                <CheckCircle size={48} strokeWidth={2.5} />
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-green-50 text-green-500 mb-6 border border-green-100">
+                <CheckCircle size={40} strokeWidth={2} />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Submission Received</h3>
-              <p className="text-gray-500 text-lg font-medium mb-10 max-w-sm mx-auto">
-                Your entry has been queued for verification. Our curators will finalize the listing within 24-48 hours.
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Application Submitted</h3>
+              <p className="text-gray-500 mb-8 max-w-sm mx-auto text-sm">
+                Our curators will review your dapp and get back to you within 24–48 hours.
               </p>
-              <button
-                onClick={() => setStatus("")}
-                className="px-10 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-purple-600 transition-all shadow-xl shadow-gray-200"
-              >
-                Submit Another Entry
+              <button onClick={() => setStatus("")}
+                className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-purple-600 transition-all">
+                Submit Another
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Name */}
-                <div className="space-y-3">
-                  <label htmlFor="name" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
-                    <PlusCircle className="w-3 h-3 text-purple-600" /> Tool Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
-                    placeholder="e.g. Uniswap V4"
-                  />
+            <form onSubmit={handleSubmit} className="space-y-7">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelCls}><PlusCircle className="w-3 h-3 text-purple-500" /> Dapp Name *</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required
+                    className={inputCls} placeholder="e.g. Uniswap, Aave" />
                 </div>
-
-                {/* Link */}
-                <div className="space-y-3">
-                  <label htmlFor="link" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
-                    <Globe className="w-3 h-3 text-purple-600" /> Website URL *
-                  </label>
-                  <input
-                    type="url"
-                    id="link"
-                    name="link"
-                    value={formData.link}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
-                    placeholder="https://..."
-                  />
+                <div>
+                  <label className={labelCls}><Globe className="w-3 h-3 text-purple-500" /> Website URL *</label>
+                  <input type="url" name="link" value={formData.link} onChange={handleChange} required
+                    className={inputCls} placeholder="https://..." />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
-                    <Tag className="w-3 h-3 text-purple-600" /> Category *
-                  </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelCls}><Tag className="w-3 h-3 text-purple-500" /> Category *</label>
                   <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setCatDropOpen(!catDropOpen)}
-                      className="w-full flex items-center justify-between bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all cursor-pointer shadow-sm text-left"
-                    >
-                      {categories.find(c => c.id === formData.category)?.name || 'Select category'}
-                      <ChevronDown size={18} className={`text-gray-400 transition-transform duration-200 ${catDropOpen ? 'rotate-180' : ''}`} />
+                    <button type="button" onClick={() => setCatOpen(!catOpen)}
+                      className={`${inputCls} flex items-center justify-between cursor-pointer`}>
+                      {CATEGORIES.find(c => c.id === formData.category)?.name || 'Select'}
+                      <ChevronDown size={16} className={`text-gray-400 transition-transform ${catOpen ? 'rotate-180' : ''}`} />
                     </button>
-                    {catDropOpen && (
+                    {catOpen && (
                       <>
-                        <div className="fixed inset-0 z-40" onClick={() => setCatDropOpen(false)} />
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1">
-                          {categories.map((cat) => (
-                            <button
-                              key={cat.id}
-                              type="button"
-                              onClick={() => {
-                                setFormData(prev => ({ ...prev, category: cat.id }));
-                                setCatDropOpen(false);
-                              }}
-                              className={`w-full flex items-center justify-between px-6 py-3 text-sm font-normal transition-colors text-left ${
-                                formData.category === cat.id
-                                  ? 'bg-purple-50 text-purple-700'
-                                  : 'text-gray-600 hover:bg-gray-50'
-                              }`}
-                            >
+                        <div className="fixed inset-0 z-40" onClick={() => setCatOpen(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1 max-h-56 overflow-y-auto">
+                          {CATEGORIES.map(cat => (
+                            <button key={cat.id} type="button"
+                              onClick={() => { setFormData(p => ({ ...p, category: cat.id })); setCatOpen(false); }}
+                              className={`w-full text-left px-5 py-3 text-sm transition-colors ${formData.category === cat.id ? 'bg-purple-50 text-purple-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}>
                               {cat.name}
-                              {formData.category === cat.id && (
-                                <span className="text-purple-500 text-sm">✓</span>
-                              )}
                             </button>
                           ))}
                         </div>
@@ -238,56 +177,61 @@ export default function SubmitTool() {
                     )}
                   </div>
                 </div>
-
-                {/* Builder Handle */}
-                <div className="space-y-3">
-                  <label htmlFor="builderHandle" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
-                    <User className="w-3 h-3 text-purple-600" /> Your Handle (@username) *
-                  </label>
-                  <input
-                    type="text"
-                    id="builderHandle"
-                    name="builderHandle"
-                    value={formData.builderHandle}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm"
-                    placeholder="@architect_name"
-                  />
+                <div>
+                  <label className={labelCls}><GitBranch className="w-3 h-3 text-purple-500" /> Chain / Network *</label>
+                  <div className="relative">
+                    <button type="button" onClick={() => setChainOpen(!chainOpen)}
+                      className={`${inputCls} flex items-center justify-between cursor-pointer`}>
+                      {formData.chain}
+                      <ChevronDown size={16} className={`text-gray-400 transition-transform ${chainOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {chainOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setChainOpen(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1 max-h-56 overflow-y-auto">
+                          {CHAINS.map(chain => (
+                            <button key={chain} type="button"
+                              onClick={() => { setFormData(p => ({ ...p, chain })); setChainOpen(false); }}
+                              className={`w-full text-left px-5 py-3 text-sm transition-colors ${formData.chain === chain ? 'bg-purple-50 text-purple-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}>
+                              {chain}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Description */}
-              <div className="space-y-3">
-                <label htmlFor="description" className="text-xs font-semibold text-gray-500 ml-2 flex items-center gap-2">
-                  <FileText className="w-3 h-3 text-purple-600" /> Description *
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-gray-900 font-normal outline-none focus:border-purple-600 focus:bg-white transition-all placeholder:text-gray-300 placeholder:font-normal shadow-sm leading-relaxed"
-                  placeholder="Define the utility and core architecture of your protocol..."
-                ></textarea>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelCls}><User className="w-3 h-3 text-purple-500" /> Your Handle (@username) *</label>
+                  <input type="text" name="builderHandle" value={formData.builderHandle} onChange={handleChange} required
+                    className={inputCls} placeholder="@yourhandle" />
+                </div>
+                <div>
+                  <label className={labelCls}><Link2 className="w-3 h-3 text-purple-500" /> GitHub / Audit Link <span className="text-gray-300 font-normal">(optional)</span></label>
+                  <input type="url" name="auditLink" value={formData.auditLink} onChange={handleChange}
+                    className={inputCls} placeholder="https://github.com/..." />
+                </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={status === "sending"}
-                  className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl transition-all shadow-xl shadow-gray-200 hover:bg-purple-600 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 group disabled:opacity-50"
-                >
-                  <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-                  {status === "sending" ? "Processing..." : "Submit for Verification"}
-                </button>
+              <div>
+                <label className={labelCls}><FileText className="w-3 h-3 text-purple-500" /> Description *</label>
+                <textarea name="description" value={formData.description} onChange={handleChange} required rows={4}
+                  className={`${inputCls} leading-relaxed`}
+                  placeholder="What does your dapp do? What problem does it solve?" />
+              </div>
 
+              <div className="pt-2">
+                <button type="submit" disabled={status === "sending"}
+                  className="w-full py-3.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-purple-600 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-3 group disabled:opacity-50">
+                  <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                  {status === "sending" ? "Submitting..." : "Submit Listing"}
+                </button>
                 {status === "error" && (
                   <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm font-medium">
-                    <XCircle size={16} /> Connection error. Please retry.
+                    <XCircle size={16} /> Connection error. Please try again.
                   </div>
                 )}
               </div>
@@ -295,12 +239,8 @@ export default function SubmitTool() {
           )}
         </motion.div>
 
-        {/* Back Link */}
         <div className="text-center">
-          <Link
-            to="/"
-            className="group inline-flex items-center gap-4 text-sm font-medium text-gray-400 hover:text-purple-600 transition-all"
-          >
+          <Link to="/" className="group inline-flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-purple-600 transition-all">
             <div className="w-10 h-10 rounded-full border border-gray-100 bg-gray-50 flex items-center justify-center group-hover:border-purple-200 group-hover:bg-purple-50 transition-all">
               <ArrowLeft size={16} />
             </div>

@@ -2,6 +2,44 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, Zap, BookOpen, X } from 'lucide-react';
 
+function extractHandle(str) {
+  if (!str) return null;
+  const match = str.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
+  if (match) return match[1];
+  return str.replace('@', ''); // handles "@handle" -> "handle" or "handle" -> "handle"
+}
+
+function AvatarWithFallback({ src, twitterHandle, name, className }) {
+  const [idx, setIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+  
+  const handle = extractHandle(twitterHandle);
+  const srcs = [
+    handle ? `https://unavatar.io/twitter/${handle}?fallback=false` : null,
+    src,
+  ].filter(Boolean);
+  const current = srcs[idx];
+  if (!current || failed) {
+    return (
+      <div className={`bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black ring-[6px] ring-white shadow-xl ${className}`}>
+        {name ? name.charAt(0) : 'Z'}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={current}
+      alt={name}
+      className={className}
+      onError={() => {
+        if (idx + 1 < srcs.length) setIdx(idx + 1);
+        else setFailed(true);
+      }}
+    />
+  );
+}
+
+
 export default function BuilderSpotlightCard({ bs }) {
   const [storyOpen, setStoryOpen] = useState(false);
   const tools =
@@ -26,18 +64,13 @@ export default function BuilderSpotlightCard({ bs }) {
       
       {/* Top Section */}
       <div className="flex items-center gap-5 relative z-10">
-        <div className="relative">
-          {bs?.xProfileImageUrl ? (
-            <img
-              src={bs.xProfileImageUrl}
-              alt={bs?.name}
-              className="w-20 h-20 rounded-full object-cover ring-[6px] ring-white shadow-xl"
-            />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-black ring-[6px] ring-white shadow-xl">
-              {bs?.name ? bs.name.charAt(0) : 'Z'}
-            </div>
-          )}
+      <div className="relative">
+          <AvatarWithFallback
+            src={bs?.xProfileImageUrl}
+            twitterHandle={bs?.twitter || bs?.twitterHandle}
+            name={bs?.name}
+            className="w-20 h-20 rounded-full object-cover ring-[6px] ring-white shadow-xl"
+          />
           <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#1DA1F2] border-[3px] border-white flex items-center justify-center text-white shadow-lg">
             <svg
               className="w-3.5 h-3.5"
@@ -127,13 +160,12 @@ export default function BuilderSpotlightCard({ bs }) {
               </button>
 
               <div className="flex items-center gap-4 mb-6">
-                {bs?.xProfileImageUrl ? (
-                  <img src={bs.xProfileImageUrl} alt={bs?.name} className="w-16 h-16 rounded-full object-cover ring-4 ring-purple-100" />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-black ring-4 ring-purple-100">
-                    {bs?.name ? bs.name.charAt(0) : 'Z'}
-                  </div>
-                )}
+                <AvatarWithFallback
+                  src={bs?.xProfileImageUrl}
+                  twitterHandle={bs?.twitter || bs?.twitterHandle}
+                  name={bs?.name}
+                  className="w-16 h-16 rounded-full object-cover ring-4 ring-purple-100"
+                />
                 <div>
                   <h3 className="text-xl font-black text-gray-900">{bs?.name || 'Zun20'}</h3>
                   <p className="text-sm text-gray-500">{bs?.role || 'Security Researcher & Builder'}</p>

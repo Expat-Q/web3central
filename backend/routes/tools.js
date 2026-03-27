@@ -96,10 +96,12 @@ router.get('/:category', async (req, res) => {
   }
 });
 
+const axios = require('axios');
+
 // POST a new tool (Public Submission)
 router.post('/submit', protect, async (req, res) => {
   try {
-    const { name, link, category, builderHandle, description } = req.body;
+    const { name, link, category, chain, handle, description, auditLink } = req.body;
 
     // Generate a slug-like ID from the name
     const toolId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -110,23 +112,46 @@ router.post('/submit', protect, async (req, res) => {
       return res.status(400).json({ error: 'A tool with a similar name already exists.' });
     }
 
+    // Auto-Verification Logic (Tier 1: DefiLlama)
+    let verified = false;
+    let verificationTier = 4; // Default: Manual
+    let metrics = { lastUpdated: new Date() };
+
+    try {
+      const llamaRes = await axios.get(`https://api.llama.fi/protocol/${toolId}`, { timeout: 5000 });
+      if (llamaRes.data && llamaRes.data.slug) {
+        verified = true;
+        verificationTier = 1;
+        const p = llamaRes.data;
+        metrics = {
+          tvl: p.tvl?.[p.tvl.length - 1]?.totalTvl || 0,
+          chains: p.chains || [chain],
+          lastUpdated: new Date()
+        };
+      }
+    } catch (err) {
+      // Not found or error: stay unverified (Tier 4)
+    }
+
     const newTool = await Tool.create({
       id: toolId,
       name,
       url: link,
       category,
       description,
+      auditLink,
+      verificationTier,
+      verified,
       builder: {
-        name: builderHandle || 'Anonymous',
-        handle: builderHandle
+        name: handle || 'Anonymous',
+        handle: handle
       },
       submitter: req.user.id,
       status: 'pending',
-      verified: false
+      metrics: metrics
     });
 
-    // Send email notification to project mail
-    // Send email notification to admin
+    // Send email notification
     try {
       if (process.env.SMTP_USER && process.env.SMTP_PASS) {
         const transporter = nodemailer.createTransport({
@@ -140,38 +165,42 @@ router.post('/submit', protect, async (req, res) => {
         await transporter.sendMail({
           from: `"Web3Central" <${process.env.SMTP_USER}>`,
           to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
-          subject: `🔧 New Tool Submission: ${name}`,
+          subject: `${verified ? '✅ Verified' : '🔧 New'} Submission: ${name}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #1e293b, #312e81); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-                <h2 style="color: white; margin: 0;">🔧 New Tool Submission</h2>
-                <p style="color: #a5b4fc; margin: 8px 0 0;">Pending your review on Web3Central</p>
+              <div style="background: linear-gradient(135deg, ${verified ? '#059669, #10b981' : '#1e293b, #312e81'}); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+                <h2 style="color: white; margin: 0;">${verified ? '✅ Auto-Verified' : '🔧 New Submission'}</h2>
+                <p style="color: white; opacity: 0.8; margin: 8px 0 0;">${verified ? 'Protocol matched on DefiLlama' : 'Pending manual review'}</p>
               </div>
               <div style="background: #f8fafc; padding: 24px; border: 1px solid #e2e8f0; border-radius: 0 0 16px 16px;">
                 <table style="width: 100%; border-collapse: collapse;">
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Tool Name</td><td style="padding: 8px 0;">${name}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Name</td><td style="padding: 8px 0;">${name}</td></tr>
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Category</td><td style="padding: 8px 0;">${category}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Builder</td><td style="padding: 8px 0;">${builderHandle || 'Anonymous'}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Chain</td><td style="padding: 8px 0;">${chain} ${verified ? ' (Verified)' : ''}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Handle</td><td style="padding: 8px 0;">${handle || 'Anonymous'}</td></tr>
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">URL</td><td style="padding: 8px 0;"><a href="${link}" style="color: #4f46e5;">${link}</a></td></tr>
+                  ${auditLink ? `<tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Audit</td><td style="padding: 8px 0;"><a href="${auditLink}" style="color: #4f46e5;">Link</a></td></tr>` : ''}
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Description</td><td style="padding: 8px 0;">${description}</td></tr>
                 </table>
                 <div style="margin-top: 20px; text-align: center;">
-                  <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Review in Admin Panel</a>
+                  <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                    ${verified ? 'View in Dashboard' : 'Review in Admin Panel'}
+                  </a>
                 </div>
               </div>
             </div>
           `
         });
-        console.log(`Submission notification sent to ${process.env.ADMIN_EMAIL || process.env.SMTP_USER}`);
-      } else {
-        console.log('Email not configured (SMTP_USER/SMTP_PASS missing). Skipping notification.');
       }
     } catch (emailErr) {
       console.error("Failed to send notification email:", emailErr.message);
-      // Tool was still saved successfully, so we don't fail the request
     }
 
-    res.status(201).json({ message: 'Tool submitted successfully and is pending review.', tool: newTool });
+    res.status(201).json({ 
+      success: true,
+      message: verified ? 'Protocol verified and submitted.' : 'Tool submitted for review.', 
+      tool: newTool 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error', details: error.message });

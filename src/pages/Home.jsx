@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview } from "../services/apiService";
 import { Star, ExternalLink, ChevronRight, Zap, Sparkles } from "lucide-react";
 import BuilderSpotlightCard from "../components/BuilderSpotlightCard";
+import { PageSkeleton } from "../components/Skeleton";
+
 
 /* ── Tool Logo with X/Twitter pfp fallback chain ── */
 const getDomain = (url) => {
@@ -162,15 +164,9 @@ export default function Home() {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-100 border-t-purple-500 rounded-full animate-spin" />
-          <p className="text-purple-400 text-sm font-bold">Loading Web3Central...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
+
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden text-gray-900">
@@ -224,11 +220,12 @@ export default function Home() {
                   Explore Apps
                 </Link>
                 <Link
-                  to="/tool-comparison"
+                  to="/submit-tool"
                   className="px-8 py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 hover:text-gray-900 transition-all text-sm"
                 >
-                  Compare Tools
+                  List Your Dapp
                 </Link>
+
               </div>
             </motion.div>
 

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
 import { fetchLessonById, submitLessonProgress, rateCommunityLesson } from '../services/apiService';
+import { LessonSkeleton } from '../components/Skeleton';
+
 import {
     ArrowLeft,
     BookOpen,
@@ -18,6 +20,40 @@ import {
 } from 'lucide-react';
 
 
+function extractHandle(str) {
+    if (!str) return null;
+    const match = str.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
+    if (match) return match[1];
+    return str.replace('@', '');
+}
+
+function AvatarWithFallback({ src, twitterHandle, name, className }) {
+    const [idx, setIdx] = useState(0);
+    const [failed, setFailed] = useState(false);
+    
+    const handle = extractHandle(twitterHandle);
+    const srcs = [
+        handle ? `https://unavatar.io/twitter/${handle}?fallback=false` : null,
+        src,
+    ].filter(Boolean);
+    const current = srcs[idx];
+    
+    if (!current || failed) {
+        return (
+            <div className={`bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-black shrink-0 ${className}`}>
+                {name ? name.charAt(0).toUpperCase() : 'W'}
+            </div>
+        );
+    }
+    return (
+        <img
+            src={current}
+            alt={name || 'Avatar'}
+            className={`shrink-0 ${className}`}
+            onError={() => idx < srcs.length - 1 ? setIdx(idx + 1) : setFailed(true)}
+        />
+    );
+}
 
 export default function LessonDetail() {
     const { slug } = useParams();
@@ -97,11 +133,8 @@ export default function LessonDetail() {
         }
     };
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-white">
-            <div className="w-10 h-10 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
-        </div>
-    );
+    if (loading) return <LessonSkeleton />;
+
 
     if (!lesson) return (
         <div className="min-h-screen pt-40 flex flex-col items-center bg-white text-gray-500">
@@ -132,13 +165,17 @@ export default function LessonDetail() {
 
                 {/* ── Author / Meta row (X-style) ── */}
                 <div className="flex items-start gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-black text-lg shrink-0">
-                        W3
-                    </div>
+                    {/* Using unavatar.io via AvatarWithFallback */}
+                    <AvatarWithFallback
+                        src={lesson.author?.avatarUrl}
+                        twitterHandle={lesson.author?.twitter}
+                        name={lesson.author?.name || lesson.author?.username || 'Web3Central'}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-50"
+                    />
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            <span className="font-bold text-gray-900 text-[15px]">Web3Central</span>
-                            <span className="text-gray-400 text-sm">@web3central</span>
+                            <span className="font-bold text-gray-900 text-[15px]">{lesson.author?.username || lesson.author?.name || 'Web3Central'}</span>
+                            <span className="text-gray-400 text-sm">@{lesson.author?.username || (lesson.author?.name || 'web3central').toLowerCase().replace(/\s+/g, '')}</span>
                             <span className="text-gray-300">·</span>
                             <span className="text-gray-400 text-sm">
                                 {new Date(lesson.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -203,59 +240,20 @@ export default function LessonDetail() {
                     </ReactMarkdown>
                 </div>
 
-                {/* ── Action bar (X-style with functional buttons) ── */}
-                <div className="mt-8 pt-5 border-t border-gray-100 flex items-center justify-between max-w-[280px]">
-                    {/* Comment (Ask AI) */}
-                    <button
-                        onClick={() => window.dispatchEvent(new CustomEvent('open-claude'))}
-                        className="flex items-center gap-1.5 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
-                        title="Comment / Ask AI"
-                    >
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                        </svg>
-                    </button>
 
-                    {/* Like (On-chain planned) */}
-                    <button
-                        onClick={() => handleRate('up')}
-                        className={`flex items-center gap-1.5 p-2 rounded-full transition-all ${
-                            rating === 'up' || lesson.ratings?.thumbsUpBy?.includes(user?.id) 
-                            ? 'text-pink-500 bg-pink-50' 
-                            : 'text-gray-500 hover:text-pink-500 hover:bg-pink-50'
-                        }`}
-                        title="Like (On-chain planned)"
-                    >
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill={rating === 'up' || lesson.ratings?.thumbsUpBy?.includes(user?.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                        </svg>
-                        {(lesson.ratings?.thumbsUp || 0) > 0 && (
-                            <span className="text-[13px] tabular-nums">{lesson.ratings?.thumbsUp}</span>
-                        )}
-                    </button>
-
-                    {/* Share */}
-                    <button
-                        onClick={() => navigator.clipboard.writeText(`${window.location.origin}/academy/${lesson.slug}`)}
-                        className="flex items-center gap-1.5 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
-                        title="Copy link"
-                    >
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                            <polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
-                        </svg>
-                    </button>
-                </div>
 
                 {/* ── Complete / XP section ── */}
-                <div className="mt-8 border border-gray-100 rounded-2xl p-6 bg-gray-50">
+                {(!lesson.author || lesson.isCurated) && (
+                    <div className="mt-8 border border-gray-100 rounded-2xl p-6 bg-gray-50">
                     {!submitResult ? (
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Award size={16} className="text-amber-500" />
-                                    <span className="font-bold text-gray-900 text-sm">Earn {lesson.xpReward || 100} XP</span>
-                                </div>
+                                {(!lesson.author || lesson.isCurated) && (
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Award size={16} className="text-amber-500" />
+                                        <span className="font-bold text-gray-900 text-sm">Earn {lesson.xpReward || 100} XP</span>
+                                    </div>
+                                )}
                                 <p className="text-gray-500 text-xs">
                                     {scrollProgress < 0.75 ? 'Read to the bottom to unlock completion.' : 'Ready to mark as completed!'}
                                 </p>
@@ -288,12 +286,12 @@ export default function LessonDetail() {
                                     <p className="font-bold text-gray-900 text-sm">
                                         {submitResult.isGuest ? 'Lesson Read!' : 'Lesson Completed!'}
                                     </p>
-                                    {submitResult.xpGained > 0 && (
+                                    {(submitResult.xpGained > 0 && (!lesson.author || lesson.isCurated)) && (
                                         <p className="text-green-600 text-xs font-bold">+{submitResult.xpGained} XP · {submitResult.newRank}</p>
                                     )}
                                     {submitResult.isGuest && (
                                         <p className="text-gray-500 text-xs">
-                                            <Link to="/signup" className="text-purple-600 font-semibold hover:underline">Create an account</Link> to track progress & earn XP.
+                                            <Link to="/signup" className="text-purple-600 font-semibold hover:underline">Create an account</Link> to track progress.
                                         </p>
                                     )}
                                 </div>
@@ -307,6 +305,7 @@ export default function LessonDetail() {
                         </motion.div>
                     )}
                 </div>
+                )}
             </div>
         </div>
     );

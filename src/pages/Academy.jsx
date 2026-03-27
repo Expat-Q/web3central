@@ -11,6 +11,8 @@ import {
     ThumbsUp, ThumbsDown, Zap, Eye, PenLine
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
+import { FeedSkeleton } from '../components/Skeleton';
+
 
 const PLATFORM_COLORS = {
     'Anthropic': 'bg-orange-100 text-orange-700 border-orange-200',
@@ -35,10 +37,13 @@ export default function Academy() {
     const [dropOpen, setDropOpen] = useState(false);
     
     // Community Feed specific state
+    const [communityMenuOpen, setCommunityMenuOpen] = useState(null); // holds lesson._id of open menu
+    const [editingLesson, setEditingLesson] = useState(null); // { _id, title, description, contentMarkdown }
     const [showCommunityModal, setShowCommunityModal] = useState(false);
     const [submittingPost, setSubmittingPost] = useState(false);
     const [newPostData, setNewPostData] = useState({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
     const [communityPostError, setCommunityPostError] = useState('');
+
 
     const { user, loading: authLoading } = useAuth();
     const { toggleBookmark, isBookmarked } = useCourseBookmarks();
@@ -104,11 +109,12 @@ export default function Academy() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="w-12 h-12 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin"></div>
+            <div className="min-h-screen bg-white pt-28 pb-16 max-w-3xl mx-auto px-4">
+                <FeedSkeleton rows={6} />
             </div>
         );
     }
+
 
     const LESSON_MODULES = [
         { name: 'All', icon: <Layers size={16} />, color: 'bg-gray-900 text-white border-gray-900', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900' },
@@ -183,6 +189,57 @@ export default function Academy() {
             }
         } catch (err) {
             console.error('Failed to rate:', err);
+        }
+    };
+
+    const handleDeleteLesson = async (lessonId) => {
+        if (!user) return;
+        if (!window.confirm('Delete this lesson? This cannot be undone.')) return;
+        try {
+            const token = localStorage.getItem('token');
+            const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+            await fetch(`${API}/academy/community/${lessonId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCommunityLessons(prev => prev.filter(l => l._id !== lessonId));
+            setCommunityMenuOpen(null);
+        } catch (err) {
+            console.error('Delete failed:', err);
+        }
+    };
+
+    const handleUpdateLesson = async (e) => {
+        e.preventDefault();
+        setSubmittingPost(true);
+        setCommunityPostError('');
+        try {
+            const token = localStorage.getItem('token');
+            const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+            const res = await fetch(`${API}/academy/community/${editingLesson._id}`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    title: editingLesson.title,
+                    description: editingLesson.description,
+                    contentMarkdown: editingLesson.contentMarkdown
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setCommunityLessons(prev => prev.map(l => l._id === editingLesson._id ? data.data : l));
+                setEditingLesson(null);
+            } else {
+                throw new Error(data.error || 'Failed to update lesson');
+            }
+        } catch (err) {
+            console.error("Failed to update lesson:", err);
+            setCommunityPostError(err?.message || 'Failed to update lesson. Please try again.');
+        } finally {
+            setSubmittingPost(false);
         }
     };
 
@@ -545,29 +602,6 @@ export default function Academy() {
                                                         </span>
                                                         <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">{course.platform}</span>
                                                     </div>
-                                                    <div className="absolute top-3 right-3 flex gap-2">
-                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${platformStyle} bg-white/90 backdrop-blur`}>
-                                                            {course.platform}
-                                                        </span>
-                                                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border bg-white/90 backdrop-blur ${course.isFree ? 'text-emerald-700 border-emerald-200' : 'text-amber-700 border-amber-200'}`}>
-                                                            {course.isFree ? 'FREE' : 'PAID'}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Bookmark Button */}
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            toggleBookmark(course);
-                                                        }}
-                                                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-sm border border-white/20 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all z-20"
-                                                    >
-                                                        <Bookmark
-                                                            size={18}
-                                                            fill={isBookmarked(course._id) ? 'currentColor' : 'none'}
-                                                            className={isBookmarked(course._id) ? 'text-purple-600' : ''}
-                                                        />
-                                                    </button>
                                                 </div>
 
                                                 {/* Content */}
@@ -611,7 +645,7 @@ export default function Academy() {
                             <h2 className="text-xl font-bold text-gray-900">Community</h2>
                             <button
                                 onClick={() => user ? setShowCommunityModal(true) : navigate('/login')}
-                                className="hidden sm:flex px-5 py-2 bg-gray-900 text-white font-bold rounded-full text-[14px] items-center gap-2 hover:bg-gray-700 transition-colors"
+                                className="flex px-5 py-2 bg-gray-900 text-white font-bold rounded-full text-[14px] items-center gap-2 hover:bg-gray-700 transition-colors"
                             >
                                 <PenLine size={14} /> Post
                             </button>
@@ -626,9 +660,9 @@ export default function Academy() {
                         ) : (
                             <div className="max-w-[600px] mx-auto border border-gray-200 rounded-2xl overflow-hidden bg-white divide-y divide-gray-100">
                                 {communityLessons.map((lesson, i) => {
-                                    const initials = lesson.author?.name
-                                        ? lesson.author.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-                                        : '?';
+                                    const initials = lesson.author?.username
+                                        ? lesson.author.username.charAt(0).toUpperCase()
+                                        : (lesson.author?.name ? lesson.author.name.charAt(0).toUpperCase() : '?');
                                     const isLiked = lesson.upvotes?.includes(user?.id);
                                     const diff = Date.now() - new Date(lesson.createdAt).getTime();
                                     const timeAgo = diff < 3600000
@@ -658,20 +692,47 @@ export default function Academy() {
                                                 {/* Header: Name · @handle · time · ··· */}
                                                 <div className="flex items-center justify-between mb-0.5">
                                                     <div className="flex items-baseline gap-1 flex-wrap min-w-0">
-                                                        <span className="font-bold text-[15px] text-gray-900 leading-none">{lesson.author?.name || 'Anonymous'}</span>
-                                                        <span className="text-gray-500 text-[14px] hidden sm:inline">@{(lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
+                                                        <span className="font-bold text-[15px] text-gray-900 leading-none">{lesson.author?.username || lesson.author?.name || 'Anonymous'}</span>
+                                                        <span className="text-gray-500 text-[14px] hidden sm:inline">@{lesson.author?.username || (lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
                                                         <span className="text-gray-400 text-[14px]">·</span>
                                                         <span className="text-gray-500 text-[14px]">{timeAgo}</span>
                                                     </div>
-                                                    <button
-                                                        onClick={e => e.stopPropagation()}
-                                                        className="shrink-0 ml-1 p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-                                                        title="More"
-                                                    >
-                                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
-                                                        </svg>
-                                                    </button>
+                                                    {/* ⋯ menu */}
+                                                    <div className="relative shrink-0 ml-1">
+                                                        <button
+                                                            onClick={e => { e.stopPropagation(); setCommunityMenuOpen(communityMenuOpen === lesson._id ? null : lesson._id); }}
+                                                            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                                                            title="More"
+                                                        >
+                                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+                                                            </svg>
+                                                        </button>
+                                                        {communityMenuOpen === lesson._id && (
+                                                            <>
+                                                                <div className="fixed inset-0 z-40" onClick={() => setCommunityMenuOpen(null)} />
+                                                                <div className="absolute right-0 top-8 z-50 bg-white border border-gray-100 rounded-2xl shadow-xl py-1 min-w-[140px] text-sm overflow-hidden">
+                                                                    <button
+                                                                        onClick={e => { e.stopPropagation(); setCommunityMenuOpen(null); }}
+                                                                        className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
+                                                                    >Follow</button>
+                                                                    {user?.id === lesson.author?._id && (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={e => { e.stopPropagation(); setEditingLesson({ _id: lesson._id, title: lesson.title, description: lesson.description || '', contentMarkdown: lesson.contentMarkdown || '' }); setCommunityMenuOpen(null); }}
+                                                                                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
+                                                                            >Edit</button>
+                                                                            <button
+                                                                                onClick={e => { e.stopPropagation(); handleDeleteLesson(lesson._id); }}
+                                                                                className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
+                                                                            >Delete</button>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+
                                                 </div>
 
                                                 {/* Post text */}
@@ -733,18 +794,12 @@ export default function Academy() {
                             </div>
                         )}
 
-                        {/* Mobile FAB */}
-                        <button
-                            onClick={() => user ? setShowCommunityModal(true) : navigate('/login')}
-                            className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-600 transition-colors"
-                        >
-                            <PenLine size={22} />
-                        </button>
+                        {/* Mobile FAB removed for clean unified layout */}
                     </motion.div>
                 )}
             </div>
 
-            {/* Post Creation Modal */}
+            {/* Publish Lesson Modal */}
             {showCommunityModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowCommunityModal(false)} />
@@ -754,7 +809,7 @@ export default function Academy() {
                         className="bg-white rounded-3xl w-full max-w-2xl relative z-10 p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
                     >
                         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Plus size={24} className="text-blue-500" /> Publish a Lesson
+                            <Plus size={24} className="text-purple-500" /> Publish a Lesson
                         </h2>
                         <form onSubmit={handleCreatePost} className="space-y-4">
                             <div>
@@ -764,7 +819,7 @@ export default function Academy() {
                                     type="text" 
                                     value={newPostData.title}
                                     onChange={e => setNewPostData(prev => ({...prev, title: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
                                     placeholder="e.g. A Deep Dive into Zero-Knowledge Proofs"
                                 />
                             </div>
@@ -774,7 +829,7 @@ export default function Academy() {
                                     type="text" 
                                     value={newPostData.description}
                                     onChange={e => setNewPostData(prev => ({...prev, description: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
                                     placeholder="A brief summary of what this covers."
                                 />
                             </div>
@@ -784,7 +839,7 @@ export default function Academy() {
                                     required
                                     value={newPostData.contentMarkdown}
                                     onChange={e => setNewPostData(prev => ({...prev, contentMarkdown: e.target.value}))}
-                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50 font-medium resize-none font-mono text-sm leading-relaxed" 
+                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium resize-none font-mono text-sm leading-relaxed" 
                                     placeholder="Write your lesson content here... Use markdown for headers, lists, code, etc."
                                 />
                             </div>
@@ -802,9 +857,74 @@ export default function Academy() {
                                 <button
                                     type="submit"
                                     disabled={submittingPost}
-                                    className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
                                 >
                                     {submittingPost ? 'Publishing...' : 'Publish Lesson'}
+                                </button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
+
+            {/* Edit Lesson Modal */}
+            {editingLesson && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setEditingLesson(null)} />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white rounded-3xl w-full max-w-2xl relative z-10 p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+                    >
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <PenLine size={24} className="text-purple-500" /> Edit Lesson
+                        </h2>
+                        <form onSubmit={handleUpdateLesson} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Title</label>
+                                <input 
+                                    required
+                                    type="text" 
+                                    value={editingLesson.title}
+                                    onChange={e => setEditingLesson(prev => ({...prev, title: e.target.value}))}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Short Description (Optional)</label>
+                                <input 
+                                    type="text" 
+                                    value={editingLesson.description}
+                                    onChange={e => setEditingLesson(prev => ({...prev, description: e.target.value}))}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1 mt-2">Lesson Content (Markdown Supported)</label>
+                                <textarea 
+                                    required
+                                    value={editingLesson.contentMarkdown}
+                                    onChange={e => setEditingLesson(prev => ({...prev, contentMarkdown: e.target.value}))}
+                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium resize-none font-mono text-sm leading-relaxed" 
+                                />
+                            </div>
+                            <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
+                                {communityPostError && (
+                                    <p className="mr-auto text-sm font-medium text-red-600">{communityPostError}</p>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setEditingLesson(null)}
+                                    className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={submittingPost}
+                                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                >
+                                    {submittingPost ? 'Updating...' : 'Update Lesson'}
                                 </button>
                             </div>
                         </form>

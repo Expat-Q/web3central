@@ -59,6 +59,8 @@ const ToolSchema = new mongoose.Schema({
     reviews: Number,
     llamaSlug: String, // Slug used in DeFiLlama API
     geckoId: String,   // CoinGecko ID for price lookup via DeFiLlama coins API
+    auditLink: String,
+    verificationTier: { type: Number, default: 4 }, // 1: DefiLlama, 2: DappRadar, 3: Explorer, 4: Manual
     metrics: {
         tvl: Number,
         tvlChange1h: Number,
