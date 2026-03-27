@@ -57,9 +57,14 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
 // ============================================
 // GOOGLE STRATEGY
 // ============================================
+// Priority: GOOGLE_CALLBACK_URL > BACKEND_URL > RENDER_EXTERNAL_URL (built-in) > localhost
 const getAbsoluteCallback = (path) => {
-    return process.env.BACKEND_URL ? `${process.env.BACKEND_URL}${path}` : `http://localhost:5000${path}`;
-}
+    const base =
+        process.env.BACKEND_URL ||
+        process.env.RENDER_EXTERNAL_URL ||   // Render auto-injects this on all services
+        'http://localhost:5000';
+    return `${base}${path}`;
+};
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'placeholder_google_id',
