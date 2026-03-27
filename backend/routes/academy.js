@@ -50,7 +50,7 @@ router.get('/lessons', async (req, res) => {
 router.get('/community', async (req, res) => {
     try {
         const lessons = await Lesson.find({ isUserGenerated: true })
-            .populate('author', 'name avatarUrl')
+            .populate('author', 'name username avatarUrl twitter')
             .sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: lessons.length, data: lessons });
     } catch (err) {
@@ -186,7 +186,8 @@ router.post('/', protect, admin, validate(lessonCreateSchema), async (req, res) 
 // @access  Public
 router.get('/lessons/:slug', async (req, res) => {
     try {
-        const lesson = await Lesson.findOne({ slug: req.params.slug });
+        const lesson = await Lesson.findOne({ slug: req.params.slug })
+            .populate('author', 'name username avatarUrl twitter');
 
         if (!lesson) {
             return res.status(404).json({ success: false, message: 'Lesson not found' });
@@ -324,6 +325,46 @@ router.delete('/courses/:id', protect, admin, async (req, res) => {
         const course = await Course.findByIdAndDelete(req.params.id);
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
         res.status(200).json({ success: true, message: 'Course deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Edit a community lesson (author only)
+// @route   PATCH /api/academy/community/:id
+// @access  Private
+router.patch('/community/:id', protect, async (req, res) => {
+    try {
+        const lesson = await Lesson.findById(req.params.id);
+        if (!lesson) return res.status(404).json({ success: false, error: 'Lesson not found' });
+        if (!lesson.isUserGenerated) return res.status(403).json({ success: false, error: 'Cannot edit curated lessons' });
+        if (lesson.author.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
+        const { title, description, contentMarkdown } = req.body;
+        if (title) lesson.title = title;
+        if (description !== undefined) lesson.description = description;
+        if (contentMarkdown) lesson.contentMarkdown = contentMarkdown;
+        await lesson.save();
+        res.status(200).json({ success: true, data: lesson });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Delete a community lesson (author only)
+// @route   DELETE /api/academy/community/:id
+// @access  Private
+router.delete('/community/:id', protect, async (req, res) => {
+    try {
+        const lesson = await Lesson.findById(req.params.id);
+        if (!lesson) return res.status(404).json({ success: false, error: 'Lesson not found' });
+        if (!lesson.isUserGenerated) return res.status(403).json({ success: false, error: 'Cannot delete curated lessons' });
+        if (lesson.author.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
+        await lesson.deleteOne();
+        res.status(200).json({ success: true, message: 'Lesson deleted' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

@@ -27,6 +27,10 @@ import {
   X
 } from "lucide-react";
 import { useBookmarks } from "../../hooks/useBookmarks";
+import { CardSkeleton } from "../../components/Skeleton";
+import MetricsPanel from "../../components/MetricsPanel";
+
+
 
 const fmt = (n) => n > 0 ? '$' + new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short', maximumFractionDigits: 2 }).format(n) : '—';
 
@@ -184,7 +188,9 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTool, setSelectedTool] = useState(null);
+  const [selectedMetricsProtocol, setSelectedMetricsProtocol] = useState(null);
   const { toggleBookmark, isBookmarked } = useBookmarks();
+
 
   // Filters & Search State
   const [searchQuery, setSearchQuery] = useState("");
@@ -327,35 +333,35 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
         initial="hidden"
         animate="visible"
         exit={{ opacity: 0, scale: 0.9 }}
-        className="group"
+        className="group h-full"
       >
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-100 transition-all duration-300 p-4 flex flex-col gap-3 h-full">
-          {/* Icon + Verified */}
-          <div className="flex items-start justify-between">
-            {(() => {
-              const twUrl = app.twitter || app.builder?.twitter;
-              const Wrapper = twUrl ? 'a' : 'div';
-              const wrapperProps = twUrl ? { href: twUrl, target: '_blank', rel: 'noreferrer', title: "Visit X Profile" } : {};
-              
-              return (
-                <Wrapper {...wrapperProps} className="relative block group/logo">
-                  <div className={`w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 p-2 shadow-sm ${twUrl ? 'group-hover/logo:border-purple-300 group-hover/logo:shadow-md transition-all' : ''}`}>
-                    <ToolLogo tool={app} />
-                  </div>
-                  {app.verified && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
-                      <ShieldCheck size={8} className="text-white" />
-                    </div>
-                  )}
-                </Wrapper>
-              );
-            })()}
+        <div 
+          onClick={() => setSelectedMetricsProtocol({
+            slug: app.llamaSlug || app.slug || app.id,
+            name: app.name,
+            logo: app.logo,
+            category: app.category
+          })}
+          className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
+        >
+          {/* Top row: Logo and Bookmark */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 relative flex-shrink-0">
+              <ToolLogo tool={app} />
+              {app.verified && (
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
+                  <ShieldCheck size={8} className="text-white" />
+                </div>
+              )}
+            </div>
+            
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); return; }
                 toggleBookmark(app);
               }}
-              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all ${isBookmarked(app.id || app._id)
+              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0 ${isBookmarked(app.id || app._id)
                 ? 'bg-purple-50 border-purple-200 text-purple-600'
                 : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-purple-300 hover:text-purple-600'}`}
             >
@@ -363,28 +369,31 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             </button>
           </div>
 
-          {/* Name + Description */}
-          <div className="flex-grow min-w-0">
-            <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1 group-hover:text-purple-700 transition-colors line-clamp-1">{app.name}</h3>
-            <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{app.description}</p>
-          </div>
+          {/* Name */}
+          <h4 className="font-bold text-[15px] leading-tight mb-1 text-gray-900 truncate group-hover:text-purple-700 transition-colors">{app.name}</h4>
+
+          {/* Description */}
+          <p className="text-[11px] text-gray-500 leading-snug line-clamp-2 mb-4 flex-grow tracking-wide">
+            {app.description}
+          </p>
 
           {/* Rating + Open */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+          <div className="flex items-center justify-between mt-auto mb-3">
             <div
               className="cursor-pointer"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); } else { setSelectedTool(app); }
               }}
             >
               <StarRating value={rating} count={app.ratingCount} />
             </div>
-            <div className="flex items-center gap-2">
+            <div onClick={(e) => e.stopPropagation()}>
               <SafeLink
                 url={app.url}
                 verified={false}
                 hideDomain={true}
-                className="flex items-center gap-1 px-4 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-full hover:bg-purple-700 transition-colors whitespace-nowrap shadow-sm shadow-purple-600/20"
+                className="bg-[#f2efff] text-[#6d39ff] px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#e8e2ff] transition-colors whitespace-nowrap"
               >
                 Open
               </SafeLink>
@@ -393,12 +402,15 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
           {/* Compare bench toggle */}
           <button
-            onClick={() => toggleBench(app._id || app.id)}
-            className={`w-full text-[10px] font-bold uppercase tracking-wider py-1.5 rounded-xl border-2 transition-all shadow-md ${bench.includes(String(app._id || app.id))
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-indigo-200'
-              : 'bg-white border-gray-300 text-gray-500 hover:border-indigo-400 hover:text-indigo-600 hover:shadow-indigo-100'}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBench(app._id || app.id);
+            }}
+            className={`w-full text-[11px] font-bold uppercase tracking-wider py-1.5 rounded-xl border-2 transition-all flex items-center justify-center gap-1 ${bench.includes(String(app._id || app.id))
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'
+              : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:bg-gray-50'}`}
           >
-            {bench.includes(String(app._id || app.id)) ? <><Check size={10} className="inline mr-1" />Added to Compare</> : <><Plus size={10} className="inline mr-1" />Compare</>}
+            {bench.includes(String(app._id || app.id)) ? <><Check size={11} />Added</> : <><Plus size={11} />Compare</>}
           </button>
         </div>
       </motion.div>
@@ -407,12 +419,14 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin" />
-        <p className="text-gray-400 text-sm font-medium">Loading protocols...</p>
+      <div className="min-h-screen bg-white pt-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
+        </div>
       </div>
     );
   }
+
 
   // ── Coming Soon Gate ──
   if (isComingSoon) {
@@ -775,8 +789,16 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
         </div>
       </div>
 
+      {/* Metrics Side Panel */}
+      <MetricsPanel 
+        isOpen={!!selectedMetricsProtocol}
+        protocol={selectedMetricsProtocol}
+        onClose={() => setSelectedMetricsProtocol(null)}
+      />
+
       {/* Rating Modal */}
       {selectedTool && (
+
         <RatingModal
           tool={selectedTool}
           onClose={() => setSelectedTool(null)}

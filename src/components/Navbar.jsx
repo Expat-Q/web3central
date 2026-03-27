@@ -26,7 +26,7 @@ export default function Navbar() {
     { name: "Academy", to: "/academy" },
     { name: "Compare", to: "/tool-comparison" },
     { name: "Support", to: "/support" },
-    { name: "Submit", to: "/submit-tool" },
+    { name: "List Dapp", to: "/submit-tool" },
     { name: "Profile", to: "/profile" },
   ];
 

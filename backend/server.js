@@ -38,6 +38,8 @@ const aiRouter = require('./routes/ai');
 const ratingsRouter = require('./routes/ratings');
 const statsRouter = require('./routes/stats');
 const chatRouter = require('./routes/chat');
+const defiRouter = require('./routes/defi');
+
 
 // Connect to Database
 connectDB();
@@ -155,6 +157,8 @@ app.use('/api/ai', aiRouter);
 app.use('/api/ratings', ratingsRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/defi', defiRouter);
+
 
 app.get('/', (req, res) => {
   res.status(200).json({

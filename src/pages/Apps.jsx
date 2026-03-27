@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
 import { Star, ChevronRight, Rocket } from "lucide-react";
+import { PageSkeleton } from "../components/Skeleton";
+
 
 /* ── Helpers ── */
 const getDomain = (url) => {
@@ -176,12 +178,9 @@ export default function Apps() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
+
 
   return (
     <div className="bg-white min-h-screen pt-20 pb-16">
