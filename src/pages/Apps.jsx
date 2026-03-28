@@ -246,6 +246,7 @@ export default function Apps() {
                         <ProtocolCard
                           tool={tool}
                           onOpenDetails={(app) => setSelectedMetricsProtocol({
+                            id: app.id || app._id,
                             slug: app.llamaSlug || app.slug || app.id,
                             name: app.name,
                             description: app.description,
@@ -257,6 +258,12 @@ export default function Apps() {
                             category: app.category,
                             verified: app.verified,
                             metrics: app.metrics,
+                            geckoId: app.geckoId,
+                            monthlyUsers: app.monthlyUsers,
+                            reviews: app.reviews,
+                            rating: app.averageRating || app.rating,
+                            ratingCount: app.ratingCount,
+                            popularWith: app.popularWith,
                           })}
                         />
                       </div>

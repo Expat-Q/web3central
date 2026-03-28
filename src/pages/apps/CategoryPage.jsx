@@ -280,6 +280,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       >
         <div 
           onClick={() => setSelectedMetricsProtocol({
+            id: app.id || app._id,
             slug: app.llamaSlug || app.slug || app.id,
             name: app.name,
             description: app.description,
@@ -291,6 +292,12 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             category: app.category,
             verified: app.verified,
             metrics: app.metrics,
+            geckoId: app.geckoId,
+            monthlyUsers: app.monthlyUsers,
+            reviews: app.reviews,
+            rating: app.averageRating || app.rating,
+            ratingCount: app.ratingCount,
+            popularWith: app.popularWith,
           })}
           className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
         >
