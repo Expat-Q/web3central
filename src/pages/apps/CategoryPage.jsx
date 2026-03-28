@@ -282,8 +282,15 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           onClick={() => setSelectedMetricsProtocol({
             slug: app.llamaSlug || app.slug || app.id,
             name: app.name,
+            description: app.description,
+            logoUrl: app.logoUrl,
             logo: app.logo,
-            category: app.category
+            url: app.url,
+            twitter: app.twitter,
+            builder: app.builder,
+            category: app.category,
+            verified: app.verified,
+            metrics: app.metrics,
           })}
           className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
         >

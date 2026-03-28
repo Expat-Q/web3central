@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
 import { Star, ChevronRight, Rocket } from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
-import { PageSkeleton } from "../components/Skeleton";
+import { CardSkeleton } from "../components/Skeleton";
+import MetricsPanel from "../components/MetricsPanel";
 
 /* ── Protocol Card ── */
-const ProtocolCard = ({ tool }) => {
+const ProtocolCard = ({ tool, onOpenDetails }) => {
   const rating = tool.averageRating || tool.rating || 0;
   return (
     <motion.div
@@ -15,7 +16,8 @@ const ProtocolCard = ({ tool }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.35 }}
-      className="border border-gray-100 rounded-[1.25rem] p-4 flex flex-col bg-white hover:border-purple-200 hover:shadow-md transition-all group"
+      className="border border-gray-100 rounded-[1.25rem] p-4 flex flex-col bg-white hover:border-purple-200 hover:shadow-md transition-all group cursor-pointer"
+      onClick={() => onOpenDetails(tool)}
     >
       <div className="w-[50px] h-[50px] mb-3 bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 flex-shrink-0 overflow-hidden">
         <ToolLogo tool={tool} />
@@ -35,7 +37,13 @@ const ProtocolCard = ({ tool }) => {
             <span className="text-[12px] font-medium text-gray-400">No Rating</span>
           )}
         </div>
-        <a href={tool.url} target="_blank" rel="noreferrer" className="bg-[#f2efff] text-[#6d39ff] px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#e8e2ff] transition-colors">
+        <a
+          href={tool.url}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="bg-[#f2efff] text-[#6d39ff] px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#e8e2ff] transition-colors"
+        >
           Open
         </a>
       </div>
@@ -90,6 +98,7 @@ export default function Apps() {
   const [appsData, setAppsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedMetricsProtocol, setSelectedMetricsProtocol] = useState(null);
   const sectionRefs = useRef({});
 
   useEffect(() => {
@@ -107,21 +116,33 @@ export default function Apps() {
     fetchData();
   }, []);
 
-  const getToolsForSection = (section) => {
-    if (!appsData) return [];
-    const tools = [];
-    const ids = new Set();
-    for (const dbKey of section.dbKeys) {
-      const arr = appsData[dbKey] || [];
-      for (const t of arr) {
-        const id = t._id || t.id;
-        if ((t.status === 'active' || !t.status) && !ids.has(id)) {
-          tools.push(t);
-          ids.add(id);
+  const sectionToolsMap = useMemo(() => {
+    if (!appsData) return {};
+
+    const map = {};
+    for (const section of SECTIONS) {
+      const tools = [];
+      const ids = new Set();
+
+      for (const dbKey of section.dbKeys) {
+        const arr = appsData[dbKey] || [];
+        for (const t of arr) {
+          const id = t._id || t.id;
+          if ((t.status === 'active' || !t.status) && !ids.has(id)) {
+            tools.push(t);
+            ids.add(id);
+          }
         }
       }
+
+      map[section.key] = tools.sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
     }
-    return tools.sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
+
+    return map;
+  }, [appsData]);
+
+  const getToolsForSection = (section) => {
+    return sectionToolsMap[section.key] || [];
   };
 
   const scrollToSection = (key) => {
@@ -137,11 +158,6 @@ export default function Apps() {
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
-
-  if (loading) {
-    return <PageSkeleton />;
-  }
-
 
   return (
     <div className="bg-white min-h-screen pt-20 pb-16">
@@ -209,13 +225,40 @@ export default function Apps() {
                 </div>
 
                 {/* Cards or Coming Soon */}
-                {section.comingSoon || displayTools.length === 0 ? (
+                {section.comingSoon ? (
                   <ComingSoonSection label={section.label} sectionKey={section.key} />
+                ) : loading ? (
+                  <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 md:grid md:grid-cols-3 lg:grid-cols-6 md:gap-4 md:overflow-visible md:snap-none md:pb-0">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={`${section.key}-skeleton-${i}`} className="min-w-[160px] max-w-[180px] shrink-0 snap-start md:min-w-0 md:max-w-none md:shrink">
+                        <CardSkeleton />
+                      </div>
+                    ))}
+                  </div>
+                ) : displayTools.length === 0 ? (
+                  <div className="py-10 flex items-center justify-center text-center rounded-2xl bg-gray-50 border border-dashed border-gray-200">
+                    <p className="text-sm text-gray-400 font-medium">No protocols listed yet.</p>
+                  </div>
                 ) : (
                   <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 md:grid md:grid-cols-3 lg:grid-cols-6 md:gap-4 md:overflow-visible md:snap-none md:pb-0">
                     {displayTools.map(tool => (
                       <div key={tool._id || tool.id} className="min-w-[160px] max-w-[180px] shrink-0 snap-start md:min-w-0 md:max-w-none md:shrink">
-                        <ProtocolCard tool={tool} />
+                        <ProtocolCard
+                          tool={tool}
+                          onOpenDetails={(app) => setSelectedMetricsProtocol({
+                            slug: app.llamaSlug || app.slug || app.id,
+                            name: app.name,
+                            description: app.description,
+                            logoUrl: app.logoUrl,
+                            logo: app.logo,
+                            url: app.url,
+                            twitter: app.twitter,
+                            builder: app.builder,
+                            category: app.category,
+                            verified: app.verified,
+                            metrics: app.metrics,
+                          })}
+                        />
                       </div>
                     ))}
                   </div>
@@ -226,6 +269,12 @@ export default function Apps() {
         </div>
 
       </div>
+
+      <MetricsPanel
+        isOpen={!!selectedMetricsProtocol}
+        protocol={selectedMetricsProtocol}
+        onClose={() => setSelectedMetricsProtocol(null)}
+      />
     </div>
   );
 }
