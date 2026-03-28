@@ -27,6 +27,13 @@ Guidelines:
 - If asked about non-Web3 topics, politely redirect to Web3-related help
 - Keep responses focused and under 500 words unless a longer explanation is needed`;
 
+const sanitizeProviderError = (message = '') => {
+    return String(message || '')
+        .replace(/Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*/gi, 'Bearer [REDACTED]')
+        .replace(/sk-[A-Za-z0-9\-_]+/gi, '[REDACTED_KEY]')
+        .slice(0, 280);
+};
+
 function buildOfflineFallbackReply(messages) {
     const latestUserMessage = [...messages]
         .reverse()
@@ -175,6 +182,7 @@ async function callGrok(messages) {
 router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
     const { messages } = req.body;
     res.setHeader('X-Chat-Provider-Chain', 'openai>grok>offline-fallback');
+    const includeDebug = process.env.CHAT_DEBUG === 'true';
 
     // Sanitize messages to only include role and content
     const sanitized = messages.map(m => ({
@@ -184,11 +192,13 @@ router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
 
     let reply;
     let provider = 'openai';
+    const diagnostics = { providerChain: 'openai>grok>offline-fallback' };
 
     try {
         reply = await callOpenAI(sanitized);
     } catch (openaiErr) {
         console.warn('OpenAI failed:', openaiErr.message);
+        diagnostics.openaiError = sanitizeProviderError(openaiErr.message);
         provider = 'grok';
         try {
             reply = await callGrok(sanitized);
@@ -196,9 +206,14 @@ router.post('/', validate(chatSchema), asyncHandler(async (req, res) => {
             console.error('[Chat] AI providers failed.');
             console.error('  OpenAI:', openaiErr.message);
             console.error('  Grok:', grokErr.message);
+            diagnostics.grokError = sanitizeProviderError(grokErr.message);
             provider = 'offline-fallback';
             reply = buildOfflineFallbackReply(sanitized);
         }
+    }
+
+    if (includeDebug) {
+        return res.json({ success: true, reply, provider, diagnostics });
     }
 
     res.json({ success: true, reply, provider });

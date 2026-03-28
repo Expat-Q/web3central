@@ -136,7 +136,8 @@ app.get('/api/health', (req, res) => {
       openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
       grokConfigured: Boolean(process.env.GROK_API_KEY),
       openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      openaiModels: process.env.OPENAI_MODELS || null
+      openaiModels: process.env.OPENAI_MODELS || null,
+      chatDebug: process.env.CHAT_DEBUG === 'true'
     }
   });
 });
