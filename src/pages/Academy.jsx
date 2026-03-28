@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
-import { fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
+import { fetchLessons, fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
 import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
@@ -11,7 +11,7 @@ import {
     ThumbsUp, ThumbsDown, Zap, Eye, PenLine
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
-import { FeedSkeleton } from '../components/Skeleton';
+import { FeedSkeleton, CardSkeleton } from '../components/Skeleton';
 
 
 const PLATFORM_COLORS = {
@@ -27,7 +27,9 @@ export default function Academy() {
     const [lessons, setLessons] = useState([]);
     const [courses, setCourses] = useState([]);
     const [communityLessons, setCommunityLessons] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [lessonsLoading, setLessonsLoading] = useState(true);
+    const [coursesLoading, setCoursesLoading] = useState(true);
+    const [communityLoading, setCommunityLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
     const [activeTab, setActiveTab] = useState('lessons');
     const [searchQuery, setSearchQuery] = useState('');
@@ -51,24 +53,45 @@ export default function Academy() {
 
     useEffect(() => {
         if (!user) return;
-        const fetchAll = async () => {
+        const fetchLessonsData = async () => {
             try {
-                const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
-                const [lessonsRes, coursesData, communityData] = await Promise.all([
-                    fetch(`${baseUrl}/academy/lessons`).then(r => r.json()),
-                    fetchCuratedCourses().catch(() => []),
-                    fetchCommunityLessons().catch(() => [])
-                ]);
-                if (lessonsRes.success) setLessons(lessonsRes.data);
+                setLessonsLoading(true);
+                const lessonsData = await fetchLessons().catch(() => []);
+                setLessons(lessonsData || []);
+            } catch (err) {
+                console.error('Error fetching lessons:', err);
+            } finally {
+                setLessonsLoading(false);
+            }
+        };
+
+        const fetchCoursesData = async () => {
+            try {
+                setCoursesLoading(true);
+                const coursesData = await fetchCuratedCourses().catch(() => []);
                 setCourses(coursesData);
+            } catch (err) {
+                console.error('Error fetching courses:', err);
+            } finally {
+                setCoursesLoading(false);
+            }
+        };
+
+        const fetchCommunityData = async () => {
+            try {
+                setCommunityLoading(true);
+                const communityData = await fetchCommunityLessons().catch(() => []);
                 setCommunityLessons(communityData);
             } catch (err) {
                 console.error('Error fetching academy data:', err);
             } finally {
-                setLoading(false);
+                setCommunityLoading(false);
             }
         };
-        fetchAll();
+
+        fetchLessonsData();
+        fetchCoursesData();
+        fetchCommunityData();
     }, [user]);
 
     // ── LOGIN GATE ──
@@ -106,15 +129,6 @@ export default function Academy() {
             </div>
         );
     }
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white pt-28 pb-16 max-w-3xl mx-auto px-4">
-                <FeedSkeleton rows={6} />
-            </div>
-        );
-    }
-
 
     const LESSON_MODULES = [
         { name: 'All', icon: <Layers size={16} />, color: 'bg-gray-900 text-white border-gray-900', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900' },
@@ -388,7 +402,13 @@ export default function Academy() {
                             ))}
                         </motion.div>
 
-                        {filteredLessons.length === 0 ? (
+                        {lessonsLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <CardSkeleton key={`lesson-skeleton-${i}`} />
+                                ))}
+                            </div>
+                        ) : filteredLessons.length === 0 ? (
                             <div className="text-center py-24 text-gray-400">
                                 <BookOpen size={48} className="mx-auto mb-4 opacity-30" />
                                 <p className="font-bold text-lg">No lessons published yet.</p>
@@ -523,7 +543,13 @@ export default function Academy() {
                             </div>
                         </div>
 
-                        {courses.length === 0 ? (
+                        {coursesLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <CardSkeleton key={`course-skeleton-${i}`} />
+                                ))}
+                            </div>
+                        ) : courses.length === 0 ? (
                             <div className="text-center py-24 text-gray-400">
                                 <Play size={48} className="mx-auto mb-4 opacity-30" />
                                 <p className="font-bold text-lg">No courses curated yet.</p>
@@ -651,7 +677,11 @@ export default function Academy() {
                             </button>
                         </div>
 
-                        {communityLessons.length === 0 ? (
+                        {communityLoading ? (
+                            <div className="max-w-[600px] mx-auto border border-gray-200 rounded-2xl overflow-hidden bg-white">
+                                <FeedSkeleton rows={5} />
+                            </div>
+                        ) : communityLessons.length === 0 ? (
                             <div className="text-center py-20 text-gray-400 max-w-[600px] mx-auto border border-gray-200 rounded-2xl bg-white">
                                 <Users size={40} className="mx-auto mb-3 opacity-20" />
                                 <p className="font-bold text-base text-gray-900">Nothing here yet.</p>
