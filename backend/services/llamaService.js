@@ -355,4 +355,8 @@ const fetchLlamaData = async () => {
     }
 };
 
-module.exports = { fetchLlamaData };
+module.exports = {
+    fetchLlamaData,
+    GECKO_MAP,
+    PARENT_MAP
+};

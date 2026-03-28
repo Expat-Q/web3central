@@ -3,58 +3,17 @@ const router = express.Router();
 const axios = require('axios');
 const { logger } = require('../lib/logger');
 const Tool = require('../models/Tool');
+const { GECKO_MAP } = require('../services/llamaService');
 
 const geckoIdCache = new Map();
 
 const GECKO_OVERRIDES = {
-    'uniswap': 'uniswap',
-    'pancakeswap': 'pancakeswap-token',
-    'sushi': 'sushi',
-    'curve': 'curve-dao-token',
-    'balancer': 'balancer',
-    '1inch': '1inch',
-    'cowswap': 'cow-protocol',
-    'jupiter': 'jupiter-exchange-solana',
-    'raydium': 'raydium',
-    'orca': 'orca',
-    'velodrome': 'velodrome-finance',
-    'aerodrome': 'aerodrome-finance',
-    'osmosis': 'osmosis',
-    'traderjoe': 'joe',
-    'quickswap': 'quickswap',
-    'camelot': 'camelot-token',
-    'spookyswap': 'spookyswap',
-    'thena': 'thena',
-    'biswap': 'biswap',
-    'vvs': 'vvs-finance',
-    'yield-yak': 'yield-yak',
-    'mdex': 'mdex',
-    'kamino-finance': 'kamino',
-    'synfutures': 'synfutures',
-    'dydx': 'dydx-chain',
-    'gmx': 'gmx',
-    'hyperliquid': 'hyperliquid',
-    'aevo': 'aevo-exchange',
-    'vertex': 'vertex-protocol',
-    'perpetual-protocol': 'perpetual-protocol',
-    'kwenta': 'kwenta',
-    'mux': 'mux-protocol',
-    'rabbitx': 'rabbitx',
-    'drift': 'drift-protocol',
-    'orderly': 'orderly-network',
-    'lighter': 'lighter',
-    'aster': 'astherus',
-    'layerzero': 'layerzero',
-    'axelar': 'axelar',
-    'stargate': 'stargate-finance',
-    'debridge': 'debridge',
-    'connext': 'connext',
-    'hop': 'hop-protocol',
-    'across': 'across-protocol',
-    'synapse': 'synapse-2',
-    'meson': 'meson-network',
-    'polyhedra': 'polyhedra-network',
-    'kaito': 'kaito'
+    ...GECKO_MAP,
+    'wormhole': 'wormhole',
+    '0x': '0x',
+    'level-finance': 'level-governance',
+    'rollbit-perps': 'rollbit-coin',
+    'zkx': 'zkx',
 };
 
 const toNumber = (value) => {

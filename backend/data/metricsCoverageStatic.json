@@ -1,0 +1,1284 @@
+{
+  "generatedAt": "2026-03-28T22:54:34.240Z",
+  "source": "src/data/appsData.js",
+  "summary": {
+    "totalTools": 88,
+    "withKnownToken": 55,
+    "fullCoverage": 41,
+    "partialCoverage": 46,
+    "missingCoverage": 1
+  },
+  "byCategory": {
+    "bridge": {
+      "total": 15,
+      "tokenized": 11,
+      "fullCoverage": 11,
+      "partialCoverage": 4,
+      "missing": 0
+    },
+    "interoperability": {
+      "total": 2,
+      "tokenized": 0,
+      "fullCoverage": 0,
+      "partialCoverage": 2,
+      "missing": 0
+    },
+    "dex": {
+      "total": 32,
+      "tokenized": 27,
+      "fullCoverage": 27,
+      "partialCoverage": 4,
+      "missing": 1
+    },
+    "infofi": {
+      "total": 6,
+      "tokenized": 1,
+      "fullCoverage": 1,
+      "partialCoverage": 5,
+      "missing": 0
+    },
+    "perps": {
+      "total": 14,
+      "tokenized": 14,
+      "fullCoverage": 0,
+      "partialCoverage": 14,
+      "missing": 0
+    },
+    "web3Chat": {
+      "total": 2,
+      "tokenized": 2,
+      "fullCoverage": 2,
+      "partialCoverage": 0,
+      "missing": 0
+    },
+    "onchainAutonomy": {
+      "total": 3,
+      "tokenized": 0,
+      "fullCoverage": 0,
+      "partialCoverage": 3,
+      "missing": 0
+    },
+    "communityTools": {
+      "total": 10,
+      "tokenized": 0,
+      "fullCoverage": 0,
+      "partialCoverage": 10,
+      "missing": 0
+    },
+    "vibeCoding": {
+      "total": 4,
+      "tokenized": 0,
+      "fullCoverage": 0,
+      "partialCoverage": 4,
+      "missing": 0
+    }
+  },
+  "rows": [
+    {
+      "id": "across",
+      "name": "Across",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "across-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "allbridge",
+      "name": "Allbridge",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "axelar",
+      "name": "Axelar",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "axelar",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "connext",
+      "name": "Connext",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "connext",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "debridge",
+      "name": "deBridge",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "debridge",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "hop",
+      "name": "Hop Protocol",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "hop-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "hyperlane",
+      "name": "Hyperlane",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "layerswap",
+      "name": "LayerSwap",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "layerzero",
+      "name": "LayerZero",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "layerzero",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "meson",
+      "name": "Meson",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "meson-network",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "orbiter",
+      "name": "Orbiter Finance",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "polyhedra",
+      "name": "Polyhedra Network",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "polyhedra-network",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "stargate",
+      "name": "Stargate",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "stargate-finance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "synapse",
+      "name": "Synapse",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "synapse-2",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "wormhole",
+      "name": "Wormhole",
+      "category": "bridge",
+      "policyGroup": "bridges",
+      "geckoId": "wormhole",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "antidrain",
+      "name": "Anti Drain Tool by @zun2025",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "blixeditor",
+      "name": "Blix Editor",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "gomtu",
+      "name": "Gomtu",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "kaitoradar",
+      "name": "Kaito Radar",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "lunarstrategy",
+      "name": "Lunar Strategy",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "polywhales",
+      "name": "Poly Whales Tracker by @zun2025",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "revokedelegation",
+      "name": "Revoke Delegation Tool by @zun2025",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "tenderly",
+      "name": "Tenderly",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "assetrecovery",
+      "name": "Undrained Asset Recovery from a compromised wallet",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "web3toolkits",
+      "name": "Web3 Toolkits by 0xMoei",
+      "category": "communityTools",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "0x",
+      "name": "0x",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "0x",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "1inch",
+      "name": "1inch",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "1inch",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "aerodrome",
+      "name": "Aerodrome",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "aerodrome-finance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "balancer",
+      "name": "Balancer",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "balancer",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "biswap",
+      "name": "Biswap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "biswap",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "camelot",
+      "name": "Camelot",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "camelot-token",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "carbon",
+      "name": "Carbon",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "cowswap",
+      "name": "CowSwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "cow-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "curve",
+      "name": "Curve",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "curve-dao-token",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "dydx",
+      "name": "dYdX",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "dydx-chain",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "jupiter",
+      "name": "Jupiter",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "jupiter-exchange-solana",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "kamino-finance",
+      "name": "Kamino Finance",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "kamino",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "matcha",
+      "name": "Matcha",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "mdex",
+      "name": "Mdex",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "mdex",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "orca",
+      "name": "Orca",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "orca",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "osmosis",
+      "name": "Osmosis",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "osmosis",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "pancakeswap",
+      "name": "PancakeSwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "pancakeswap-token",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "quickswap",
+      "name": "QuickSwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "quickswap",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "raydium",
+      "name": "Raydium",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "raydium",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "shade-swap",
+      "name": "ShadeSwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "slingshot",
+      "name": "Slingshot",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "spookyswap",
+      "name": "SpookySwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "spookyswap",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "sushi",
+      "name": "SushiSwap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "sushi",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "synfutures",
+      "name": "SynFutures",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "synfutures",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "test-tool",
+      "name": "Test Tool",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [],
+      "metricCount": 0
+    },
+    {
+      "id": "thena",
+      "name": "Thena",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "thena",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "traderjoe",
+      "name": "Trader Joe",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "joe",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "uniswap",
+      "name": "Uniswap",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "uniswap",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "velodrome",
+      "name": "Velodrome",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "velodrome-finance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "velodrome",
+      "name": "Velodrome",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "velodrome-finance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "vvs",
+      "name": "VVS Finance",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "vvs-finance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "yield-yak",
+      "name": "Yield Yak",
+      "category": "dex",
+      "policyGroup": "trading",
+      "geckoId": "yield-yak",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "bantr",
+      "name": "Bantr",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "cookie",
+      "name": "Cookie",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "galxe",
+      "name": "Galxe Starboard",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "kaito",
+      "name": "Kaito",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": "kaito",
+      "hasToken": true,
+      "selectedMetrics": [
+        "monthlyUsers",
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "wallchain",
+      "name": "Wallchain",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "xeet",
+      "name": "Xeet",
+      "category": "infofi",
+      "policyGroup": "analytics",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "gaszip",
+      "name": "Gas.zip",
+      "category": "interoperability",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "relay",
+      "name": "Relay",
+      "category": "interoperability",
+      "policyGroup": "bridges",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers",
+        "rating"
+      ],
+      "metricCount": 2
+    },
+    {
+      "id": "elsa",
+      "name": "Elsa",
+      "category": "onchainAutonomy",
+      "policyGroup": "onchain",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "magicnewton",
+      "name": "Magic Newton",
+      "category": "onchainAutonomy",
+      "policyGroup": "onchain",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "warden",
+      "name": "Warden Protocol",
+      "category": "onchainAutonomy",
+      "policyGroup": "onchain",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "aevo",
+      "name": "Aevo",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "aevo-exchange",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "aster",
+      "name": "Aster",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "astherus",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "dydx",
+      "name": "dYdX",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "dydx-chain",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "gmx",
+      "name": "GMX",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "gmx",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "hyperliquid",
+      "name": "Hyperliquid",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "hyperliquid",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "kwenta",
+      "name": "Kwenta",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "kwenta",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "level-finance",
+      "name": "Level Finance",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "level-governance",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "lighter",
+      "name": "Lighter",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "lighter",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "mux",
+      "name": "MUX Protocol",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "mux-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "perpetual-protocol",
+      "name": "Perpetual Protocol",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "perpetual-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "rabbitx",
+      "name": "RabbitX",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "rabbitx",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "rollbit-perps",
+      "name": "Rollbit Perps",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "rollbit-coin",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "vertex",
+      "name": "Vertex",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "vertex-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "zkx",
+      "name": "ZKX",
+      "category": "perps",
+      "policyGroup": "trading",
+      "geckoId": "zkx",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv"
+      ],
+      "metricCount": 3
+    },
+    {
+      "id": "lancaquiz",
+      "name": "Lanca Quiz by @adedir",
+      "category": "vibeCoding",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "sentientquiz",
+      "name": "Sentient AGI Quiz App",
+      "category": "vibeCoding",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "wardenquiz",
+      "name": "Warden Protocol Quiz App",
+      "category": "vibeCoding",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "wardencounter",
+      "name": "Warden protocol WM Counter",
+      "category": "vibeCoding",
+      "policyGroup": "community",
+      "geckoId": null,
+      "hasToken": false,
+      "selectedMetrics": [
+        "monthlyUsers"
+      ],
+      "metricCount": 1
+    },
+    {
+      "id": "drift",
+      "name": "Drift Finance",
+      "category": "web3Chat",
+      "policyGroup": "trading",
+      "geckoId": "drift-protocol",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    },
+    {
+      "id": "orderly",
+      "name": "Orderly Network",
+      "category": "web3Chat",
+      "policyGroup": "trading",
+      "geckoId": "orderly-network",
+      "hasToken": true,
+      "selectedMetrics": [
+        "tokenPrice",
+        "mcap",
+        "fdv",
+        "monthlyUsers"
+      ],
+      "metricCount": 4
+    }
+  ]
+}
