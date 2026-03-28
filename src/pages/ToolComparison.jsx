@@ -20,6 +20,63 @@ import {
   Database
 } from "lucide-react";
 
+const getDomain = (url) => {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return '';
+  }
+};
+
+const extractTwitterHandle = (url) => {
+  if (!url) return null;
+  const match = url.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
+  return match ? match[1] : null;
+};
+
+const ToolLogo = ({ tool, className = "w-12 h-12" }) => {
+  const [fallbackIdx, setFallbackIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+
+  const domain = tool.url ? getDomain(tool.url) : null;
+  const twitterUrl = tool.twitter || tool.builder?.twitter;
+  const twitterHandle = extractTwitterHandle(twitterUrl);
+
+  const sources = [
+    tool.logo,
+    twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}?fallback=false` : null,
+    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
+    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
+  ].filter(Boolean);
+
+  const currentSrc = sources[fallbackIdx];
+
+  if (!currentSrc || failed) {
+    return (
+      <div className={`${className} rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600`}>
+        {tool.name?.charAt(0)?.toUpperCase() || '?'}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${className} rounded-2xl bg-white border border-indigo-100 p-2 flex items-center justify-center overflow-hidden`}>
+      <img
+        src={currentSrc}
+        alt={tool.name}
+        onError={() => {
+          if (fallbackIdx + 1 < sources.length) {
+            setFallbackIdx((prev) => prev + 1);
+          } else {
+            setFailed(true);
+          }
+        }}
+        className="w-full h-full object-contain"
+      />
+    </div>
+  );
+};
+
 export default function ToolComparison() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -228,14 +285,14 @@ export default function ToolComparison() {
                           <span className="text-[10px] font-semibold text-gray-400">Parameter</span>
                         </th>
                         {selectedTools.map(tool => (
-                          <th key={tool.id} className="p-8 md:p-12 border-b border-gray-100 min-w-[240px]">
+                          <th key={tool.id || tool._id} className="p-8 md:p-12 border-b border-gray-100 min-w-[240px]">
                             <div className="flex flex-col items-center group">
-                              <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-black mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                                {tool.name.charAt(0)}
+                              <div className="mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                                <ToolLogo tool={tool} className="w-16 h-16" />
                               </div>
                               <h3 className="text-xl font-black text-gray-900 tracking-tight mb-2">{tool.name}</h3>
                               <button
-                                onClick={() => removeFromComparison(tool.id)}
+                                onClick={() => removeFromComparison(tool.id || tool._id)}
                                 className="text-[10px] font-semibold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
                               >
                                 <X size={12} /> Remove
@@ -265,7 +322,7 @@ export default function ToolComparison() {
                               value = tool[criterion.key];
                             }
                             return (
-                              <td key={`${tool.id}-${criterion.key}`} className="p-8 md:p-10 text-center border-b border-gray-50">
+                              <td key={`${tool.id || tool._id}-${criterion.key}`} className="p-8 md:p-10 text-center border-b border-gray-50">
                                 {formatValue(criterion, value)}
                               </td>
                             );
@@ -278,7 +335,7 @@ export default function ToolComparison() {
                           <span className="font-bold text-gray-900 text-sm tracking-tight">Protocol Intent</span>
                         </td>
                         {selectedTools.map(tool => (
-                          <td key={`${tool.id}-desc`} className="p-8 md:p-10 border-b border-gray-50 bg-gray-50/10">
+                          <td key={`${tool.id || tool._id}-desc`} className="p-8 md:p-10 border-b border-gray-50 bg-gray-50/10">
                             <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-3 italic">
                               "{tool.description}"
                             </p>
@@ -306,9 +363,9 @@ export default function ToolComparison() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {availableTools.filter(t => !selectedTools.some(s => s.id === t.id)).slice(0, 9).map((tool, i) => (
+            {availableTools.filter(t => !selectedTools.some(s => (s.id || s._id) === (t.id || t._id))).slice(0, 9).map((tool, i) => (
               <motion.div
-                key={tool.id}
+                key={tool.id || tool._id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -322,8 +379,8 @@ export default function ToolComparison() {
                   <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-bl-[60px] translate-x-4 -translate-y-4 opacity-0 group-hover:opacity-100 transition-all duration-500" />
 
                   <div className="flex justify-between items-start mb-10 relative z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-xl font-black text-indigo-600 group-hover:scale-110 shadow-sm transition-transform">
-                      {tool.name.charAt(0)}
+                    <div className="group-hover:scale-110 shadow-sm transition-transform">
+                      <ToolLogo tool={tool} className="w-14 h-14" />
                     </div>
                     {tool.verified && (
                       <div className="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-semibold rounded-lg border border-green-100">
