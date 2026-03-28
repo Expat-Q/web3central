@@ -29,68 +29,11 @@ import {
 import { useBookmarks } from "../../hooks/useBookmarks";
 import { CardSkeleton } from "../../components/Skeleton";
 import MetricsPanel from "../../components/MetricsPanel";
+import ToolLogo from "../../components/ToolLogo";
 
 
 
 const fmt = (n) => n > 0 ? '$' + new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short', maximumFractionDigits: 2 }).format(n) : '—';
-
-const getDomain = (url) => {
-  try {
-    return new URL(url).hostname.replace('www.', '');
-  } catch {
-    return '';
-  }
-};
-
-const extractTwitterHandle = (url) => {
-  if (!url) return null;
-  const match = url.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
-  return match ? match[1] : null;
-};
-
-// Custom robust logo component
-const ToolLogo = ({ tool }) => {
-  const [fallbackIdx, setFallbackIdx] = useState(0);
-  const [failed, setFailed] = useState(false);
-
-  const domain = tool.url ? getDomain(tool.url) : null;
-  const twitterUrl = tool.twitter || tool.builder?.twitter;
-  const twitterHandle = extractTwitterHandle(twitterUrl);
-
-  // Build ordered list of image sources to try
-  // 1. Stored logo 2. Twitter avatar (unavatar) 3. Clearbit (404 on miss) 4. Google Favicon (always works)
-  const sources = [
-    tool.logo,
-    twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}?fallback=false` : null,
-    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
-    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
-  ].filter(Boolean);
-
-  const currentSrc = sources[fallbackIdx];
-
-  if (!currentSrc || failed) {
-    return (
-      <div className="w-full h-full bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">
-        {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={currentSrc}
-      alt={tool.name}
-      onError={() => {
-        if (fallbackIdx + 1 < sources.length) {
-          setFallbackIdx(prev => prev + 1);
-        } else {
-          setFailed(true);
-        }
-      }}
-      className="w-full h-full object-contain drop-shadow-sm"
-    />
-  );
-};
 
 // ── Animation Variants ──
 const containerVariants = {
@@ -809,4 +752,4 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       )}
     </div>
   );
-}
+}

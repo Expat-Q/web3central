@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { fetchToolsData } from "../services/apiService";
 import { motion, AnimatePresence } from "framer-motion";
+import ToolLogo from "../components/ToolLogo";
 import {
   BarChart3,
   Search,
@@ -19,63 +20,6 @@ import {
   ChevronRight,
   Database
 } from "lucide-react";
-
-const getDomain = (url) => {
-  try {
-    return new URL(url).hostname.replace('www.', '');
-  } catch {
-    return '';
-  }
-};
-
-const extractTwitterHandle = (url) => {
-  if (!url) return null;
-  const match = url.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
-  return match ? match[1] : null;
-};
-
-const ToolLogo = ({ tool, className = "w-12 h-12" }) => {
-  const [fallbackIdx, setFallbackIdx] = useState(0);
-  const [failed, setFailed] = useState(false);
-
-  const domain = tool.url ? getDomain(tool.url) : null;
-  const twitterUrl = tool.twitter || tool.builder?.twitter;
-  const twitterHandle = extractTwitterHandle(twitterUrl);
-
-  const sources = [
-    tool.logo,
-    twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}?fallback=false` : null,
-    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
-    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
-  ].filter(Boolean);
-
-  const currentSrc = sources[fallbackIdx];
-
-  if (!currentSrc || failed) {
-    return (
-      <div className={`${className} rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600`}>
-        {tool.name?.charAt(0)?.toUpperCase() || '?'}
-      </div>
-    );
-  }
-
-  return (
-    <div className={`${className} rounded-2xl bg-white border border-indigo-100 p-2 flex items-center justify-center overflow-hidden`}>
-      <img
-        src={currentSrc}
-        alt={tool.name}
-        onError={() => {
-          if (fallbackIdx + 1 < sources.length) {
-            setFallbackIdx((prev) => prev + 1);
-          } else {
-            setFailed(true);
-          }
-        }}
-        className="w-full h-full object-contain"
-      />
-    </div>
-  );
-};
 
 export default function ToolComparison() {
   const navigate = useNavigate();
@@ -288,7 +232,12 @@ export default function ToolComparison() {
                           <th key={tool.id || tool._id} className="p-8 md:p-12 border-b border-gray-100 min-w-[240px]">
                             <div className="flex flex-col items-center group">
                               <div className="mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                                <ToolLogo tool={tool} className="w-16 h-16" />
+                                <ToolLogo
+                                  tool={tool}
+                                  className="w-16 h-16 rounded-2xl bg-white border border-indigo-100 p-2 flex items-center justify-center overflow-hidden"
+                                  imageClassName="w-full h-full object-contain"
+                                  fallbackClassName="w-full h-full rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600"
+                                />
                               </div>
                               <h3 className="text-xl font-black text-gray-900 tracking-tight mb-2">{tool.name}</h3>
                               <button
@@ -380,7 +329,12 @@ export default function ToolComparison() {
 
                   <div className="flex justify-between items-start mb-10 relative z-10">
                     <div className="group-hover:scale-110 shadow-sm transition-transform">
-                      <ToolLogo tool={tool} className="w-14 h-14" />
+                      <ToolLogo
+                        tool={tool}
+                        className="w-14 h-14 rounded-2xl bg-white border border-indigo-100 p-2 flex items-center justify-center overflow-hidden"
+                        imageClassName="w-full h-full object-contain"
+                        fallbackClassName="w-full h-full rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl font-black text-indigo-600"
+                      />
                     </div>
                     {tool.verified && (
                       <div className="px-3 py-1 bg-green-50 text-green-500 text-[10px] font-semibold rounded-lg border border-green-100">

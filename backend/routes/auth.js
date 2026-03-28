@@ -41,6 +41,13 @@ const normalizeTwitterHandle = (input = '') => {
     return clean ? `@${clean}` : '';
 };
 
+const deriveAvatarUrlFromTwitter = (twitter = '') => {
+    const normalized = normalizeTwitterHandle(twitter);
+    if (!normalized) return '';
+    const handle = normalized.replace(/^@/, '');
+    return `https://unavatar.io/twitter/${handle}`;
+};
+
 const serializeUser = (user) => ({
     id: user._id,
     name: user.name,
@@ -48,7 +55,7 @@ const serializeUser = (user) => ({
     role: user.role,
     bio: user.bio || '',
     twitter: user.twitter || '',
-    avatarUrl: user.avatarUrl || '',
+    avatarUrl: user.avatarUrl || deriveAvatarUrlFromTwitter(user.twitter || ''),
     totalXP: user.totalXP || 0,
     rank: user.rank || 'Novice',
     learningProgress: serializeLearningProgress(user.learningProgress)
@@ -227,10 +234,11 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
             const prevTwitter = normalizeTwitterHandle(user.twitter || '');
             updates.twitter = nextTwitter;
 
-            // Update avatar only when user updates X/Twitter handle.
-            if (nextTwitter && nextTwitter !== prevTwitter) {
-                const handle = nextTwitter.replace(/^@/, '');
-                updates.avatarUrl = `https://unavatar.io/twitter/${handle}`;
+            // Keep avatar in sync with twitter handle updates.
+            if (!nextTwitter) {
+                updates.avatarUrl = '';
+            } else if (nextTwitter !== prevTwitter || !user.avatarUrl) {
+                updates.avatarUrl = deriveAvatarUrlFromTwitter(nextTwitter);
             }
         }
         if (name && name.trim().length > 0) updates.name = name.trim();

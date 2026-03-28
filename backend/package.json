@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "test": "jest --coverage --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
-    "migrate:learning-progress": "node scripts/migrateLearningProgress.js"
+    "migrate:learning-progress": "node scripts/migrateLearningProgress.js",
+    "migrate:tool-logos": "node scripts/migrateToolLogos.js"
   },
   "keywords": [],
   "author": "",
