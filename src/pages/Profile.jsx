@@ -11,38 +11,8 @@ import {
 import { useBookmarks } from '../hooks/useBookmarks';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import SafeLink from '../components/SafeLink';
+import ToolLogo from '../components/ToolLogo';
 import { updateProfile, fetchMyTools } from '../services/apiService';
-
-const getDomain = (url) => {
-    try {
-        return new URL(url).hostname.replace('www.', '');
-    } catch {
-        return '';
-    }
-};
-
-const ToolLogo = ({ tool }) => {
-    const [imgError, setImgError] = useState(false);
-    const domain = tool.url ? getDomain(tool.url) : null;
-    const initialSrc = tool.logo || (domain ? `https://logo.clearbit.com/${domain}?size=128` : null);
-
-    if (imgError || !initialSrc) {
-        return (
-            <div className="w-full h-full bg-slate-900 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-sm">
-                {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-            </div>
-        );
-    }
-
-    return (
-        <img
-            src={initialSrc}
-            alt={tool.name}
-            onError={() => setImgError(true)}
-            className="w-full h-full object-contain drop-shadow-sm"
-        />
-    );
-};
 
 export default function Profile() {
     const { user, setUser, logout, loading: authLoading } = useAuth();

@@ -4,46 +4,8 @@ import { Link } from "react-router-dom";
 import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview } from "../services/apiService";
 import { Star, ExternalLink, ChevronRight, Zap, Sparkles } from "lucide-react";
 import BuilderSpotlightCard from "../components/BuilderSpotlightCard";
+import ToolLogo from "../components/ToolLogo";
 import { PageSkeleton } from "../components/Skeleton";
-
-
-/* ── Tool Logo with X/Twitter pfp fallback chain ── */
-const getDomain = (url) => {
-  try { return new URL(url).hostname.replace('www.', ''); } catch { return ''; }
-};
-const extractTwitterHandle = (url) => {
-  if (!url) return null;
-  const match = url.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
-  return match ? match[1] : null;
-};
-const ToolLogo = ({ tool }) => {
-  const [idx, setIdx] = useState(0);
-  const [failed, setFailed] = useState(false);
-  const domain = tool.url ? getDomain(tool.url) : null;
-  const handle = extractTwitterHandle(tool.twitter || tool.builder?.twitter);
-  const sources = [
-    tool.logo,
-    handle ? `https://unavatar.io/twitter/${handle}?fallback=false` : null,
-    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
-    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
-  ].filter(Boolean);
-  const src = sources[idx];
-  if (!src || failed) {
-    return (
-      <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center font-black text-lg rounded-[inherit]">
-        {tool.name?.charAt(0).toUpperCase() || '?'}
-      </div>
-    );
-  }
-  return (
-    <img
-      src={src}
-      alt={tool.name}
-      className="w-full h-full object-cover rounded-[inherit]"
-      onError={() => idx < sources.length - 1 ? setIdx(idx + 1) : setFailed(true)}
-    />
-  );
-};
 
 /* ── Animated Number Counter ── */
 const AnimatedCounter = ({ value, duration = 2, prefix = "", suffix = "" }) => {
@@ -124,7 +86,9 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const allTools = appsData ? Object.values(appsData).flat() : [];
+  const allTools = appsData
+    ? Object.values(appsData).filter(Array.isArray).flat()
+    : [];
   const activeToolsCount = platformStats?.activeTools || allTools.length || 0;
   const inReviewCount = platformStats?.pendingTools || 0;
   const communityToolsList = appsData?.communityTools || [];

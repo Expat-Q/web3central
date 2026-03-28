@@ -2,15 +2,28 @@ const express = require('express');
 const Tool = require('../models/Tool');
 const nodemailer = require('nodemailer');
 const { protect, admin } = require('../middleware/auth');
+const { deriveToolLogo } = require('../utils/toolLogo');
 
 const router = express.Router();
+
+const decorateToolWithLogo = (toolDoc) => {
+  const tool = toolDoc?.toObject ? toolDoc.toObject() : toolDoc;
+  if (!tool.logoUrl) {
+    const derived = deriveToolLogo(tool);
+    if (derived.logoUrl) {
+      tool.logoUrl = derived.logoUrl;
+      tool.logoSource = derived.logoSource;
+    }
+  }
+  return tool;
+};
 
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
 // expected by the frontend (e.g. { category1: [tools], category2: [tools] })
 router.get('/', async (req, res) => {
   try {
-    const tools = await Tool.find({});
+    const tools = (await Tool.find({})).map(decorateToolWithLogo);
 
     // Group tools by category
     const toolsByCategory = tools.reduce((acc, tool) => {
@@ -50,7 +63,7 @@ router.get('/', async (req, res) => {
 router.get('/my-tools', protect, async (req, res) => {
   try {
     const tools = await Tool.find({ submitter: req.user.id });
-    res.json(tools);
+    res.json(tools.map(decorateToolWithLogo));
   } catch (error) {
     res.status(500).json({ error: 'Internal server error while fetching my tools' });
   }
@@ -90,7 +103,7 @@ router.get('/:category', async (req, res) => {
     const category = req.params.category;
     const aliases = CATEGORY_ALIASES[category] || [category];
     const tools = await Tool.find({ category: { $in: aliases } });
-    res.json(tools);
+    res.json(tools.map(decorateToolWithLogo));
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -101,7 +114,8 @@ const axios = require('axios');
 // POST a new tool (Public Submission)
 router.post('/submit', protect, async (req, res) => {
   try {
-    const { name, link, category, chain, handle, description, auditLink } = req.body;
+    const { name, link, category, chain, handle, builderHandle, description, auditLink } = req.body;
+    const submitHandle = handle || builderHandle || '';
 
     // Generate a slug-like ID from the name
     const toolId = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -133,6 +147,15 @@ router.post('/submit', protect, async (req, res) => {
       // Not found or error: stay unverified (Tier 4)
     }
 
+    const derivedLogo = deriveToolLogo({
+      name,
+      url: link,
+      builder: {
+        handle: submitHandle,
+        twitter: submitHandle ? `https://x.com/${String(submitHandle).replace(/^@/, '')}` : ''
+      }
+    });
+
     const newTool = await Tool.create({
       id: toolId,
       name,
@@ -143,12 +166,14 @@ router.post('/submit', protect, async (req, res) => {
       verificationTier,
       verified,
       builder: {
-        name: handle || 'Anonymous',
-        handle: handle
+        name: submitHandle || 'Anonymous',
+        handle: submitHandle
       },
       submitter: req.user.id,
       status: 'pending',
-      metrics: metrics
+      metrics: metrics,
+      logoUrl: derivedLogo.logoUrl,
+      logoSource: derivedLogo.logoSource
     });
 
     // Send email notification
@@ -177,7 +202,7 @@ router.post('/submit', protect, async (req, res) => {
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Name</td><td style="padding: 8px 0;">${name}</td></tr>
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Category</td><td style="padding: 8px 0;">${category}</td></tr>
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Chain</td><td style="padding: 8px 0;">${chain} ${verified ? ' (Verified)' : ''}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Handle</td><td style="padding: 8px 0;">${handle || 'Anonymous'}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Handle</td><td style="padding: 8px 0;">${submitHandle || 'Anonymous'}</td></tr>
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">URL</td><td style="padding: 8px 0;"><a href="${link}" style="color: #4f46e5;">${link}</a></td></tr>
                   ${auditLink ? `<tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Audit</td><td style="padding: 8px 0;"><a href="${auditLink}" style="color: #4f46e5;">Link</a></td></tr>` : ''}
                   <tr><td style="padding: 8px 0; color: #64748b; font-weight: bold;">Description</td><td style="padding: 8px 0;">${description}</td></tr>
@@ -231,6 +256,17 @@ router.post('/:category', async (req, res) => {
         name: 'Web3Central Admin',
         twitter: toolData.twitter || ''
       };
+    }
+
+    const derivedLogo = deriveToolLogo({
+      ...toolData,
+      category,
+      url: toolData.url,
+    });
+
+    if (derivedLogo.logoUrl) {
+      toolData.logoUrl = derivedLogo.logoUrl;
+      toolData.logoSource = derivedLogo.logoSource;
     }
 
     // Check if ID exists
@@ -336,6 +372,26 @@ router.put('/:category/:id', protect, async (req, res) => {
     const { category, id } = req.params;
     const updateData = req.body;
 
+    const existingTool = await Tool.findOne({ id });
+    if (!existingTool) {
+      return res.status(404).json({ error: 'Tool not found' });
+    }
+
+    const mergedForLogo = {
+      ...existingTool.toObject(),
+      ...updateData,
+      builder: {
+        ...(existingTool.builder || {}),
+        ...(updateData.builder || {})
+      }
+    };
+
+    const derivedLogo = deriveToolLogo(mergedForLogo);
+    if (derivedLogo.logoUrl) {
+      updateData.logoUrl = derivedLogo.logoUrl;
+      updateData.logoSource = derivedLogo.logoSource;
+    }
+
     // Prevent changing ID via update if that breaks references, generally safer to ignore ID update
     // But here we rely on ID.
 
@@ -344,10 +400,6 @@ router.put('/:category/:id', protect, async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     );
-
-    if (!updatedTool) {
-      return res.status(404).json({ error: 'Tool not found' });
-    }
 
     res.json({ message: 'Tool updated successfully', tool: updatedTool });
   } catch (error) {

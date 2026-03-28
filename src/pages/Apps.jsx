@@ -3,47 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
 import { Star, ChevronRight, Rocket } from "lucide-react";
+import ToolLogo from "../components/ToolLogo";
 import { PageSkeleton } from "../components/Skeleton";
-
-
-/* ── Helpers ── */
-const getDomain = (url) => {
-  try { return new URL(url).hostname.replace('www.', ''); } catch { return ''; }
-};
-const extractTwitterHandle = (url) => {
-  if (!url) return null;
-  const match = url.match(/(?:x\.com|twitter\.com)\/([a-zA-Z0-9_]+)/i);
-  return match ? match[1] : null;
-};
-
-const ToolLogo = ({ tool }) => {
-  const [fallbackIdx, setFallbackIdx] = useState(0);
-  const [failed, setFailed] = useState(false);
-  const domain = tool.url ? getDomain(tool.url) : null;
-  const handle = extractTwitterHandle(tool.twitter || tool.builder?.twitter);
-  const sources = [
-    tool.logo,
-    handle ? `https://unavatar.io/twitter/${handle}?fallback=false` : null,
-    domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
-    domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
-  ].filter(Boolean);
-  const currentSrc = sources[fallbackIdx];
-  if (!currentSrc || failed) {
-    return (
-      <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center font-bold text-lg rounded-[inherit]">
-        {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-      </div>
-    );
-  }
-  return (
-    <img
-      src={currentSrc}
-      alt={tool.name}
-      onError={() => fallbackIdx + 1 < sources.length ? setFallbackIdx(prev => prev + 1) : setFailed(true)}
-      className="w-full h-full object-contain rounded-[inherit]"
-    />
-  );
-};
 
 /* ── Protocol Card ── */
 const ProtocolCard = ({ tool }) => {

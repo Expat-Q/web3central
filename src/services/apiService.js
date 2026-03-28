@@ -1,7 +1,79 @@
 import apiClient from '../lib/apiClient';
 
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const memoryCache = new Map();
+const inflightRequests = new Map();
+
+const getSessionCache = (key) => {
+  try {
+    const raw = sessionStorage.getItem(`apiCache:${key}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.expiresAt || Date.now() > parsed.expiresAt) {
+      sessionStorage.removeItem(`apiCache:${key}`);
+      return null;
+    }
+    return parsed.value;
+  } catch {
+    return null;
+  }
+};
+
+const setSessionCache = (key, value, ttlMs = CACHE_TTL_MS) => {
+  try {
+    sessionStorage.setItem(`apiCache:${key}`, JSON.stringify({
+      value,
+      expiresAt: Date.now() + ttlMs
+    }));
+  } catch {
+    // Ignore storage failures (quota/private mode)
+  }
+};
+
+const getCached = (key) => {
+  const mem = memoryCache.get(key);
+  if (mem && Date.now() < mem.expiresAt) return mem.value;
+
+  const sessionValue = getSessionCache(key);
+  if (sessionValue !== null) {
+    memoryCache.set(key, { value: sessionValue, expiresAt: Date.now() + 30 * 1000 });
+    return sessionValue;
+  }
+  return null;
+};
+
+const setCached = (key, value, ttlMs = CACHE_TTL_MS) => {
+  memoryCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+  setSessionCache(key, value, ttlMs);
+};
+
+const cachedGet = async ({ cacheKey, endpoint, requestKey, ttlMs = CACHE_TTL_MS }) => {
+  const cached = getCached(cacheKey);
+  if (cached !== null) return cached;
+
+  if (inflightRequests.has(cacheKey)) {
+    return inflightRequests.get(cacheKey);
+  }
+
+  const promise = apiClient.get(endpoint, { requestKey })
+    .then((data) => {
+      setCached(cacheKey, data, ttlMs);
+      return data;
+    })
+    .finally(() => {
+      inflightRequests.delete(cacheKey);
+    });
+
+  inflightRequests.set(cacheKey, promise);
+  return promise;
+};
+
 export const fetchToolsData = async () => {
-  return apiClient.get('/tools', { requestKey: 'fetchTools' });
+  return cachedGet({
+    cacheKey: 'tools-all',
+    endpoint: '/tools',
+    requestKey: 'fetchTools'
+  });
 };
 
 export const fetchToolsByCategory = async (category) => {
@@ -41,7 +113,11 @@ export const createTool = async (category, toolData) => {
 };
 
 export const fetchCommunitySpotlight = async () => {
-  return apiClient.get('/community-spotlight', { requestKey: 'fetchSpotlight' });
+  return cachedGet({
+    cacheKey: 'community-spotlight',
+    endpoint: '/community-spotlight',
+    requestKey: 'fetchSpotlight'
+  });
 };
 
 export const updateCommunitySpotlight = async (spotlightData) => {
@@ -75,7 +151,11 @@ export const generateAiQuiz = async (content) => {
 };
 
 export const fetchStatsOverview = async () => {
-  return apiClient.get('/stats/overview', { requestKey: 'fetchStats' });
+  return cachedGet({
+    cacheKey: 'stats-overview',
+    endpoint: '/stats/overview',
+    requestKey: 'fetchStats'
+  });
 };
 
 export const fetchLessonById = async (slug) => {
