@@ -4,6 +4,59 @@ const axios = require('axios');
 const { logger } = require('../lib/logger');
 const Tool = require('../models/Tool');
 
+const geckoIdCache = new Map();
+
+const GECKO_OVERRIDES = {
+    'uniswap': 'uniswap',
+    'pancakeswap': 'pancakeswap-token',
+    'sushi': 'sushi',
+    'curve': 'curve-dao-token',
+    'balancer': 'balancer',
+    '1inch': '1inch',
+    'cowswap': 'cow-protocol',
+    'jupiter': 'jupiter-exchange-solana',
+    'raydium': 'raydium',
+    'orca': 'orca',
+    'velodrome': 'velodrome-finance',
+    'aerodrome': 'aerodrome-finance',
+    'osmosis': 'osmosis',
+    'traderjoe': 'joe',
+    'quickswap': 'quickswap',
+    'camelot': 'camelot-token',
+    'spookyswap': 'spookyswap',
+    'thena': 'thena',
+    'biswap': 'biswap',
+    'vvs': 'vvs-finance',
+    'yield-yak': 'yield-yak',
+    'mdex': 'mdex',
+    'kamino-finance': 'kamino',
+    'synfutures': 'synfutures',
+    'dydx': 'dydx-chain',
+    'gmx': 'gmx',
+    'hyperliquid': 'hyperliquid',
+    'aevo': 'aevo-exchange',
+    'vertex': 'vertex-protocol',
+    'perpetual-protocol': 'perpetual-protocol',
+    'kwenta': 'kwenta',
+    'mux': 'mux-protocol',
+    'rabbitx': 'rabbitx',
+    'drift': 'drift-protocol',
+    'orderly': 'orderly-network',
+    'lighter': 'lighter',
+    'aster': 'astherus',
+    'layerzero': 'layerzero',
+    'axelar': 'axelar',
+    'stargate': 'stargate-finance',
+    'debridge': 'debridge',
+    'connext': 'connext',
+    'hop': 'hop-protocol',
+    'across': 'across-protocol',
+    'synapse': 'synapse-2',
+    'meson': 'meson-network',
+    'polyhedra': 'polyhedra-network',
+    'kaito': 'kaito'
+};
+
 const toNumber = (value) => {
     const num = Number(value);
     return Number.isFinite(num) ? num : 0;
@@ -85,6 +138,48 @@ const fetchCoinGeckoMarketData = async (geckoId) => {
     }
 };
 
+const normalize = (value = '') => String(value || '').trim().toLowerCase();
+
+const resolveGeckoId = async ({ toolId, slug, explicitGeckoId, name, symbol }) => {
+    const direct =
+        explicitGeckoId ||
+        GECKO_OVERRIDES[toolId] ||
+        GECKO_OVERRIDES[slug];
+
+    if (direct) return direct;
+
+    const cacheKey = `${normalize(name)}::${normalize(symbol)}`;
+    if (geckoIdCache.has(cacheKey)) {
+        return geckoIdCache.get(cacheKey);
+    }
+
+    if (!name && !symbol) {
+        geckoIdCache.set(cacheKey, null);
+        return null;
+    }
+
+    try {
+        const query = encodeURIComponent(name || symbol);
+        const { data } = await axios.get(`https://api.coingecko.com/api/v3/search?query=${query}`, { timeout: 10000 });
+        const coins = data?.coins || [];
+        const symbolNorm = normalize(symbol);
+        const nameNorm = normalize(name);
+
+        const exactById = coins.find((c) => normalize(c.id) === normalize(toolId) || normalize(c.id) === normalize(slug));
+        const exactByName = coins.find((c) => normalize(c.name) === nameNorm);
+        const exactBySymbol = symbolNorm ? coins.find((c) => normalize(c.symbol) === symbolNorm) : null;
+        const fallbackTop = coins[0] || null;
+
+        const resolved = exactById?.id || exactByName?.id || exactBySymbol?.id || fallbackTop?.id || null;
+        geckoIdCache.set(cacheKey, resolved);
+        return resolved;
+    } catch (err) {
+        logger.warn('CoinGecko search lookup failed', { name, symbol, error: err.message });
+        geckoIdCache.set(cacheKey, null);
+        return null;
+    }
+};
+
 // @desc    Get live metrics for a protocol from DefiLlama
 // @route   GET /api/defi/protocol/:slug
 // @access  Public
@@ -102,23 +197,30 @@ router.get('/protocol/:slug', async (req, res) => {
             {
                 geckoId: 1,
                 category: 1,
-                name: 1
+                name: 1,
+                id: 1,
+                symbol: 1
             }
         ).lean();
-        
-        // 1. Fetch main protocol data
-        const protocolRes = await axios.get(`https://api.llama.fi/protocol/${slug}`, { timeout: 10000 });
-        const p = protocolRes.data;
 
-        if (!p || Object.keys(p).length === 0) {
-            return res.status(404).json({ success: false, error: 'Protocol not found on DefiLlama' });
+        // 1. Fetch main protocol data
+        let p = null;
+        try {
+            const protocolRes = await axios.get(`https://api.llama.fi/protocol/${slug}`, { timeout: 10000 });
+            p = protocolRes?.data || null;
+        } catch (err) {
+            logger.warn('DefiLlama protocol lookup failed', { slug, error: err.message });
+        }
+
+        if (!p && !toolDoc) {
+            return res.status(404).json({ success: false, error: 'Protocol not found' });
         }
 
         // 2. Extract key metrics
         // DefiLlama /protocol/{slug} response has currentChainTvl, tvl[], etc.
-        const tvlSeries = Array.isArray(p.tvl) ? p.tvl : [];
+        const tvlSeries = Array.isArray(p?.tvl) ? p.tvl : [];
         const currentTvlFromSeries = tvlSeries.length > 0 ? extractTvlValue(tvlSeries[tvlSeries.length - 1]) : 0;
-        const currentTvl = currentTvlFromSeries || toNumber(p.currentChainTvl?.['Total']) || 0;
+        const currentTvl = currentTvlFromSeries || toNumber(p?.currentChainTvl?.['Total']) || 0;
         
         // Calculate 7d change if possible
         let change7d = null;
@@ -131,29 +233,40 @@ router.get('/protocol/:slug', async (req, res) => {
         }
 
         // 3. Fetch 24h volume from DEX/derivatives overview endpoints when available
-        const volume24h = await findVolume24hBySlug(slug);
+        const volume24h = p ? await findVolume24hBySlug(slug) : 0;
 
         // 4. Token market data (CoinGecko fallback)
-        const geckoId = toolDoc?.geckoId || p.gecko_id || p.geckoId || null;
+        const geckoId = await resolveGeckoId({
+            toolId: toolDoc?.id,
+            slug,
+            explicitGeckoId: toolDoc?.geckoId || p?.gecko_id || p?.geckoId,
+            name: p?.name || toolDoc?.name,
+            symbol: p?.symbol || toolDoc?.symbol
+        });
         const coinData = await fetchCoinGeckoMarketData(geckoId);
+
+        // Persist discovered geckoId for future requests
+        if (toolDoc?._id && geckoId && !toolDoc.geckoId) {
+            Tool.updateOne({ _id: toolDoc._id }, { $set: { geckoId } }).catch(() => {});
+        }
         
         const metrics = {
-            name: p.name,
-            slug: p.slug,
-            logo: p.logo,
-            category: p.category || toolDoc?.category,
+            name: p?.name || toolDoc?.name,
+            slug: p?.slug || slug,
+            logo: p?.logo,
+            category: p?.category || toolDoc?.category,
             tvl: currentTvl,
-            change_7d: change7d || p.change_7d || 0,
+            change_7d: change7d || p?.change_7d || 0,
             volume24h,
-            mcap: toNumber(p.mcap) || toNumber(coinData?.mcap),
-            fdv: toNumber(p.fdv) || toNumber(coinData?.fdv),
-            tokenPrice: toNumber(coinData?.currentPrice) || toNumber(p.tokenPrice),
-            staking: toNumber(p.staking),
-            pool2: toNumber(p.pool2),
-            chains: p.chains || [],
-            symbol: p.symbol,
-            twitter: p.twitter,
-            description: p.description,
+            mcap: toNumber(p?.mcap) || toNumber(coinData?.mcap),
+            fdv: toNumber(p?.fdv) || toNumber(coinData?.fdv),
+            tokenPrice: toNumber(coinData?.currentPrice) || toNumber(p?.tokenPrice),
+            staking: toNumber(p?.staking),
+            pool2: toNumber(p?.pool2),
+            chains: p?.chains || [],
+            symbol: p?.symbol || toolDoc?.symbol,
+            twitter: p?.twitter,
+            description: p?.description,
             geckoId
         };
 

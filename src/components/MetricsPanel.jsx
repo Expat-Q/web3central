@@ -75,8 +75,23 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
 
+  const shouldFetchLiveMetrics = React.useMemo(() => {
+    const category = String(protocol?.category || '').toLowerCase();
+    const hasSlug = Boolean(protocol?.slug);
+    if (!hasSlug) return false;
+
+    const offchainLike =
+      category.includes('security') ||
+      category.includes('analytics') ||
+      category.includes('research') ||
+      category.includes('infofi') ||
+      category.includes('community');
+
+    return !offchainLike;
+  }, [protocol]);
+
   React.useEffect(() => {
-    if (isOpen && protocol?.slug) {
+    if (isOpen && shouldFetchLiveMetrics) {
       if (metricsCache.has(protocol.slug)) {
         setData(metricsCache.get(protocol.slug));
         setError(null);
@@ -87,7 +102,7 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
       setData(null);
       setError(null);
     }
-  }, [isOpen, protocol]);
+  }, [isOpen, protocol, shouldFetchLiveMetrics]);
 
   const fetchMetrics = async () => {
     setLoading(true);
@@ -339,7 +354,7 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                 </div>
               ) : (
                 <>
-                  {error && (
+                  {error && shouldFetchLiveMetrics && (
                     <div className="text-center py-4 px-4 bg-amber-50 rounded-2xl border border-amber-100">
                       <Info size={18} className="mx-auto mb-2 text-amber-600" />
                       <p className="font-bold text-amber-900 text-sm">Live DefiLlama data unavailable</p>
