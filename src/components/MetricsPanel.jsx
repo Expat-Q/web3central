@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info, Landmark, Globe, ShieldCheck, User, Tag } from 'lucide-react';
+import { X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info, Landmark, Globe, ShieldCheck, User, Tag, Coins, Users, Star, MessageSquare } from 'lucide-react';
 import ToolLogo from './ToolLogo';
 
 const metricsCache = new Map();
@@ -51,6 +51,23 @@ const DetailRow = ({ icon, label, value, href }) => {
   }
 
   return <div className="flex items-center gap-2 py-2 px-2 -mx-2">{content}</div>;
+};
+
+const parseUsers = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const parsed = String(value).replace(/[^\d]/g, '');
+  if (!parsed) return null;
+  const num = Number(parsed);
+  return Number.isFinite(num) ? num : null;
+};
+
+const formatCount = (val) => {
+  if (val === null || val === undefined) return null;
+  if (val >= 1e9) return `${(val / 1e9).toFixed(2)}B`;
+  if (val >= 1e6) return `${(val / 1e6).toFixed(2)}M`;
+  if (val >= 1e3) return `${(val / 1e3).toFixed(1)}K`;
+  return `${Math.round(val)}`;
 };
 
 export default function MetricsPanel({ protocol, isOpen, onClose }) {
@@ -116,10 +133,160 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
       volume24h: data?.volume24h ?? fallback?.volume24h ?? null,
       mcap: data?.mcap ?? fallback?.mcap ?? null,
       fdv: data?.fdv ?? fallback?.fdv ?? null,
+      tokenPrice: data?.tokenPrice ?? fallback?.tokenPrice ?? null,
+      staking: data?.staking ?? fallback?.staking ?? null,
+      pool2: data?.pool2 ?? fallback?.pool2 ?? null,
       chains: (data?.chains?.length ? data.chains : fallback?.chains) || [],
       source: data ? 'DefiLlama (live)' : fallback?.lastUpdated ? 'Web3Central snapshot' : null
     };
   }, [data, protocol]);
+
+  const displayedMetrics = React.useMemo(() => {
+    const category = String(protocol?.category || '').toLowerCase();
+    const isWallet = category.includes('wallet');
+    const isNft = category.includes('nft');
+    const isCommunity = category.includes('community');
+    const isOffchain =
+      category.includes('security') ||
+      category.includes('analytics') ||
+      category.includes('research') ||
+      category.includes('infofi') ||
+      isCommunity;
+    const isOnchain =
+      !isOffchain ||
+      category.includes('dex') ||
+      category.includes('perp') ||
+      category.includes('defi') ||
+      category.includes('interoperability') ||
+      category.includes('bridge') ||
+      category.includes('staking') ||
+      category.includes('rwa') ||
+      category.includes('onchain');
+
+    const hasToken = Number(mergedMetrics.mcap) > 0 || Number(mergedMetrics.fdv) > 0 || Number(mergedMetrics.tokenPrice) > 0 || Boolean(protocol?.geckoId);
+    const monthlyUsersNum = parseUsers(protocol?.monthlyUsers);
+    const ratingNum = Number(protocol?.rating || 0);
+    const reviewsNum = Number(protocol?.reviews || protocol?.ratingCount || 0);
+    const chainsCount = Array.isArray(mergedMetrics.chains) ? mergedMetrics.chains.length : 0;
+
+    const allCandidates = [
+      {
+        key: 'tvl',
+        label: 'TVL',
+        value: formatCurrency(mergedMetrics.tvl),
+        subValue: formatPercent(mergedMetrics.change7d),
+        icon: <Landmark size={18} />,
+        color: 'from-purple-500 to-indigo-600'
+      },
+      {
+        key: 'volume24h',
+        label: '24h Volume',
+        value: formatCurrency(mergedMetrics.volume24h),
+        icon: <Activity size={18} />,
+        color: 'from-cyan-500 to-blue-600'
+      },
+      {
+        key: 'mcap',
+        label: 'Market Cap',
+        value: hasToken ? formatCurrency(mergedMetrics.mcap) : null,
+        icon: <DollarSign size={18} />,
+        color: 'from-emerald-500 to-teal-600'
+      },
+      {
+        key: 'fdv',
+        label: 'FDV',
+        value: hasToken ? formatCurrency(mergedMetrics.fdv) : null,
+        icon: <BarChart3 size={18} />,
+        color: 'from-orange-500 to-amber-600'
+      },
+      {
+        key: 'tokenPrice',
+        label: 'Token Price',
+        value: hasToken ? formatCurrency(mergedMetrics.tokenPrice) : null,
+        icon: <Coins size={18} />,
+        color: 'from-fuchsia-500 to-purple-600'
+      },
+      {
+        key: 'monthlyUsers',
+        label: 'Monthly Users',
+        value: protocol?.monthlyUsers || formatCount(monthlyUsersNum),
+        icon: <Users size={18} />,
+        color: 'from-sky-500 to-indigo-600'
+      },
+      {
+        key: 'rating',
+        label: 'Rating',
+        value: ratingNum > 0 ? `${ratingNum.toFixed(1)} / 5` : null,
+        icon: <Star size={18} />,
+        color: 'from-amber-500 to-yellow-600'
+      },
+      {
+        key: 'reviews',
+        label: 'Reviews',
+        value: reviewsNum > 0 ? formatCount(reviewsNum) : null,
+        icon: <MessageSquare size={18} />,
+        color: 'from-violet-500 to-purple-600'
+      },
+      {
+        key: 'chains',
+        label: 'Chains',
+        value: chainsCount > 0 ? formatCount(chainsCount) : null,
+        icon: <Layers size={18} />,
+        color: 'from-slate-500 to-gray-700'
+      },
+      {
+        key: 'staking',
+        label: 'Staking TVL',
+        value: formatCurrency(mergedMetrics.staking),
+        icon: <Landmark size={18} />,
+        color: 'from-indigo-500 to-blue-700'
+      },
+      {
+        key: 'pool2',
+        label: 'Pool2',
+        value: formatCurrency(mergedMetrics.pool2),
+        icon: <Activity size={18} />,
+        color: 'from-emerald-500 to-green-700'
+      }
+    ].filter((m) => m.value);
+
+    const orderForOffchain = ['monthlyUsers', 'rating', 'reviews', 'chains', 'tokenPrice', 'mcap', 'fdv'];
+    const orderForWallet = ['volume24h', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains'];
+    const orderForNft = ['volume24h', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains', 'tvl'];
+    const orderForOnchain = ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'staking', 'pool2', 'chains', 'monthlyUsers', 'rating'];
+
+    const preferredOrder = isWallet
+      ? orderForWallet
+      : isNft
+        ? orderForNft
+        : isOffchain
+          ? orderForOffchain
+          : isOnchain
+            ? orderForOnchain
+            : ['tvl', 'volume24h', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains'];
+
+    const byKey = new Map(allCandidates.map((m) => [m.key, m]));
+    const selected = [];
+
+    for (const key of preferredOrder) {
+      const metric = byKey.get(key);
+      if (metric && !selected.find((m) => m.key === metric.key)) {
+        selected.push(metric);
+      }
+      if (selected.length >= 4) break;
+    }
+
+    if (selected.length < 4) {
+      for (const metric of allCandidates) {
+        if (!selected.find((m) => m.key === metric.key)) {
+          selected.push(metric);
+        }
+        if (selected.length >= 4) break;
+      }
+    }
+
+    return selected.slice(0, 4);
+  }, [protocol, mergedMetrics]);
 
   return (
     <AnimatePresence>
@@ -202,34 +369,25 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                     </div>
                   </div>
 
-                  {/* Metrics Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <MetricCard
-                      label="TVL"
-                      value={formatCurrency(mergedMetrics.tvl)}
-                      subValue={formatPercent(mergedMetrics.change7d)}
-                      icon={<Landmark size={18} />}
-                      color="from-purple-500 to-indigo-600"
-                    />
-                    <MetricCard
-                      label="24h Volume"
-                      value={formatCurrency(mergedMetrics.volume24h)}
-                      icon={<Activity size={18} />}
-                      color="from-cyan-500 to-blue-600"
-                    />
-                    <MetricCard
-                      label="Market Cap"
-                      value={formatCurrency(mergedMetrics.mcap)}
-                      icon={<DollarSign size={18} />}
-                      color="from-emerald-500 to-teal-600"
-                    />
-                    <MetricCard
-                      label="FDV"
-                      value={formatCurrency(mergedMetrics.fdv)}
-                      icon={<BarChart3 size={18} />}
-                      color="from-orange-500 to-amber-600"
-                    />
-                  </div>
+                  {/* Metrics Grid (conditional, max 4) */}
+                  {displayedMetrics.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      {displayedMetrics.map((metric) => (
+                        <MetricCard
+                          key={metric.key}
+                          label={metric.label}
+                          value={metric.value}
+                          subValue={metric.subValue}
+                          icon={metric.icon}
+                          color={metric.color}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 px-4 bg-gray-100/70 rounded-2xl border border-gray-200">
+                      <p className="text-sm font-semibold text-gray-500">No live metrics available for this app yet.</p>
+                    </div>
+                  )}
 
                   {mergedMetrics.source && (
                     <p className="text-[11px] font-bold text-gray-400 -mt-4">Source: {mergedMetrics.source}</p>

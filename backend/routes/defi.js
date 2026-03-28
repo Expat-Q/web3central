@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { logger } = require('../lib/logger');
+const Tool = require('../models/Tool');
 
 const toNumber = (value) => {
     const num = Number(value);
@@ -44,7 +45,44 @@ const findVolume24hBySlug = async (slug) => {
         }
     }
 
+    // Bridges volume source (different host/shape)
+    try {
+        const { data } = await axios.get('https://bridges.llama.fi/bridges', { timeout: 10000 });
+        const bridges = data?.bridges || [];
+        const bridge = bridges.find((b) => b.slug === slug);
+        if (bridge) {
+            volume24h += toNumber(
+                bridge.last24hVolume ??
+                bridge.lastDailyVolume ??
+                bridge.volumePrevDay ??
+                0
+            );
+        }
+    } catch (err) {
+        logger.warn('Bridge volume lookup failed', { slug, error: err.message });
+    }
+
     return volume24h;
+};
+
+const fetchCoinGeckoMarketData = async (geckoId) => {
+    if (!geckoId) return null;
+    try {
+        const { data } = await axios.get(
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${encodeURIComponent(geckoId)}`,
+            { timeout: 10000 }
+        );
+        const coin = Array.isArray(data) ? data[0] : null;
+        if (!coin) return null;
+        return {
+            currentPrice: toNumber(coin.current_price),
+            mcap: toNumber(coin.market_cap),
+            fdv: toNumber(coin.fully_diluted_valuation)
+        };
+    } catch (err) {
+        logger.warn('CoinGecko market lookup failed', { geckoId, error: err.message });
+        return null;
+    }
 };
 
 // @desc    Get live metrics for a protocol from DefiLlama
@@ -53,6 +91,20 @@ const findVolume24hBySlug = async (slug) => {
 router.get('/protocol/:slug', async (req, res) => {
     try {
         const { slug } = req.params;
+
+        const toolDoc = await Tool.findOne(
+            {
+                $or: [
+                    { llamaSlug: slug },
+                    { id: slug }
+                ]
+            },
+            {
+                geckoId: 1,
+                category: 1,
+                name: 1
+            }
+        ).lean();
         
         // 1. Fetch main protocol data
         const protocolRes = await axios.get(`https://api.llama.fi/protocol/${slug}`, { timeout: 10000 });
@@ -80,21 +132,29 @@ router.get('/protocol/:slug', async (req, res) => {
 
         // 3. Fetch 24h volume from DEX/derivatives overview endpoints when available
         const volume24h = await findVolume24hBySlug(slug);
+
+        // 4. Token market data (CoinGecko fallback)
+        const geckoId = toolDoc?.geckoId || p.gecko_id || p.geckoId || null;
+        const coinData = await fetchCoinGeckoMarketData(geckoId);
         
         const metrics = {
             name: p.name,
             slug: p.slug,
             logo: p.logo,
-            category: p.category,
+            category: p.category || toolDoc?.category,
             tvl: currentTvl,
             change_7d: change7d || p.change_7d || 0,
             volume24h,
-            mcap: p.mcap || 0,
-            fdv: p.fdv || 0,
+            mcap: toNumber(p.mcap) || toNumber(coinData?.mcap),
+            fdv: toNumber(p.fdv) || toNumber(coinData?.fdv),
+            tokenPrice: toNumber(coinData?.currentPrice) || toNumber(p.tokenPrice),
+            staking: toNumber(p.staking),
+            pool2: toNumber(p.pool2),
             chains: p.chains || [],
             symbol: p.symbol,
             twitter: p.twitter,
-            description: p.description
+            description: p.description,
+            geckoId
         };
 
         res.status(200).json({
