@@ -1406,23 +1406,6 @@ module.exports = {
       narrative: "Perps replacing spot DEXs",
       narrativeDescription: "Multi-chain DEX with broad ecosystem support"
     },
-    {
-      id: "test-tool",
-      name: "Test Tool",
-      url: "https://test.com",
-      description: "A test tool for testing purposes",
-      category: "dex",
-      tags: [
-        "Test",
-        "Demo"
-      ],
-      builder: {
-        name: "Test Builder",
-        handle: "@testbuilder",
-        twitter: "https://twitter.com/testbuilder",
-        github: "https://github.com/testbuilder"
-      }
-    }
   ],
   infofi: [
     {
