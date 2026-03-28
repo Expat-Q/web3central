@@ -1,0 +1,474 @@
+{
+  "generatedAt": "2026-03-28T23:30:57.222Z",
+  "mode": "apply",
+  "restoredCount": 123,
+  "byCategory": {
+    "gaming": 7,
+    "wallets": 19,
+    "rwa": 2,
+    "communityTools": 8,
+    "interoperability": 4,
+    "onchainAutonomy": 2,
+    "bountyHub": 7,
+    "analytics": 7,
+    "l2": 1,
+    "security": 15,
+    "defi": 3,
+    "dex": 24,
+    "privacy": 4,
+    "predictions": 4,
+    "nft": 16
+  },
+  "sample": [
+    {
+      "_id": "69a4be12d456f52635672775",
+      "id": "base-sport-fantasy",
+      "name": "Base Sport Fantasy",
+      "oldCategory": "communityTools",
+      "newCategory": "gaming",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aaddebe6697dc9cc9c5f05",
+      "id": "anti-drain-extension",
+      "name": "Anti Drain extension.",
+      "oldCategory": "communityTools",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aaf112bd6523f0247566bf",
+      "id": "time-travel-extension",
+      "name": "Time Travel (Extension)",
+      "oldCategory": "communityTools",
+      "newCategory": "rwa",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aaf9586b9aff5839cc04ee",
+      "id": "seed-phrase-recovery-tool",
+      "name": "Seed Phrase Recovery Tool",
+      "oldCategory": "communityTools",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aee454f083169eb452d501",
+      "id": "twitter-interaction-circle",
+      "name": "Twitter interaction circle",
+      "oldCategory": "communityTools",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aee574f083169eb452d505",
+      "id": "sol-wallet-cleaner-claim-your-sol",
+      "name": "Sol wallet cleaner( Claim your sol)",
+      "oldCategory": "communityTools",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69aee61af083169eb452d509",
+      "id": "twitter-video-downloader",
+      "name": "Twitter Video Downloader",
+      "oldCategory": "communityTools",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b3fb9a95ec30835166b84e",
+      "id": "rapid-bridge",
+      "name": "Rapid Bridge",
+      "oldCategory": "interoperability",
+      "newCategory": "interoperability",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b7344bc98c3503cfc04e77",
+      "id": "wizz",
+      "name": "Wizz",
+      "oldCategory": "bountyHub",
+      "newCategory": "onchainAutonomy",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b7344fc98c3503cfc04e7a",
+      "id": "stallion",
+      "name": "Stallion",
+      "oldCategory": "bountyHub",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b7344fc98c3503cfc04e7d",
+      "id": "first-dollar",
+      "name": "First Dollar",
+      "oldCategory": "bountyHub",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73450c98c3503cfc04e80",
+      "id": "scribble",
+      "name": "Scribble",
+      "oldCategory": "bountyHub",
+      "newCategory": "analytics",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73450c98c3503cfc04e83",
+      "id": "gib-work",
+      "name": "Gib.Work",
+      "oldCategory": "bountyHub",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73452c98c3503cfc04e86",
+      "id": "superteam-earn",
+      "name": "Superteam Earn",
+      "oldCategory": "bountyHub",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73452c98c3503cfc04e89",
+      "id": "cre8core",
+      "name": "Cre8core Labs",
+      "oldCategory": "bountyHub",
+      "newCategory": "l2",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73453c98c3503cfc04e8c",
+      "id": "onboard3",
+      "name": "Onboard3",
+      "oldCategory": "bountyHub",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73453c98c3503cfc04e8f",
+      "id": "tunnl",
+      "name": "Tunnl",
+      "oldCategory": "bountyHub",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b73454c98c3503cfc04e92",
+      "id": "enb-ecosystem",
+      "name": "ENB Ecosystem",
+      "oldCategory": "bountyHub",
+      "newCategory": "gaming",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b7faa75c411a144732f1e8",
+      "id": "alchioscy",
+      "name": "Alchioscy",
+      "oldCategory": "communityTools",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69b8053498a02a68239da023",
+      "id": "alchemy",
+      "name": "Alchemy ",
+      "oldCategory": "dex",
+      "newCategory": "communityTools",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70b94a14b9bb1de97a89",
+      "id": "immunefi",
+      "name": "Immunefi",
+      "oldCategory": "security",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70b94a14b9bb1de97a8f",
+      "id": "sherlock",
+      "name": "Sherlock",
+      "oldCategory": "security",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70ba4a14b9bb1de97a92",
+      "id": "openzeppelin",
+      "name": "OpenZeppelin",
+      "oldCategory": "security",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70be4a14b9bb1de97a98",
+      "id": "forta-network",
+      "name": "Forta",
+      "oldCategory": "security",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70be4a14b9bb1de97a9c",
+      "id": "dune-analytics",
+      "name": "Dune Analytics",
+      "oldCategory": "analytics",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97a9f",
+      "id": "nansen",
+      "name": "Nansen",
+      "oldCategory": "analytics",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97aa2",
+      "id": "token-terminal",
+      "name": "Token Terminal",
+      "oldCategory": "analytics",
+      "newCategory": "bountyHub",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97aa5",
+      "id": "defillama",
+      "name": "DeFiLlama",
+      "oldCategory": "analytics",
+      "newCategory": "defi",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c04a14b9bb1de97aa8",
+      "id": "arkham-intelligence",
+      "name": "Arkham Intelligence",
+      "oldCategory": "analytics",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c04a14b9bb1de97aab",
+      "id": "messari",
+      "name": "Messari",
+      "oldCategory": "analytics",
+      "newCategory": "analytics",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c14a14b9bb1de97aae",
+      "id": "flipside-crypto",
+      "name": "Flipside Crypto",
+      "oldCategory": "analytics",
+      "newCategory": "analytics",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c14a14b9bb1de97ab1",
+      "id": "metamask",
+      "name": "MetaMask",
+      "oldCategory": "wallets",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97ab4",
+      "id": "rabby-wallet",
+      "name": "Rabby Wallet",
+      "oldCategory": "wallets",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97ab7",
+      "id": "phantom",
+      "name": "Phantom",
+      "oldCategory": "wallets",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97aba",
+      "id": "rainbow-wallet",
+      "name": "Rainbow",
+      "oldCategory": "wallets",
+      "newCategory": "dex",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97abd",
+      "id": "backpack-wallet",
+      "name": "Backpack",
+      "oldCategory": "wallets",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97ac0",
+      "id": "coinbase-wallet",
+      "name": "Coinbase Wallet",
+      "oldCategory": "wallets",
+      "newCategory": "dex",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97ac3",
+      "id": "ledger-live",
+      "name": "Ledger Live",
+      "oldCategory": "wallets",
+      "newCategory": "wallets",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c44a14b9bb1de97ac6",
+      "id": "railgun",
+      "name": "RAILGUN",
+      "oldCategory": "privacy",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c44a14b9bb1de97ac9",
+      "id": "aztec-network",
+      "name": "Aztec",
+      "oldCategory": "privacy",
+      "newCategory": "privacy",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c54a14b9bb1de97acf",
+      "id": "zcash",
+      "name": "Zcash",
+      "oldCategory": "privacy",
+      "newCategory": "security",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c54a14b9bb1de97ad2",
+      "id": "secret-network",
+      "name": "Secret Network",
+      "oldCategory": "privacy",
+      "newCategory": "privacy",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c64a14b9bb1de97ad5",
+      "id": "polymarket",
+      "name": "Polymarket",
+      "oldCategory": "predictions",
+      "newCategory": "predictions",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c64a14b9bb1de97ad8",
+      "id": "azuro",
+      "name": "Azuro",
+      "oldCategory": "predictions",
+      "newCategory": "dex",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c74a14b9bb1de97adb",
+      "id": "overtime-markets",
+      "name": "Overtime Markets",
+      "oldCategory": "predictions",
+      "newCategory": "dex",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c74a14b9bb1de97ade",
+      "id": "augur",
+      "name": "Augur",
+      "oldCategory": "predictions",
+      "newCategory": "predictions",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be70c84a14b9bb1de97ae1",
+      "id": "gnosis-conditional-tokens",
+      "name": "Omen",
+      "oldCategory": "predictions",
+      "newCategory": "predictions",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be774b34dcaa87d20c2343",
+      "id": "curve-finance",
+      "name": "Curve Finance",
+      "oldCategory": "defi",
+      "newCategory": "dex",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be774d34dcaa87d20c234b",
+      "id": "radiant-capital",
+      "name": "Radiant Capital",
+      "oldCategory": "defi",
+      "newCategory": "interoperability",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    },
+    {
+      "_id": "69be774e34dcaa87d20c234e",
+      "id": "venus-protocol",
+      "name": "Venus",
+      "oldCategory": "defi",
+      "newCategory": "defi",
+      "oldStatus": "disabled",
+      "newStatus": "active"
+    }
+  ]
+}
