@@ -70,22 +70,61 @@ const formatCount = (val) => {
   return `${Math.round(val)}`;
 };
 
+const CATEGORY_ALIASES = {
+  dex: 'trading',
+  perps: 'trading',
+  web3chat: 'trading',
+  trading: 'trading',
+  interoperability: 'bridges',
+  bridge: 'bridges',
+  bridges: 'bridges',
+  communitytools: 'community',
+  community: 'community',
+  security: 'security',
+  analytics: 'analytics',
+  infofi: 'analytics',
+  researchfiles: 'analytics',
+  wallets: 'wallets',
+  wallet: 'wallets',
+  nft: 'nft',
+  defi: 'defi',
+  staking: 'staking',
+  rwa: 'rwa',
+  l2: 'l2',
+  onchainautonomy: 'onchain',
+  vibecoding: 'community',
+};
+
+const CATEGORY_METRIC_POLICY = {
+  trading: ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'chains', 'monthlyUsers', 'rating', 'reviews'],
+  bridges: ['volume24h', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'chains', 'monthlyUsers', 'rating'],
+  defi: ['tvl', 'volume24h', 'staking', 'pool2', 'tokenPrice', 'mcap', 'fdv', 'chains', 'rating'],
+  staking: ['staking', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'pool2', 'chains', 'rating'],
+  wallets: ['volume24h', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains', 'reviews'],
+  nft: ['volume24h', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains', 'reviews'],
+  analytics: ['monthlyUsers', 'rating', 'reviews', 'chains', 'tokenPrice', 'mcap', 'fdv'],
+  security: ['monthlyUsers', 'rating', 'reviews', 'chains', 'tokenPrice', 'mcap', 'fdv'],
+  community: ['monthlyUsers', 'rating', 'reviews', 'chains', 'tokenPrice', 'mcap', 'fdv'],
+  l2: ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'chains', 'monthlyUsers', 'rating'],
+  rwa: ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'chains', 'monthlyUsers', 'rating'],
+  onchain: ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'chains', 'monthlyUsers', 'rating'],
+  default: ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'reviews', 'chains']
+};
+
+const normalizeCategory = (category = '') => String(category || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+
 export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
 
   const shouldFetchLiveMetrics = React.useMemo(() => {
-    const category = String(protocol?.category || '').toLowerCase();
+    const category = normalizeCategory(protocol?.category);
+    const group = CATEGORY_ALIASES[category] || 'default';
     const hasSlug = Boolean(protocol?.slug);
     if (!hasSlug) return false;
 
-    const offchainLike =
-      category.includes('security') ||
-      category.includes('analytics') ||
-      category.includes('research') ||
-      category.includes('infofi') ||
-      category.includes('community');
+    const offchainLike = ['security', 'analytics', 'community'].includes(group);
 
     return !offchainLike;
   }, [protocol]);
@@ -157,26 +196,8 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
   }, [data, protocol]);
 
   const displayedMetrics = React.useMemo(() => {
-    const category = String(protocol?.category || '').toLowerCase();
-    const isWallet = category.includes('wallet');
-    const isNft = category.includes('nft');
-    const isCommunity = category.includes('community');
-    const isOffchain =
-      category.includes('security') ||
-      category.includes('analytics') ||
-      category.includes('research') ||
-      category.includes('infofi') ||
-      isCommunity;
-    const isOnchain =
-      !isOffchain ||
-      category.includes('dex') ||
-      category.includes('perp') ||
-      category.includes('defi') ||
-      category.includes('interoperability') ||
-      category.includes('bridge') ||
-      category.includes('staking') ||
-      category.includes('rwa') ||
-      category.includes('onchain');
+    const normalizedCategory = normalizeCategory(protocol?.category);
+    const categoryGroup = CATEGORY_ALIASES[normalizedCategory] || 'default';
 
     const hasToken = Number(mergedMetrics.mcap) > 0 || Number(mergedMetrics.fdv) > 0 || Number(mergedMetrics.tokenPrice) > 0 || Boolean(protocol?.geckoId);
     const monthlyUsersNum = parseUsers(protocol?.monthlyUsers);
@@ -265,20 +286,7 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
       }
     ].filter((m) => m.value);
 
-    const orderForOffchain = ['monthlyUsers', 'rating', 'reviews', 'chains', 'tokenPrice', 'mcap', 'fdv'];
-    const orderForWallet = ['volume24h', 'tvl', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains'];
-    const orderForNft = ['volume24h', 'tokenPrice', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains', 'tvl'];
-    const orderForOnchain = ['tvl', 'volume24h', 'tokenPrice', 'mcap', 'fdv', 'staking', 'pool2', 'chains', 'monthlyUsers', 'rating'];
-
-    const preferredOrder = isWallet
-      ? orderForWallet
-      : isNft
-        ? orderForNft
-        : isOffchain
-          ? orderForOffchain
-          : isOnchain
-            ? orderForOnchain
-            : ['tvl', 'volume24h', 'mcap', 'fdv', 'monthlyUsers', 'rating', 'chains'];
+    const preferredOrder = CATEGORY_METRIC_POLICY[categoryGroup] || CATEGORY_METRIC_POLICY.default;
 
     const byKey = new Map(allCandidates.map((m) => [m.key, m]));
     const selected = [];
