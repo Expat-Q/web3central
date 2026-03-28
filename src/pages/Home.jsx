@@ -63,18 +63,17 @@ export default function Home() {
   const [communitySpotlight, setCommunitySpotlight] = useState(null);
   const [platformStats, setPlatformStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [toolsLoading, setToolsLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCriticalData = async () => {
       try {
         setLoading(true);
-        const [toolsData, spotlightData, statsData] = await Promise.all([
-          fetchToolsData(),
+        const [spotlightData, statsData] = await Promise.all([
           fetchCommunitySpotlight(),
           fetchStatsOverview()
         ]);
-        setAppsData(toolsData);
         setCommunitySpotlight(spotlightData);
         setPlatformStats(statsData);
       } catch (err) {
@@ -83,7 +82,21 @@ export default function Home() {
         setLoading(false);
       }
     };
-    fetchData();
+
+    const fetchTools = async () => {
+      try {
+        setToolsLoading(true);
+        const toolsData = await fetchToolsData();
+        setAppsData(toolsData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setToolsLoading(false);
+      }
+    };
+
+    fetchCriticalData();
+    fetchTools();
   }, []);
 
   const allTools = appsData
@@ -317,7 +330,22 @@ export default function Home() {
             </div>
 
             <div className="space-y-2">
-              {activeTrendingTools.length > 0 ? activeTrendingTools.map((tool, i) => {
+              {toolsLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={`trend-skeleton-${i}`}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 animate-pulse"
+                  >
+                    <span className="w-6 h-6 rounded bg-gray-200 shrink-0" />
+                    <div className="w-12 h-12 rounded-2xl bg-gray-200 shrink-0" />
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="h-3.5 bg-gray-200 rounded w-2/5" />
+                      <div className="h-2.5 bg-gray-200 rounded w-1/3" />
+                    </div>
+                    <div className="w-12 h-7 rounded-full bg-gray-200 shrink-0" />
+                  </div>
+                ))
+              ) : activeTrendingTools.length > 0 ? activeTrendingTools.map((tool, i) => {
                 const rating = tool.averageRating || tool.rating || 0;
                 return (
                   <motion.div
