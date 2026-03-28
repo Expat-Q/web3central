@@ -1,0 +1,1731 @@
+{
+  "generatedAt": "2026-03-28T23:20:52.534Z",
+  "mode": "apply",
+  "scannedTools": 211,
+  "staticCatalogSize": 85,
+  "archiveCandidateCount": 123,
+  "candidates": [
+    {
+      "_id": "69a4be12d456f52635672775",
+      "id": "base-sport-fantasy",
+      "name": "Base Sport Fantasy",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aaddebe6697dc9cc9c5f05",
+      "id": "anti-drain-extension",
+      "name": "Anti Drain extension.",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aaf112bd6523f0247566bf",
+      "id": "time-travel-extension",
+      "name": "Time Travel (Extension)",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aaf9586b9aff5839cc04ee",
+      "id": "seed-phrase-recovery-tool",
+      "name": "Seed Phrase Recovery Tool",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aee454f083169eb452d501",
+      "id": "twitter-interaction-circle",
+      "name": "Twitter interaction circle",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aee574f083169eb452d505",
+      "id": "sol-wallet-cleaner-claim-your-sol",
+      "name": "Sol wallet cleaner( Claim your sol)",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69aee61af083169eb452d509",
+      "id": "twitter-video-downloader",
+      "name": "Twitter Video Downloader",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b3fb9a95ec30835166b84e",
+      "id": "rapid-bridge",
+      "name": "Rapid Bridge",
+      "category": "interoperability",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b7344bc98c3503cfc04e77",
+      "id": "wizz",
+      "name": "Wizz",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b7344fc98c3503cfc04e7a",
+      "id": "stallion",
+      "name": "Stallion",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b7344fc98c3503cfc04e7d",
+      "id": "first-dollar",
+      "name": "First Dollar",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73450c98c3503cfc04e80",
+      "id": "scribble",
+      "name": "Scribble",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73450c98c3503cfc04e83",
+      "id": "gib-work",
+      "name": "Gib.Work",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73452c98c3503cfc04e86",
+      "id": "superteam-earn",
+      "name": "Superteam Earn",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73452c98c3503cfc04e89",
+      "id": "cre8core",
+      "name": "Cre8core Labs",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73453c98c3503cfc04e8c",
+      "id": "onboard3",
+      "name": "Onboard3",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73453c98c3503cfc04e8f",
+      "id": "tunnl",
+      "name": "Tunnl",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b73454c98c3503cfc04e92",
+      "id": "enb-ecosystem",
+      "name": "ENB Ecosystem",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b7faa75c411a144732f1e8",
+      "id": "alchioscy",
+      "name": "Alchioscy",
+      "category": "communityTools",
+      "status": "rejected",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69b8053498a02a68239da023",
+      "id": "alchemy",
+      "name": "Alchemy ",
+      "category": "dex",
+      "status": "rejected",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70b94a14b9bb1de97a89",
+      "id": "immunefi",
+      "name": "Immunefi",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70b94a14b9bb1de97a8f",
+      "id": "sherlock",
+      "name": "Sherlock",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70ba4a14b9bb1de97a92",
+      "id": "openzeppelin",
+      "name": "OpenZeppelin",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70be4a14b9bb1de97a98",
+      "id": "forta-network",
+      "name": "Forta",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70be4a14b9bb1de97a9c",
+      "id": "dune-analytics",
+      "name": "Dune Analytics",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97a9f",
+      "id": "nansen",
+      "name": "Nansen",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97aa2",
+      "id": "token-terminal",
+      "name": "Token Terminal",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70bf4a14b9bb1de97aa5",
+      "id": "defillama",
+      "name": "DeFiLlama",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c04a14b9bb1de97aa8",
+      "id": "arkham-intelligence",
+      "name": "Arkham Intelligence",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c04a14b9bb1de97aab",
+      "id": "messari",
+      "name": "Messari",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c14a14b9bb1de97aae",
+      "id": "flipside-crypto",
+      "name": "Flipside Crypto",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c14a14b9bb1de97ab1",
+      "id": "metamask",
+      "name": "MetaMask",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97ab4",
+      "id": "rabby-wallet",
+      "name": "Rabby Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97ab7",
+      "id": "phantom",
+      "name": "Phantom",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c24a14b9bb1de97aba",
+      "id": "rainbow-wallet",
+      "name": "Rainbow",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97abd",
+      "id": "backpack-wallet",
+      "name": "Backpack",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97ac0",
+      "id": "coinbase-wallet",
+      "name": "Coinbase Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c34a14b9bb1de97ac3",
+      "id": "ledger-live",
+      "name": "Ledger Live",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c44a14b9bb1de97ac6",
+      "id": "railgun",
+      "name": "RAILGUN",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c44a14b9bb1de97ac9",
+      "id": "aztec-network",
+      "name": "Aztec",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c54a14b9bb1de97acf",
+      "id": "zcash",
+      "name": "Zcash",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c54a14b9bb1de97ad2",
+      "id": "secret-network",
+      "name": "Secret Network",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c64a14b9bb1de97ad5",
+      "id": "polymarket",
+      "name": "Polymarket",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c64a14b9bb1de97ad8",
+      "id": "azuro",
+      "name": "Azuro",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c74a14b9bb1de97adb",
+      "id": "overtime-markets",
+      "name": "Overtime Markets",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c74a14b9bb1de97ade",
+      "id": "augur",
+      "name": "Augur",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be70c84a14b9bb1de97ae1",
+      "id": "gnosis-conditional-tokens",
+      "name": "Omen",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774b34dcaa87d20c2343",
+      "id": "curve-finance",
+      "name": "Curve Finance",
+      "category": "defi",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774d34dcaa87d20c234b",
+      "id": "radiant-capital",
+      "name": "Radiant Capital",
+      "category": "defi",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774e34dcaa87d20c234e",
+      "id": "venus-protocol",
+      "name": "Venus",
+      "category": "defi",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774e34dcaa87d20c2351",
+      "id": "maple-finance",
+      "name": "Maple Finance",
+      "category": "defi",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774e34dcaa87d20c2354",
+      "id": "goldfinch",
+      "name": "Goldfinch",
+      "category": "defi",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774f34dcaa87d20c2357",
+      "id": "revoke-cash",
+      "name": "Revoke.cash",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774f34dcaa87d20c235a",
+      "id": "wallet-guard",
+      "name": "Wallet Guard",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be774f34dcaa87d20c235d",
+      "id": "blowfish",
+      "name": "Blowfish",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775034dcaa87d20c2360",
+      "id": "scam-sniffer",
+      "name": "Scam Sniffer",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775034dcaa87d20c2363",
+      "id": "pocket-universe",
+      "name": "Pocket Universe",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775034dcaa87d20c2366",
+      "id": "safe-global",
+      "name": "Safe",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775134dcaa87d20c2369",
+      "id": "certik",
+      "name": "CertiK",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775134dcaa87d20c236c",
+      "id": "peckshield",
+      "name": "PeckShield",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775134dcaa87d20c236f",
+      "id": "slowmist",
+      "name": "SlowMist",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775234dcaa87d20c2372",
+      "id": "goplus-security",
+      "name": "GoPlus Security",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775234dcaa87d20c2375",
+      "id": "blockaid",
+      "name": "Blockaid",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775234dcaa87d20c2378",
+      "id": "hypernative",
+      "name": "Hypernative",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775334dcaa87d20c237b",
+      "id": "hexagate",
+      "name": "Hexagate",
+      "category": "security",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775334dcaa87d20c237e",
+      "id": "glassnode",
+      "name": "Glassnode",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775334dcaa87d20c2381",
+      "id": "cryptoquant",
+      "name": "CryptoQuant",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775434dcaa87d20c2384",
+      "id": "dexscreener",
+      "name": "DexScreener",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775434dcaa87d20c2387",
+      "id": "dextools",
+      "name": "DexTools",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775434dcaa87d20c238a",
+      "id": "geckoterminal",
+      "name": "GeckoTerminal",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775534dcaa87d20c238d",
+      "id": "zapper",
+      "name": "Zapper",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775534dcaa87d20c2390",
+      "id": "zerion",
+      "name": "Zerion",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775734dcaa87d20c2393",
+      "id": "debank",
+      "name": "DeBank",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775734dcaa87d20c2396",
+      "id": "layer2beat",
+      "name": "L2Beat",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775834dcaa87d20c2399",
+      "id": "santiment",
+      "name": "Santiment",
+      "category": "analytics",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775834dcaa87d20c239c",
+      "id": "trust-wallet",
+      "name": "Trust Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775834dcaa87d20c239f",
+      "id": "okx-wallet",
+      "name": "OKX Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775934dcaa87d20c23a2",
+      "id": "argent",
+      "name": "Argent",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775934dcaa87d20c23a5",
+      "id": "keplr",
+      "name": "Keplr",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775934dcaa87d20c23a8",
+      "id": "solflare",
+      "name": "Solflare",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775934dcaa87d20c23ab",
+      "id": "trezor-suite",
+      "name": "Trezor Suite",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775a34dcaa87d20c23ae",
+      "id": "petra-wallet",
+      "name": "Petra",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775a34dcaa87d20c23b1",
+      "id": "leap-wallet",
+      "name": "Leap Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775a34dcaa87d20c23b4",
+      "id": "zerion-wallet",
+      "name": "Zerion Wallet",
+      "category": "wallets",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775b34dcaa87d20c23b7",
+      "id": "magic-eden",
+      "name": "Magic Eden",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775b34dcaa87d20c23ba",
+      "id": "zora",
+      "name": "Zora",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775b34dcaa87d20c23bd",
+      "id": "foundation-app",
+      "name": "Foundation",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775c34dcaa87d20c23c0",
+      "id": "rarible",
+      "name": "Rarible",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775c34dcaa87d20c23c3",
+      "id": "manifold",
+      "name": "Manifold",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775c34dcaa87d20c23c6",
+      "id": "superrare",
+      "name": "SuperRare",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775d34dcaa87d20c23c9",
+      "id": "art-blocks",
+      "name": "Art Blocks",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775d34dcaa87d20c23cc",
+      "id": "tensor-trade",
+      "name": "Tensor",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775d34dcaa87d20c23cf",
+      "id": "sound-xyz",
+      "name": "Sound.xyz",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775e34dcaa87d20c23d2",
+      "id": "highlight-xyz",
+      "name": "Highlight",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775e34dcaa87d20c23d5",
+      "id": "mint-fun",
+      "name": "Mint.fun",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775e34dcaa87d20c23d8",
+      "id": "star-atlas",
+      "name": "Star Atlas",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775f34dcaa87d20c23db",
+      "id": "big-time",
+      "name": "Big Time",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775f34dcaa87d20c23de",
+      "id": "parallel-game",
+      "name": "Parallel",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be775f34dcaa87d20c23e1",
+      "id": "pixels-game",
+      "name": "Pixels",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776034dcaa87d20c23e4",
+      "id": "gods-unchained",
+      "name": "Gods Unchained",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776034dcaa87d20c23e7",
+      "id": "the-sandbox",
+      "name": "The Sandbox",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776034dcaa87d20c23ea",
+      "id": "decentraland",
+      "name": "Decentraland",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776134dcaa87d20c23ed",
+      "id": "shrapnel-game",
+      "name": "Shrapnel",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776134dcaa87d20c23f0",
+      "id": "defi-kingdoms",
+      "name": "DeFi Kingdoms",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776134dcaa87d20c23f3",
+      "id": "splinterlands",
+      "name": "Splinterlands",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776234dcaa87d20c23f6",
+      "id": "sorare",
+      "name": "Sorare",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776234dcaa87d20c23f9",
+      "id": "aurory",
+      "name": "Aurory",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776234dcaa87d20c23fc",
+      "id": "guild-of-guardians",
+      "name": "Guild of Guardians",
+      "category": "gaming",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776334dcaa87d20c23ff",
+      "id": "manta-network",
+      "name": "Manta Network",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776334dcaa87d20c2402",
+      "id": "aleph-zero",
+      "name": "Aleph Zero",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776334dcaa87d20c2405",
+      "id": "oasis-network",
+      "name": "Oasis Network",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776434dcaa87d20c2408",
+      "id": "phala-network",
+      "name": "Phala Network",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776434dcaa87d20c240b",
+      "id": "iron-fish",
+      "name": "Iron Fish",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776434dcaa87d20c240e",
+      "id": "threshold-network",
+      "name": "Threshold Network",
+      "category": "privacy",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776534dcaa87d20c2411",
+      "id": "zeitgeist",
+      "name": "Zeitgeist",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776534dcaa87d20c2414",
+      "id": "sx-network",
+      "name": "SX Network",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776534dcaa87d20c2417",
+      "id": "polkamarkets",
+      "name": "Polkamarkets",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be776634dcaa87d20c241a",
+      "id": "reality-eth",
+      "name": "Reality.eth",
+      "category": "predictions",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be7ad2feb34c14c69d7ea4",
+      "id": "opensea",
+      "name": "OpenSea",
+      "category": "nft",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69be7eb856efe62a60e670db",
+      "id": "brandos",
+      "name": "BrandOS",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69bec5f3249a383a1cf79280",
+      "id": "jumper-exchange",
+      "name": "Jumper",
+      "category": "interoperability",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69c265da2f9e30326d60c049",
+      "id": "bridgegg",
+      "name": "BRIDGEGG",
+      "category": "communityTools",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    },
+    {
+      "_id": "69c79a61cb195f6f8a262b33",
+      "id": "wpl",
+      "name": "WPL",
+      "category": "bountyHub",
+      "status": "active",
+      "reasons": {
+        "noOnchainSignal": true,
+        "noUsageSignal": true,
+        "noResolverHints": true,
+        "legacyName": false,
+        "notInStaticCatalog": true
+      }
+    }
+  ]
+}
