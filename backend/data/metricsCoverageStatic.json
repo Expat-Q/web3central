@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-03-28T22:54:34.240Z",
+  "generatedAt": "2026-03-28T23:08:40.453Z",
   "source": "src/data/appsData.js",
   "summary": {
-    "totalTools": 88,
+    "totalTools": 87,
     "withKnownToken": 55,
     "fullCoverage": 41,
     "partialCoverage": 46,
-    "missingCoverage": 1
+    "missingCoverage": 0
   },
   "byCategory": {
     "bridge": {
@@ -24,11 +24,11 @@
       "missing": 0
     },
     "dex": {
-      "total": 32,
+      "total": 31,
       "tokenized": 27,
       "fullCoverage": 27,
       "partialCoverage": 4,
-      "missing": 1
+      "missing": 0
     },
     "infofi": {
       "total": 6,
@@ -754,16 +754,6 @@
         "monthlyUsers"
       ],
       "metricCount": 4
-    },
-    {
-      "id": "test-tool",
-      "name": "Test Tool",
-      "category": "dex",
-      "policyGroup": "trading",
-      "geckoId": null,
-      "hasToken": false,
-      "selectedMetrics": [],
-      "metricCount": 0
     },
     {
       "id": "thena",
