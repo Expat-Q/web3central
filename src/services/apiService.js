@@ -125,7 +125,11 @@ export const updateCommunitySpotlight = async (spotlightData) => {
 };
 
 export const fetchLessons = async () => {
-  const data = await apiClient.get('/academy/lessons', { requestKey: 'fetchLessons' });
+  const data = await cachedGet({
+    cacheKey: 'academy-lessons',
+    endpoint: '/academy/lessons',
+    requestKey: 'fetchLessons'
+  });
   return data.data;
 };
 
@@ -134,7 +138,11 @@ export const createAcademyLesson = async (lessonData) => {
 };
 
 export const fetchCuratedCourses = async () => {
-  const data = await apiClient.get('/academy/courses', { requestKey: 'fetchCourses' });
+  const data = await cachedGet({
+    cacheKey: 'academy-courses',
+    endpoint: '/academy/courses',
+    requestKey: 'fetchCourses'
+  });
   return data.data || [];
 };
 
@@ -184,7 +192,11 @@ export const mockOAuthLogin = async (provider) => {
 };
 
 export const fetchCommunityLessons = async () => {
-  const data = await apiClient.get('/academy/community', { requestKey: 'fetchCommunityLessons' });
+  const data = await cachedGet({
+    cacheKey: 'academy-community-lessons',
+    endpoint: '/academy/community',
+    requestKey: 'fetchCommunityLessons'
+  });
   return data.data || [];
 };
 
