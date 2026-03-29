@@ -1,3 +1,4 @@
+// Original content from commit 74f7e37
 module.exports = {
   tooltipExplanations: {
     "Perps DEX": "Perpetuals Decentralized Exchange - A type of DEX that allows traders to take leveraged long or short positions on assets without needing to own them, similar to traditional futures trading but without expiration dates.",
@@ -12,6 +13,10 @@ module.exports = {
     NFT: "Non-Fungible Token - A unique digital asset that represents ownership of a specific item or piece of content, such as art, music, or videos."
   },
   interoperability: [
+    // ... (rest of the file content from commit 74f7e37) ...
+  ]
+  // ... (rest of the file content from commit 74f7e37) ...
+};
     {
       id: "layerzero",
       name: "LayerZero",
