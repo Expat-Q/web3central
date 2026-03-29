@@ -7,8 +7,6 @@ const { GECKO_MAP } = require('../services/llamaService');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const includeAllStatuses = process.argv.includes('--all');
-
 const CATEGORY_ALIASES = {
   dex: 'trading',
   perps: 'trading',
@@ -106,22 +104,10 @@ const run = async () => {
 
   await mongoose.connect(process.env.MONGODB_URI);
 
-  const findFilter = includeAllStatuses
-    ? {}
-    : {
-        $or: [
-          { status: 'active' },
-          { status: 'experimental' },
-          { status: { $exists: false } },
-          { status: null }
-        ]
-      };
-
-  const tools = await Tool.find(findFilter, {
+  const tools = await Tool.find({}, {
     id: 1,
     name: 1,
     category: 1,
-    status: 1,
     geckoId: 1,
     monthlyUsers: 1,
     rating: 1,
@@ -156,7 +142,6 @@ const run = async () => {
 
   const report = {
     generatedAt: new Date().toISOString(),
-    scope: includeAllStatuses ? 'all-statuses' : 'active-surface-only',
     summary: {
       totalTools: rows.length,
       fullCoverage: rows.filter((r) => r.metricCount >= 4).length,

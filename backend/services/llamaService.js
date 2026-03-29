@@ -125,7 +125,6 @@ const GECKO_MAP = {
     'lighter': 'lighter',
     'aster': 'astherus',
     'kaito': 'kaito',
-    'axie-infinity': 'axie-infinity',
 };
 
 /**
