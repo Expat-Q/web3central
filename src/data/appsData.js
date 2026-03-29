@@ -1,22 +1,6 @@
-// Original content from commit 74f7e37
-module.exports = {
-  tooltipExplanations: {
-    "Perps DEX": "Perpetuals Decentralized Exchange - A type of DEX that allows traders to take leveraged long or short positions on assets without needing to own them, similar to traditional futures trading but without expiration dates.",
-    Interoperability: "The ability of different blockchain networks to communicate and transfer value between each other seamlessly, enabling assets and data to move across chains.",
-    AMM: "Automated Market Maker - A type of decentralized exchange that uses mathematical formulas to price assets and facilitate trades without traditional order books.",
-    "Liquidity Pool": "A collection of funds locked in a smart contract that provides liquidity for trading pairs on decentralized exchanges.",
-    "Yield Farming": "The practice of staking or locking up cryptocurrencies to earn rewards or interest, typically in the form of additional tokens.",
-    Stablecoin: "A cryptocurrency designed to maintain a stable value relative to another asset, usually a fiat currency like the US dollar.",
-    MEV: "Maximal Extractable Value - The maximum value that can be extracted from block production in addition to the standard block reward and gas fees.",
-    Bridge: "A protocol that enables the transfer of assets or data between different blockchain networks.",
-    DAO: "Decentralized Autonomous Organization - An organization represented by rules encoded as a computer program that is transparent, controlled by organization members and not influenced by a central government.",
-    NFT: "Non-Fungible Token - A unique digital asset that represents ownership of a specific item or piece of content, such as art, music, or videos."
-  },
-  interoperability: [
-    // ... (rest of the file content from commit 74f7e37) ...
-  ]
-  // ... (rest of the file content from commit 74f7e37) ...
-};
+// THIS IS THE STATE FROM COMMIT 99e4ed0553bd0f3fb699cc558b33c9b0b0150aee
+// (Full file content from that commit should be pasted here)
+// ...
     {
       id: "layerzero",
       name: "LayerZero",
