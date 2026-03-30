@@ -36,6 +36,7 @@ export default function Navbar() {
     { name: "DeFi",        to: "/apps/defi",        icon: <Landmark size={15} />,       color: "from-emerald-500 to-green-600"  },
     { name: "Staking",     to: "/apps/staking",     icon: <Sparkles size={15} />,       color: "from-indigo-500 to-violet-600"  },
     { name: "Security",    to: "/apps/security",    icon: <ShieldCheck size={15} />,    color: "from-red-500 to-rose-600"       },
+    { name: "InfoFi",      to: "/apps/infofi",      icon: <Activity size={15} />,       color: "from-purple-500 to-indigo-600"  },
     { name: "Analytics",   to: "/apps/analytics",   icon: <BarChart3 size={15} />,      color: "from-cyan-500 to-sky-600"       },
     { name: "Wallets",     to: "/apps/wallets",     icon: <Wallet size={15} />,         color: "from-slate-500 to-gray-600"     },
     { name: "Layer 2",     to: "/apps/l2",          icon: <Layers size={15} />,         color: "from-violet-500 to-indigo-600"  },

@@ -8,7 +8,7 @@ import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
     Play, Globe, Bookmark, Search, Users, Plus, Star, Heart, Edit3,
-    ThumbsUp, ThumbsDown, Zap, Eye, PenLine
+    ThumbsUp, ThumbsDown, Zap, Eye, PenLine, Share2
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import { FeedSkeleton, CardSkeleton } from '../components/Skeleton';
@@ -595,6 +595,25 @@ export default function Academy() {
                                                     className={isBookmarked(course._id) ? 'text-purple-600' : ''}
                                                 />
                                             </button>
+
+                                            {/* Share Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    const shareUrl = `${window.location.origin}/academy?search=${encodeURIComponent(course.title)}`;
+                                                    if (navigator.share) {
+                                                        navigator.share({ title: course.title, text: course.description, url: shareUrl }).catch(() => {});
+                                                    } else {
+                                                        navigator.clipboard.writeText(shareUrl);
+                                                        alert('Link copied to clipboard!');
+                                                    }
+                                                }}
+                                                className="absolute top-3 right-14 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
+                                                title="Share Course"
+                                            >
+                                                <Share2 size={16} />
+                                            </button>
                                             <a
                                                 href={course.url}
                                                 target="_blank"
@@ -721,11 +740,13 @@ export default function Academy() {
                                             <div className="flex-grow min-w-0">
                                                 {/* Header: Name · @handle · time · ··· */}
                                                 <div className="flex items-center justify-between mb-0.5">
-                                                    <div className="flex items-baseline gap-1 flex-wrap min-w-0">
-                                                        <span className="font-bold text-[15px] text-gray-900 leading-none">{lesson.author?.username || lesson.author?.name || 'Anonymous'}</span>
-                                                        <span className="text-gray-500 text-[14px] hidden sm:inline">@{lesson.author?.username || (lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
-                                                        <span className="text-gray-400 text-[14px]">·</span>
-                                                        <span className="text-gray-500 text-[14px]">{timeAgo}</span>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="font-bold text-[15px] text-gray-900 leading-tight">{lesson.author?.username || lesson.author?.name || 'Anonymous'}</span>
+                                                        <div className="flex items-center gap-1 flex-wrap">
+                                                            <span className="text-gray-500 text-[13px]">@{lesson.author?.username || (lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
+                                                            <span className="text-gray-400 text-[13px]">·</span>
+                                                            <span className="text-gray-500 text-[13px]">{timeAgo}</span>
+                                                        </div>
                                                     </div>
                                                     {/* ⋯ menu */}
                                                     <div className="relative shrink-0 ml-1">
@@ -803,13 +824,19 @@ export default function Academy() {
                                                         )}
                                                     </button>
 
-                                                    {/* Share — copy link */}
+                                                    {/* Share — platform link */}
                                                     <button
                                                         onClick={() => {
-                                                            navigator.clipboard.writeText(`${window.location.origin}/academy/${lesson.slug}`);
+                                                            const shareUrl = `${window.location.origin}/academy/${lesson.slug}`;
+                                                            if (navigator.share) {
+                                                                navigator.share({ title: lesson.title, text: lesson.description || '', url: shareUrl }).catch(() => {});
+                                                            } else {
+                                                                navigator.clipboard.writeText(shareUrl);
+                                                                alert('Link copied to clipboard!');
+                                                            }
                                                         }}
                                                         className="flex items-center gap-1 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
-                                                        title="Copy link"
+                                                        title="Share"
                                                     >
                                                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                                                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>

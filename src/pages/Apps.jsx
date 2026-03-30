@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
-import { Star, ChevronRight, Rocket } from "lucide-react";
+import { Star, ChevronRight, Rocket, Share2 } from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
 import { CardSkeleton } from "../components/Skeleton";
 import MetricsPanel from "../components/MetricsPanel";
@@ -19,8 +19,26 @@ const ProtocolCard = ({ tool, onOpenDetails }) => {
       className="border border-gray-100 rounded-[1.25rem] p-4 flex flex-col bg-white hover:border-purple-200 hover:shadow-md transition-all group cursor-pointer"
       onClick={() => onOpenDetails(tool)}
     >
-      <div className="w-[50px] h-[50px] mb-3 bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 flex-shrink-0 overflow-hidden">
-        <ToolLogo tool={tool} />
+      <div className="flex items-start justify-between mb-3">
+        <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 flex-shrink-0 overflow-hidden">
+          <ToolLogo tool={tool} />
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const shareUrl = `${window.location.origin}/apps/${tool.category}?id=${tool._id || tool.id}`;
+            if (navigator.share) {
+              navigator.share({ title: tool.name, text: tool.description, url: shareUrl }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(shareUrl);
+              alert('Link copied to clipboard!');
+            }
+          }}
+          className="w-8 h-8 rounded-xl border bg-gray-50 border-gray-100 text-gray-400 hover:border-purple-300 hover:text-purple-600 flex items-center justify-center transition-all shrink-0"
+          title="Share"
+        >
+          <Share2 size={13} />
+        </button>
       </div>
       <h4 className="font-bold text-[15px] leading-tight mb-1 text-gray-900 truncate group-hover:text-purple-700 transition-colors">{tool.name}</h4>
       <p className="text-[11px] text-gray-500 leading-snug line-clamp-2 mb-4 flex-grow tracking-wide">
@@ -42,7 +60,7 @@ const ProtocolCard = ({ tool, onOpenDetails }) => {
           target="_blank"
           rel="noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#f2efff] text-[#6d39ff] px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#e8e2ff] transition-colors"
+          className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
         >
           Open
         </a>
@@ -59,6 +77,7 @@ const SECTIONS = [
   { key: "staking",     label: "Staking",           dbKeys: ["staking"],                     comingSoon: false },
   { key: "rwa",         label: "RWA",               dbKeys: ["rwa"],                         comingSoon: false },
   { key: "security",    label: "Security",          dbKeys: ["security"],                    comingSoon: false },
+  { key: "infofi",      label: "InfoFi",            dbKeys: ["infofi"],                      comingSoon: false },
   { key: "analytics",   label: "Analytics",         dbKeys: ["analytics"],                   comingSoon: false },
   { key: "wallets",     label: "Wallets",           dbKeys: ["wallets"],                     comingSoon: false },
   { key: "l2",          label: "Layer 2",           dbKeys: ["l2"],                          comingSoon: false },

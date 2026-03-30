@@ -24,6 +24,7 @@ import {
   Activity,
   Coins,
   Bookmark,
+  Share2,
   X
 } from "lucide-react";
 import { useBookmarks } from "../../hooks/useBookmarks";
@@ -100,8 +101,8 @@ const CATEGORY_META = {
   dex:              { title: 'DEX',                    desc: 'Decentralized exchanges',           color: 'purple',  comingSoon: false },
   perps:            { title: 'Perpetuals',             desc: 'Derivatives and perpetual trading', color: 'purple',  comingSoon: false },
   interoperability: { title: 'Interoperability',       desc: 'Cross-chain protocols',             color: 'blue',    comingSoon: false },
+  infofi:           { title: 'InfoFi',                 desc: 'Research, analytics, and intelligence', color: 'purple',  comingSoon: false },
   bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 contributions', color: 'amber',   comingSoon: false },
-  onchainAutonomy:  { title: 'Onchain Automation',     desc: 'Automated smart contract protocols', color: 'indigo',  comingSoon: false },
   communityTools:   { title: 'Community Tools',        desc: 'DAO and coordination tools',         color: 'teal',    comingSoon: false },
 };
 
@@ -110,7 +111,7 @@ const heroImages = {
   perps: '/images/heroes/hero-perps.png',
   web3Chat: '/images/heroes/hero-perps.png',
   interoperability: '/images/heroes/hero-interoperability.png',
-  onchainAutonomy: '/images/heroes/hero-onchain-autonomy.png',
+  infofi: '/images/heroes/hero-onchain-autonomy.png',
   communityTools: '/images/heroes/hero-community-tools.png',
   bountyHub: '/images/heroes/hero-onchain-autonomy.png',
 };
@@ -186,6 +187,20 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
     if (categoryKey) fetchData();
   }, [categoryKey]);
+
+  useEffect(() => {
+    const toolId = searchParams.get('id');
+    if (toolId && !loading && data.length > 0) {
+      setTimeout(() => {
+        const el = document.getElementById(`tool-${toolId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('ring-4', 'ring-purple-500/30', 'ring-offset-4', 'rounded-[2rem]');
+          setTimeout(() => el.classList.remove('ring-4', 'ring-purple-500/30', 'ring-offset-4', 'rounded-[2rem]'), 5000);
+        }
+      }, 800);
+    }
+  }, [searchParams, loading, data.length]);
 
   // ── App Store derived data ──
   const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all';
@@ -276,7 +291,8 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
         initial="hidden"
         animate="visible"
         exit={{ opacity: 0, scale: 0.9 }}
-        className="group h-full"
+        id={`tool-${app._id || app.id}`}
+        className="group h-full transition-all duration-500"
       >
         <div 
           onClick={() => setSelectedMetricsProtocol({
@@ -311,19 +327,37 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
                 </div>
               )}
             </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); return; }
-                toggleBookmark(app);
-              }}
-              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0 ${isBookmarked(app.id || app._id)
-                ? 'bg-purple-50 border-purple-200 text-purple-600'
-                : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-purple-300 hover:text-purple-600'}`}
-            >
-              <Bookmark size={13} className={isBookmarked(app.id || app._id) ? 'fill-current' : ''} />
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const shareUrl = `${window.location.origin}/apps/${categoryKey}?id=${app._id || app.id}`;
+                  if (navigator.share) {
+                    navigator.share({ title: app.name, text: app.description, url: shareUrl }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(shareUrl);
+                    alert('Link copied to clipboard!');
+                  }
+                }}
+                className="w-8 h-8 rounded-xl border bg-gray-50 border-gray-100 text-gray-400 hover:border-purple-300 hover:text-purple-600 flex items-center justify-center transition-all shrink-0"
+                title="Share"
+              >
+                <Share2 size={13} />
+              </button>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); return; }
+                  toggleBookmark(app);
+                }}
+                className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0 ${isBookmarked(app.id || app._id)
+                  ? 'bg-purple-50 border-purple-200 text-purple-600'
+                  : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-purple-300 hover:text-purple-600'}`}
+              >
+                <Bookmark size={13} className={isBookmarked(app.id || app._id) ? 'fill-current' : ''} />
+              </button>
+            </div>
           </div>
 
           {/* Name */}
@@ -336,21 +370,23 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
           {/* Rating + Open */}
           <div className="flex items-center justify-between mt-auto mb-3">
-            <div
-              className="cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); } else { setSelectedTool(app); }
-              }}
-            >
-              <StarRating value={rating} count={app.ratingCount} />
+            <div className="flex items-center gap-2">
+              <div
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!user || user.email === 'guest@web3central.internal') { navigate('/login'); } else { setSelectedTool(app); }
+                }}
+              >
+                <StarRating value={rating} count={app.ratingCount} />
+              </div>
             </div>
             <div onClick={(e) => e.stopPropagation()}>
               <SafeLink
                 url={app.url}
                 verified={false}
                 hideDomain={true}
-                className="bg-[#f2efff] text-[#6d39ff] px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#e8e2ff] transition-colors whitespace-nowrap"
+                className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
               >
                 Open
               </SafeLink>

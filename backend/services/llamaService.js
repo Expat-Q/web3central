@@ -70,6 +70,38 @@ const PARENT_MAP = {
 
     // --- InfoFi / Other ---
     'kaito': { parent: null, slugs: ['kaito'] },
+
+    // --- Lending / Markets ---
+    'aave': { parent: 'parent#aave', slugs: null },
+    'compound': { parent: 'parent#compound', slugs: null },
+    'maker': { parent: 'parent#makerdao', slugs: null },
+    'spark': { parent: 'parent#spark', slugs: null },
+    'morpho': { parent: 'parent#morpho', slugs: ['morpho-blue', 'morpho-optimizer'] },
+    'venus': { parent: 'parent#venus', slugs: null },
+    'radiant': { parent: 'parent#radiant-capital', slugs: null },
+    'liquity': { parent: 'parent#liquity', slugs: null },
+    'justlend': { parent: null, slugs: ['justlend'] },
+
+    // --- Liquid Staking / ETH Restaking ---
+    'lido': { parent: 'parent#lido', slugs: null },
+    'rocket-pool': { parent: null, slugs: ['rocket-pool'] },
+    'ether-fi': { parent: null, slugs: ['ether.fi'] },
+    'eigenlayer': { parent: null, slugs: ['eigenlayer'] },
+    'renzo': { parent: null, slugs: ['renzo'] },
+    'puffer': { parent: null, slugs: ['puffer-finance'] },
+    'swell': { parent: null, slugs: ['swell-network'] },
+    'kelp-dao': { parent: null, slugs: ['kelp-dao'] },
+    'mantle-lsp': { parent: null, slugs: ['mantle-lsp'] },
+
+    // --- Yield / Fixed Rate ---
+    'pendle': { parent: 'parent#pendle', slugs: null },
+    'instadapp': { parent: 'parent#instadapp', slugs: null },
+    'yield-protocol': { parent: null, slugs: ['yield-protocol'] },
+
+    // --- Synthetics / Assets ---
+    'synthetix': { parent: 'parent#synthetix', slugs: null },
+    'ethena': { parent: null, slugs: ['ethena'] },
+    'frax': { parent: 'parent#frax-finance', slugs: ['frax-swap', 'frax-ether', 'fraxlend'] },
 };
 
 /**
@@ -125,6 +157,34 @@ const GECKO_MAP = {
     'lighter': 'lighter',
     'aster': 'astherus',
     'kaito': 'kaito',
+
+    // --- Lending ---
+    'aave': 'aave',
+    'compound': 'compound-governance-token',
+    'maker': 'maker',
+    'spark': 'spark',
+    'morpho': 'morpho',
+    'venus': 'venus',
+    'radiant': 'radiant-capital',
+    'liquity': 'liquity',
+
+    // --- Liquid Staking ---
+    'lido': 'lido-dao',
+    'rocket-pool': 'rocket-pool',
+    'ether-fi': 'ether-fi',
+    'eigenlayer': 'eigenlayer',
+    'renzo': 'renzo',
+    'puffer': 'puffer-finance',
+    'swell': 'swell-network',
+
+    // --- Yield ---
+    'pendle': 'pendle',
+    'instadapp': 'instadapp',
+
+    // --- Synthetics ---
+    'synthetix': 'synthetix-network-token',
+    'ethena': 'ethena',
+    'frax': 'frax-share',
 };
 
 /**

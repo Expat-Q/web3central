@@ -173,13 +173,15 @@ export default function LessonDetail() {
                         className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-50"
                     />
                     <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            <span className="font-bold text-gray-900 text-[15px]">{lesson.author?.username || lesson.author?.name || 'Web3Central'}</span>
-                            <span className="text-gray-400 text-sm">@{lesson.author?.username || (lesson.author?.name || 'web3central').toLowerCase().replace(/\s+/g, '')}</span>
-                            <span className="text-gray-300">·</span>
-                            <span className="text-gray-400 text-sm">
-                                {new Date(lesson.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </span>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-gray-900 text-[16px] leading-tight">{lesson.author?.username || lesson.author?.name || 'Web3Central'}</span>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-gray-400 text-xs font-medium">@{lesson.author?.username || (lesson.author?.name || 'web3central').toLowerCase().replace(/\s+/g, '')}</span>
+                                <span className="text-gray-300 text-[10px]">·</span>
+                                <span className="text-gray-400 text-[11px]">
+                                    {new Date(lesson.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </span>
+                            </div>
                         </div>
                         {isCompleted && (
                             <div className="flex flex-wrap items-center gap-2 mt-1.5">

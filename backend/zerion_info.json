@@ -1,0 +1,15 @@
+[dotenv@17.2.3] injecting env (18) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[
+  {
+    _id: new ObjectId('69be775534dcaa87d20c2390'),
+    id: 'zerion',
+    name: 'Zerion',
+    category: 'wallets'
+  },
+  {
+    _id: new ObjectId('69be775a34dcaa87d20c23b4'),
+    id: 'zerion-wallet',
+    name: 'Zerion Wallet',
+    category: 'wallets'
+  }
+]
