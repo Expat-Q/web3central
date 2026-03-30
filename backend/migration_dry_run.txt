@@ -1,0 +1,26 @@
+[dotenv@17.2.3] injecting env (18) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+🔧 fixCategories — mode: DRY RUN
+
+✅ Connected to MongoDB
+
+📦 Total tools in DB: 211
+
+📋 Planned category changes:
+
+📊 Changes by category:
+
+⚠️  Unmatched tools (not in CATEGORY_MAP — will NOT be changed):
+  [onchainAutonomy] Magic Newton (id: magicnewton)
+  [communityTools] Anti Drain Tool by @zun2025 (id: antidrain)
+  [onchainAutonomy] Warden Protocol (id: warden)
+  [wallets] Zerion (id: zerion)
+
+📝 Summary:
+  Tools to update: 0
+  Tools already correct / unmatched: 211
+  Unmatched (skipped): 4
+
+💡 This was a dry run. Run with --apply to write changes to the DB.
+
+🔌 Disconnected.

@@ -18,7 +18,8 @@ import {
   Star,
   Activity,
   ChevronRight,
-  Database
+  Database,
+  Coins
 } from "lucide-react";
 
 export default function ToolComparison() {
@@ -138,14 +139,26 @@ export default function ToolComparison() {
       )
     }
 
+    if (criterion.type === "percentage") {
+      const isPositive = value > 0;
+      return (
+        <div className={`flex items-center justify-center gap-1 font-bold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+          {isPositive ? '+' : ''}{value.toFixed(2)}%
+          {isPositive ? <TrendingUp size={12} /> : <TrendingUp size={12} className="rotate-180" />}
+        </div>
+      );
+    }
+
     return <span className="text-gray-600 font-medium">{value}</span>;
   };
 
   const criteria = [
     { key: "metrics.tvl", label: "Liquidity (TVL)", icon: <Activity size={16} />, type: "currency" },
+    { key: "metrics.tvlChange24h", label: "24h TVL Change", icon: <TrendingUp size={16} />, type: "percentage" },
+    { key: "metrics.volume24h", label: "24h Volume", icon: <BarChart3 size={16} />, type: "currency" },
     { key: "metrics.mcap", label: "Market Cap", icon: <Database size={16} />, type: "currency" },
+    { key: "metrics.tokenPrice", label: "Token Price", icon: <Coins size={16} />, type: "currency" },
     { key: "rating", label: "User Trust", icon: <Star size={16} />, type: "number" },
-    { key: "monthlyUsers", label: "Monthly Growth", icon: <TrendingUp size={16} />, type: "string" },
     { key: "verified", label: "Vetted Status", icon: <ShieldCheck size={16} />, type: "boolean" },
     { key: "tags", label: "Focus Areas", icon: <Layers size={16} />, type: "array" }
   ];

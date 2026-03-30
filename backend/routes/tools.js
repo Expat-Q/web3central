@@ -18,6 +18,20 @@ const decorateToolWithLogo = (toolDoc) => {
   return tool;
 };
 
+// @desc    Manually trigger DeFiLlama metrics sync
+// @route   POST /api/tools/sync
+// @access  Private/Admin
+router.post('/sync', protect, admin, async (req, res) => {
+  try {
+    const { fetchLlamaData } = require('../services/llamaService');
+    const updateCount = await fetchLlamaData();
+    res.json({ success: true, message: `Sync completed. Updated ${updateCount} tools.` });
+  } catch (err) {
+    console.error('Manual sync failed:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
 // expected by the frontend (e.g. { category1: [tools], category2: [tools] })
@@ -72,6 +86,7 @@ router.get('/my-tools', protect, async (req, res) => {
 // Category alias map — maps new frontend keys to old DB category values
 // If a key maps to an array, we query ALL of those DB categories
 const CATEGORY_ALIASES = {
+  infofi:          ['infofi'],
   trading:         ['dex', 'perps', 'trading', 'web3Chat'],
   bridges:         ['interoperability', 'bridges'],
   defi:            ['defi'],

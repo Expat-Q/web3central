@@ -41,7 +41,6 @@ import LessonDetail from "./pages/LessonDetail";
 import Profile from "./pages/Profile";
 
 import Dex from "./pages/apps/Dex";
-import OnchainAutonomy from "./pages/apps/OnchainAutonomy";
 import Interoperability from "./pages/apps/Interoperability";
 import CommunityTools from "./pages/apps/CommunityTools";
 import Web3Chat from "./pages/apps/Web3Chat";
@@ -80,7 +79,6 @@ function App() {
 
               {/* Legacy category routes — redirect to new dynamic routes */}
               <Route path="/apps/dex" element={<Dex />} />
-              <Route path="/apps/onchain-autonomy" element={<OnchainAutonomy />} />
               <Route path="/apps/interoperability" element={<Interoperability />} />
               <Route path="/apps/community-tools" element={<CommunityTools />} />
               <Route path="/apps/perps" element={<Web3Chat />} />
