@@ -61,6 +61,28 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
+  const fs = require('fs');
+  const path = require('path');
+  const logDir = '/tmp';
+  const logFile = path.join(logDir, 'backend_error.log');
+
+  const errorLog = {
+    timestamp: new Date().toISOString(),
+    requestId,
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  };
+
+  try {
+    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+    fs.appendFileSync(logFile, JSON.stringify(errorLog, null, 2) + '\n---\n');
+  } catch (fsErr) {
+    console.error('Failed to write to error log file:', fsErr.message);
+  }
+
   console.error(`[${requestId}] UnhandledError:`, {
     name: err.name,
     message: err.message,

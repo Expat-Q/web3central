@@ -55,15 +55,21 @@ const ProtocolCard = ({ tool, onOpenDetails }) => {
             <span className="text-[12px] font-medium text-gray-400">No Rating</span>
           )}
         </div>
-        <a
-          href={tool.url}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
-        >
-          Open
-        </a>
+        {tool.isOffline ? (
+          <span className="bg-red-50 text-red-500 border border-red-100 px-4 py-1.5 rounded-full text-[11px] font-bold cursor-not-allowed">
+            Site Down
+          </span>
+        ) : (
+          <a
+            href={tool.url}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
+          >
+            Open
+          </a>
+        )}
       </div>
     </motion.div>
   );
