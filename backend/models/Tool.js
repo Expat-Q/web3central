@@ -45,6 +45,10 @@ const ToolSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isOffline: {
+        type: Boolean,
+        default: false
+    },
     trending: {
         type: Boolean,
         default: false

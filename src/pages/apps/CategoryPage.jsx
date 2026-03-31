@@ -382,14 +382,20 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
               </div>
             </div>
             <div onClick={(e) => e.stopPropagation()}>
-              <SafeLink
-                url={app.url}
-                verified={false}
-                hideDomain={true}
-                className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
-              >
-                Open
-              </SafeLink>
+              {app.isOffline ? (
+                <span className="flex items-center justify-center bg-red-50 text-red-500 px-4 py-1.5 rounded-full text-[11px] font-bold border border-red-100 cursor-not-allowed">
+                  Site Down
+                </span>
+              ) : (
+                <SafeLink
+                  url={app.url}
+                  verified={false}
+                  hideDomain={true}
+                  className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
+                >
+                  Open
+                </SafeLink>
+              )}
             </div>
           </div>
 
@@ -722,14 +728,20 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
                     >
                       {bench.includes(String(featured._id || featured.id)) ? '✓ Compare' : '+ Compare'}
                     </button>
-                    <SafeLink
-                      url={featured.url}
-                      verified={false}
-                      hideDomain={true}
-                      className="w-full md:w-auto flex items-center justify-center px-4 md:px-6 py-2.5 bg-white text-gray-900 text-sm font-black rounded-full hover:bg-gray-100 transition-colors"
-                    >
-                      Open
-                    </SafeLink>
+                    {featured.isOffline ? (
+                      <span className="w-full md:w-auto flex items-center justify-center px-4 md:px-6 py-2.5 bg-red-500 text-white text-sm font-black rounded-full cursor-not-allowed shadow-lg shadow-red-500/20">
+                        Site Down
+                      </span>
+                    ) : (
+                      <SafeLink
+                        url={featured.url}
+                        verified={false}
+                        hideDomain={true}
+                        className="w-full md:w-auto flex items-center justify-center px-4 md:px-6 py-2.5 bg-white text-gray-900 text-sm font-black rounded-full hover:bg-gray-100 transition-colors"
+                      >
+                        Open
+                      </SafeLink>
+                    )}
                   </div>
                 </div>
               </motion.div>
