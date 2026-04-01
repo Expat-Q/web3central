@@ -1,0 +1,29 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    models/Lesson.js
+	modified:   models/User.js
+	modified:   server.js
+	modified:   ../package-lock.json
+	modified:   ../package.json
+	modified:   ../src/App.jsx
+	modified:   ../src/pages/Academy.jsx
+	modified:   ../src/pages/Admin.jsx
+	modified:   ../src/pages/Home.jsx
+	modified:   ../src/services/apiService.js
+	modified:   ../tailwind.config.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	git_status.txt
+	models/News.js
+	routes/news.js
+	server_error.txt
+	test_mongoose.js
+	test_out.txt
+	../src/pages/NewsArticle.jsx
+
+no changes added to commit (use "git add" and/or "git commit -a")

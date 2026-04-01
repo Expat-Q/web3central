@@ -39,6 +39,7 @@ import OAuthCallback from "./pages/auth/OAuthCallback";
 import Academy from "./pages/Academy";
 import LessonDetail from "./pages/LessonDetail";
 import Profile from "./pages/Profile";
+import NewsArticle from "./pages/NewsArticle";
 
 import Dex from "./pages/apps/Dex";
 import Interoperability from "./pages/apps/Interoperability";
@@ -76,6 +77,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/oauth/callback" element={<OAuthCallback />} />
+              <Route path="/news/:slug" element={<NewsArticle />} />
 
               {/* Legacy category routes — redirect to new dynamic routes */}
               <Route path="/apps/dex" element={<Dex />} />

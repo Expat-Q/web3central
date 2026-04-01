@@ -95,12 +95,29 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // @desc    OAuth - Google Callback
 // @route   GET /api/auth/google/callback
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login?error=Google_Auth_Failed', session: false }),
-    (req, res) => {
+router.get('/google/callback', (req, res, next) => {
+    passport.authenticate('google', { session: false }, (err, user, info) => {
+        const frontendUrl = process.env.FRONTEND_URL
+            ? process.env.FRONTEND_URL.split(',')[0]
+            : 'http://localhost:3000';
+
+        if (err) {
+            return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
+        }
+
+        // Passport called done(null, false, info) — authentication was rejected
+        if (!user) {
+            if (info && info.message === 'ACCOUNT_EXISTS_USE_PASSWORD') {
+                // This email is already registered via email/password
+                return res.redirect(`${frontendUrl}/login?error=account_exists`);
+            }
+            return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
+        }
+
+        req.user = user;
         handleOAuthSuccess(req, res);
-    }
-);
+    })(req, res, next);
+});
 
 // @desc    OAuth - Initiate Discord Login
 // @route   GET /api/auth/discord

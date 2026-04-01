@@ -38,7 +38,7 @@ export default function Signup() {
         });
 
         if (res.success) {
-            navigate('/academy');
+            navigate('/');
         } else {
             setError(res.message);
         }

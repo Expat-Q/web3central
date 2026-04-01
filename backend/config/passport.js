@@ -19,6 +19,14 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
+// Custom error class to signal an account conflict
+class AccountExistsError extends Error {
+    constructor() {
+        super('ACCOUNT_EXISTS_USE_PASSWORD');
+        this.name = 'AccountExistsError';
+    }
+}
+
 // Helper to find or create user
 const findOrCreateUser = async (providerIdField, profile, emailField, nameField, avatarField) => {
     try {
@@ -26,15 +34,18 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
         let user = await User.findOne({ [providerIdField]: profile.id });
         if (user) return user;
 
-        // 2. Check if a user with this email already exists (Account Linking)
+        // 2. Check if a user with this email already exists
         const email = profile[emailField] && profile[emailField].length > 0 ? profile[emailField][0].value : null;
 
         if (email) {
             user = await User.findOne({ email });
             if (user) {
-                user[providerIdField] = profile.id;
-                if (!user.avatarUrl && avatarField) user.avatarUrl = avatarField;
-                await user.save();
+                // If the account was created manually (has a password, no provider ID yet),
+                // reject the OAuth attempt to prevent silent account merging.
+                if (!user[providerIdField]) {
+                    throw new AccountExistsError();
+                }
+                // Otherwise the account already has this provider linked — just return it.
                 return user;
             }
         }
@@ -43,7 +54,7 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
         const newUser = {
             [providerIdField]: profile.id,
             name: profile[nameField] || 'Web3 Builder',
-            email: email || `${profile.id}@${providerIdField.replace('Id', '')}.local`, // Fallback for no email
+            email: email || `${profile.id}@${providerIdField.replace('Id', '')}.local`,
             avatarUrl: avatarField || ''
         };
 
@@ -53,6 +64,8 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
         throw error;
     }
 };
+
+module.exports.AccountExistsError = AccountExistsError;
 
 // ============================================
 // GOOGLE STRATEGY
@@ -77,6 +90,10 @@ passport.use(new GoogleStrategy({
         const user = await findOrCreateUser('googleId', profile, 'emails', 'displayName', avatar);
         done(null, user);
     } catch (err) {
+        if (err.name === 'AccountExistsError') {
+            // Signal to the callback route that a manual account exists
+            return done(null, false, { message: 'ACCOUNT_EXISTS_USE_PASSWORD' });
+        }
         done(err, null);
     }
 }));

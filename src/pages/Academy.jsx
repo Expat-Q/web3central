@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
-import { fetchLessons, fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
+import { fetchLatestNews, fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
 import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
@@ -24,19 +24,17 @@ const PLATFORM_COLORS = {
 };
 
 export default function Academy() {
-    const [lessons, setLessons] = useState([]);
+    const [news, setNews] = useState([]);
     const [courses, setCourses] = useState([]);
     const [communityLessons, setCommunityLessons] = useState([]);
-    const [lessonsLoading, setLessonsLoading] = useState(true);
+    const [newsLoading, setNewsLoading] = useState(true);
     const [coursesLoading, setCoursesLoading] = useState(true);
     const [communityLoading, setCommunityLoading] = useState(true);
-    const [activeCategory, setActiveCategory] = useState('All');
-    const [activeTab, setActiveTab] = useState('lessons');
+    const [activeTab, setActiveTab] = useState('news');
     const [searchQuery, setSearchQuery] = useState('');
     const [priceFilter, setPriceFilter] = useState('All'); // 'All', 'Free', 'Paid'
     const [levelFilter, setLevelFilter] = useState('All'); 
     const [platformFilter, setPlatformFilter] = useState('All');
-    const [dropOpen, setDropOpen] = useState(false);
     
     // Community Feed specific state
     const [communityMenuOpen, setCommunityMenuOpen] = useState(null); // holds lesson._id of open menu
@@ -53,15 +51,15 @@ export default function Academy() {
 
     useEffect(() => {
         if (!user) return;
-        const fetchLessonsData = async () => {
+        const fetchNewsData = async () => {
             try {
-                setLessonsLoading(true);
-                const lessonsData = await fetchLessons().catch(() => []);
-                setLessons(lessonsData || []);
+                setNewsLoading(true);
+                const data = await fetchLatestNews().catch(() => []);
+                setNews(data || []);
             } catch (err) {
-                console.error('Error fetching lessons:', err);
+                console.error('Error fetching news:', err);
             } finally {
-                setLessonsLoading(false);
+                setNewsLoading(false);
             }
         };
 
@@ -89,7 +87,7 @@ export default function Academy() {
             }
         };
 
-        fetchLessonsData();
+        fetchNewsData();
         fetchCoursesData();
         fetchCommunityData();
     }, [user]);
@@ -108,7 +106,7 @@ export default function Academy() {
                     </div>
                     <h1 className="text-3xl font-black text-gray-900 mb-3">Academy Access</h1>
                     <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                        Sign in to access Web3 courses, lessons, and curated learning resources all in one place.
+                        Sign in to access Web3 courses, news, and curated learning resources all in one place.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <button
@@ -129,30 +127,6 @@ export default function Academy() {
             </div>
         );
     }
-
-    const LESSON_MODULES = [
-        { name: 'All', icon: <Layers size={16} />, color: 'bg-gray-900 text-white border-gray-900', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900' },
-        { name: 'Web3 Foundations', icon: <BookOpen size={16} />, color: 'bg-blue-600 text-white border-blue-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-700', dot: 'bg-blue-500' },
-        { name: 'DeFi Architecture', icon: <Coins size={16} />, color: 'bg-emerald-600 text-white border-emerald-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-700', dot: 'bg-emerald-500' },
-        { name: 'Smart Contract Security', icon: <Shield size={16} />, color: 'bg-purple-600 text-white border-purple-600', inactive: 'bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-700', dot: 'bg-purple-500' },
-    ];
-
-    const MODULE_COLORS = {
-        'Web3 Foundations': { bg: 'bg-blue-50', text: 'text-blue-600', icon: <BookOpen size={22} className="text-blue-600" /> },
-        'DeFi Architecture': { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: <Coins size={22} className="text-emerald-600" /> },
-        'Smart Contract Security': { bg: 'bg-purple-50', text: 'text-purple-600', icon: <Shield size={22} className="text-purple-600" /> },
-    };
-    const defaultModule = { bg: 'bg-gray-50', text: 'text-gray-600', icon: <BookOpen size={22} className="text-gray-500" /> };
-
-    const filteredLessons = activeCategory === 'All'
-        ? lessons
-        : lessons.filter(l => l.module === activeCategory);
-
-    const isLocked = (prereqs = []) => {
-        if (!user || prereqs.length === 0) return false;
-        const progressObj = user?.learningProgress || {};
-        return prereqs.some(reqId => !progressObj[reqId]?.completed);
-    };
 
     const filteredCourses = courses.filter(course => {
         const query = searchQuery.toLowerCase();
@@ -304,7 +278,7 @@ export default function Academy() {
                             Your Web3 <span className="text-purple-600">Learning Path</span>
                         </h1>
                         <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-normal leading-relaxed">
-                            From basic bridging to institutional-grade analysis. Curated courses and interactive lessons all in one place.
+                            From basic bridging to institutional-grade analysis. Curated courses and interactive news all in one place.
                         </p>
                     </motion.div>
                 </div>
@@ -312,13 +286,13 @@ export default function Academy() {
                 {/* Tab Switcher */}
                 <div className="flex flex-col sm:flex-row gap-2 mb-10 pb-1">
                     <button
-                        onClick={() => setActiveTab('lessons')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all border ${activeTab === 'lessons'
+                        onClick={() => setActiveTab('news')}
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all border ${activeTab === 'news'
                             ? 'bg-gray-900 text-white shadow-md border-gray-900'
                             : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 border-gray-200 shadow-sm'
                             }`}
                     >
-                        <span className="flex items-center justify-center gap-2"><BookOpen size={15} /> Interactive Lessons</span>
+                        <span className="flex items-center justify-center gap-2"><BookOpen size={15} /> Crypto News</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('courses')}
@@ -343,135 +317,61 @@ export default function Academy() {
                     </button>
                 </div>
 
-                {/* ── LESSONS TAB ── */}
-                {activeTab === 'lessons' && (
+                {/* ── CRYPTO NEWS TAB ── */}
+                {activeTab === 'news' && (
                     <>
-                        <div className="sm:hidden mb-8 relative">
-                            <button
-                                onClick={() => setDropOpen(!dropOpen)}
-                                className="w-full flex items-center justify-between px-5 py-3.5 rounded-2xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-                            >
-                                {activeCategory}
-                                <ChevronRight size={16} className={`text-gray-400 transition-transform duration-200 ${dropOpen ? '-rotate-90' : 'rotate-90'}`} />
-                            </button>
-                            {dropOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setDropOpen(false)} />
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1">
-                                        {LESSON_MODULES.map(cat => (
-                                            <button
-                                                key={cat.name}
-                                                onClick={() => { setActiveCategory(cat.name); setDropOpen(false); }}
-                                                className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors text-left ${activeCategory === cat.name
-                                                    ? 'bg-purple-50 text-purple-700'
-                                                    : 'text-gray-600 hover:bg-gray-50'
-                                                    }`}
-                                            >
-                                                <span className="text-base">{cat.icon}</span>
-                                                {cat.name}
-                                                {activeCategory === cat.name && (
-                                                    <span className="ml-auto text-purple-500">✓</span>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Desktop: Colourized pill filters */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="hidden sm:flex sm:flex-wrap gap-2 mb-12"
-                        >
-                            {LESSON_MODULES.map(cat => (
-                                <button
-                                    key={cat.name}
-                                    onClick={() => setActiveCategory(cat.name)}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all border shadow-sm ${
-                                        activeCategory === cat.name ? cat.color : cat.inactive
-                                    }`}
-                                >
-                                    {activeCategory === cat.name && cat.dot && (
-                                        <span className={`w-2 h-2 rounded-full bg-white opacity-70`} />
-                                    )}
-                                    {cat.icon} {cat.name}
-                                </button>
-                            ))}
-                        </motion.div>
-
-                        {lessonsLoading ? (
+                        {newsLoading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {Array.from({ length: 6 }).map((_, i) => (
-                                    <CardSkeleton key={`lesson-skeleton-${i}`} />
+                                    <CardSkeleton key={`news-skeleton-${i}`} />
                                 ))}
                             </div>
-                        ) : filteredLessons.length === 0 ? (
+                        ) : news.length === 0 ? (
                             <div className="text-center py-24 text-gray-400">
                                 <BookOpen size={48} className="mx-auto mb-4 opacity-30" />
-                                <p className="font-bold text-lg">No lessons published yet.</p>
-                                <p className="text-sm mt-1">Check back soon or ask the admin to publish lessons.</p>
+                                <p className="font-bold text-lg">No news published yet.</p>
+                                <p className="text-sm mt-1">Check back soon for the latest updates.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filteredLessons.map((lesson, i) => (
-                                    <motion.div
-                                        key={lesson._id}
+                                {news.map((article, i) => (
+                                    <motion.div 
+                                        key={article._id || i}
                                         initial={{ opacity: 0, y: 30 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: (i % 3) * 0.1, duration: 0.6 }}
-                                        className="group"
+                                        className="group flex flex-col bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(109,40,217,0.08)] hover:-translate-y-1 hover:border-purple-200 transition-all duration-300"
                                     >
-                                        <div className="bg-white border border-gray-100 p-6 md:p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(109,40,217,0.08)] hover:border-purple-100 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
-                                            {/* Completed overlay badge */}
-                                            {user?.learningProgress?.[lesson.slug]?.completed && (
-                                                <div className="absolute top-4 right-4 flex items-center gap-1 bg-green-50 border border-green-100 text-green-600 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-                                                    <CheckCircle2 size={9} /> Mastered
+                                        <div className="relative h-48 overflow-hidden bg-slate-100 shrink-0">
+                                            <img 
+                                                src={article.thumbnailUrl} 
+                                                alt={article.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            {article.tags && article.tags[0] && (
+                                                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-purple-600 shadow-sm border border-purple-100">
+                                                {article.tags[0]}
                                                 </div>
                                             )}
-                                            <div className="mb-6 flex items-start gap-4">
-                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0 ${(MODULE_COLORS[lesson.module] || defaultModule).bg}`}>
-                                                    {(MODULE_COLORS[lesson.module] || defaultModule).icon}
-                                                </div>
-                                                <div>
-                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${(MODULE_COLORS[lesson.module] || defaultModule).text}`}>
-                                                        {lesson.module}
-                                                    </span>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">{lesson.level}</span>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                        <div className="p-6 md:p-8 flex flex-col flex-grow">
+                                            <div className="text-xs font-semibold text-gray-400 mb-3 flex items-center justify-between">
+                                                <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                                             </div>
-                                            <div className="flex-grow">
-                                                <h3 className="text-base md:text-lg font-black mb-2 tracking-tight text-gray-900 group-hover:text-purple-700 transition-colors leading-snug">{lesson.title}</h3>
-                                                <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed">{lesson.description}</p>
-                                            </div>
-                                            <div className="mt-auto pt-5 border-t border-gray-50 flex items-center justify-between">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Zap size={13} className="text-amber-500" />
-                                                    <span className="text-xs font-black text-gray-900">+{lesson.xpReward} XP</span>
-                                                </div>
-                                                {user?.learningProgress?.[lesson.slug]?.completed ? (
-                                                    <div className="flex items-center gap-1.5 text-green-600 bg-green-50 pl-2 pr-3 py-1.5 rounded-full border border-green-100">
-                                                        <CheckCircle2 size={12} />
-                                                        <span className="font-bold text-[10px] uppercase tracking-wide">Done</span>
-                                                    </div>
-                                                ) : isLocked(lesson.prerequisites) ? (
-                                                    <div className="flex items-center gap-1.5 text-gray-400 bg-gray-50 pl-2 pr-3 py-1.5 rounded-full border border-gray-200">
-                                                        <Lock size={11} />
-                                                        <span className="font-bold text-[10px] uppercase tracking-wide">Locked</span>
-                                                    </div>
-                                                ) : (
-                                                    <Link
-                                                        to={`/academy/${lesson.slug}`}
-                                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-purple-600 transition-all shadow-md"
-                                                    >
-                                                        Start <ChevronRight size={12} />
-                                                    </Link>
-                                                )}
+                                            <h3 className="text-lg font-black text-gray-900 leading-snug mb-3 group-hover:text-purple-600 transition-colors line-clamp-2">
+                                                {article.title}
+                                            </h3>
+                                            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-6">
+                                                {article.shortDescription}
+                                            </p>
+                                            <div className="mt-auto pt-5 border-t border-gray-50 flex justify-between items-center">
+                                                <Link 
+                                                    to={`/news/${article.slug}`} 
+                                                    className="inline-flex items-center text-sm font-bold text-gray-900 hover:text-purple-700 transition-colors group-hover:gap-2 gap-1"
+                                                >
+                                                    Read Article <ChevronRight size={16} />
+                                                </Link>
                                             </div>
                                         </div>
                                     </motion.div>
