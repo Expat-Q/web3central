@@ -5,6 +5,7 @@ import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview, fetchLates
 import { Star, ExternalLink, ChevronRight, Zap, Sparkles } from "lucide-react";
 import BuilderSpotlightCard from "../components/BuilderSpotlightCard";
 import ToolLogo from "../components/ToolLogo";
+import NewsCard from "../components/NewsCard";
 import { PageSkeleton } from "../components/Skeleton";
 
 /* ── Animated Number Counter ── */
@@ -429,46 +430,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newsFeed.slice(0, 3).map((article, i) => (
-              <motion.div 
-                key={article._id || i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="group flex flex-col bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
-              >
-                <div className="relative h-48 overflow-hidden bg-slate-100">
-                  <img 
-                    src={article.thumbnailUrl} 
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {article.tags && article.tags[0] && (
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-indigo-600 shadow-sm">
-                      {article.tags[0]}
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="text-[11px] font-semibold text-slate-400 mb-3 flex items-center justify-between">
-                    <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                  </div>
-                  <h3 className="text-[17px] font-bold text-slate-900 leading-snug mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 leading-relaxed line-clamp-2 mb-6">
-                    {article.shortDescription}
-                  </p>
-                  <div className="mt-auto">
-                    <Link 
-                      to={`/news/${article.slug}`} 
-                      className="inline-flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
-                    >
-                      Read Full Article <ChevronRight size={16} className="ml-0.5" />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
+              <NewsCard key={article._id || i} article={article} index={i} />
             ))}
           </div>
         </section>
