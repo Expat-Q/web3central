@@ -30,19 +30,34 @@ class AccountExistsError extends Error {
 // Helper to find or create user
 const findOrCreateUser = async (providerIdField, profile, emailField, nameField, avatarField) => {
     try {
+        console.log(`[DEBUG OAuth] Starting lookup for ${providerIdField} ID: ${profile.id}`);
+
         // 1. Check if user already exists with this provider ID
         let user = await User.findOne({ [providerIdField]: profile.id });
-        if (user) return user;
+        if (user) {
+            console.log(`[DEBUG OAuth] User found by provider ID: ${user.email}`);
+            return user;
+        }
 
         // 2. Check if a user with this email already exists
-        const email = profile[emailField] && profile[emailField].length > 0 ? profile[emailField][0].value : null;
+        // Google usually provides emails in profile.emails array
+        let email = null;
+        if (profile[emailField] && profile[emailField].length > 0) {
+            email = profile[emailField][0].value;
+        } else if (profile.email) {
+            email = profile.email;
+        }
+        
+        console.log(`[DEBUG OAuth] Extracted email: ${email}`);
 
         if (email) {
             user = await User.findOne({ email });
             if (user) {
+                console.log(`[DEBUG OAuth] Email match found for existing user: ${email}`);
                 // If the account was created manually (has a password, no provider ID yet),
                 // reject the OAuth attempt to prevent silent account merging.
                 if (!user[providerIdField]) {
+                    console.log(`[DEBUG OAuth] Rejecting: Account has manual password but no ${providerIdField} linked.`);
                     throw new AccountExistsError();
                 }
                 // Otherwise the account already has this provider linked — just return it.
@@ -51,16 +66,26 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
         }
 
         // 3. Create new user
+        // Fallback email if none provided by provider
+        const finalEmail = email || `${profile.id}@${providerIdField.replace('Id', '')}.local`;
+        
+        // Final name extraction
+        const finalName = profile[nameField] || profile.displayName || profile.username || 'Web3 Builder';
+        
+        console.log(`[DEBUG OAuth] Creating new account: ${finalEmail} (Name: ${finalName})`);
+        
         const newUser = {
             [providerIdField]: profile.id,
-            name: profile[nameField] || 'Web3 Builder',
-            email: email || `${profile.id}@${providerIdField.replace('Id', '')}.local`,
+            name: finalName,
+            email: finalEmail,
             avatarUrl: avatarField || ''
         };
 
         user = await User.create(newUser);
+        console.log(`[DEBUG OAuth] New user created successfully: ${user.email}`);
         return user;
     } catch (error) {
+        console.error(`[DEBUG OAuth] Error in findOrCreateUser:`, error);
         throw error;
     }
 };
@@ -86,12 +111,17 @@ passport.use(new GoogleStrategy({
     proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+        console.log('[DEBUG OAuth] Received profile from Google:', {
+            id: profile.id,
+            displayName: profile.displayName,
+            emails: profile.emails
+        });
         const avatar = profile.photos && profile.photos.length > 0 ? profile.photos[0].value : '';
         const user = await findOrCreateUser('googleId', profile, 'emails', 'displayName', avatar);
         done(null, user);
     } catch (err) {
+        console.error('[DEBUG OAuth] GoogleStrategy overall error:', err);
         if (err.name === 'AccountExistsError') {
-            // Signal to the callback route that a manual account exists
             return done(null, false, { message: 'ACCOUNT_EXISTS_USE_PASSWORD' });
         }
         done(err, null);

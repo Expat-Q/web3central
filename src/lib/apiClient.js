@@ -15,6 +15,12 @@ class ApiClient {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  getAdminHeaders() {
+    const isUnlocked = sessionStorage.getItem('admin_unlocked') === 'true';
+    // Match the ADMIN_KEY used in the gate: 213478
+    return isUnlocked ? { 'x-admin-key': '213478' } : {};
+  }
+
   createAbortController(requestKey) {
     if (requestKey && this.activeRequests.has(requestKey)) {
       this.activeRequests.get(requestKey).abort();
@@ -59,7 +65,8 @@ class ApiClient {
 
     const headers = {
       'Content-Type': 'application/json',
-      ...(auth ? this.getAuthHeaders() : {})
+      ...(auth ? this.getAuthHeaders() : {}),
+      ...this.getAdminHeaders()
     };
 
     try {

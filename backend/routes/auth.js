@@ -95,6 +95,8 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // @desc    OAuth - Google Callback
 // @route   GET /api/auth/google/callback
+// @desc    OAuth - Google Callback
+// @route   GET /api/auth/google/callback
 router.get('/google/callback', (req, res, next) => {
     passport.authenticate('google', { session: false }, (err, user, info) => {
         const frontendUrl = process.env.FRONTEND_URL
@@ -102,19 +104,23 @@ router.get('/google/callback', (req, res, next) => {
             : 'http://localhost:3000';
 
         if (err) {
+            console.error('[DEBUG OAuth] Strategy-level error in callback:', err);
             return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
         }
 
         // Passport called done(null, false, info) — authentication was rejected
         if (!user) {
+            console.warn('[DEBUG OAuth] Authentication failed, user not found. Info:', info);
             if (info && info.message === 'ACCOUNT_EXISTS_USE_PASSWORD') {
                 // This email is already registered via email/password
+                console.log('[DEBUG OAuth] Redirecting to login with account_exists error');
                 return res.redirect(`${frontendUrl}/login?error=account_exists`);
             }
             return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
         }
 
         req.user = user;
+        console.log('[DEBUG OAuth] Authentication successful for user:', user.email);
         handleOAuthSuccess(req, res);
     })(req, res, next);
 });
