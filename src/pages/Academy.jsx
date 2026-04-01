@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import { FeedSkeleton, CardSkeleton } from '../components/Skeleton';
+import NewsCard from '../components/NewsCard';
 
 
 const PLATFORM_COLORS = {
@@ -335,46 +336,7 @@ export default function Academy() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {news.map((article, i) => (
-                                    <motion.div 
-                                        key={article._id || i}
-                                        initial={{ opacity: 0, y: 30 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: (i % 3) * 0.1, duration: 0.6 }}
-                                        className="group flex flex-col bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(109,40,217,0.08)] hover:-translate-y-1 hover:border-purple-200 transition-all duration-300"
-                                    >
-                                        <div className="relative h-48 overflow-hidden bg-slate-100 shrink-0">
-                                            <img 
-                                                src={article.thumbnailUrl} 
-                                                alt={article.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                            {article.tags && article.tags[0] && (
-                                                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-purple-600 shadow-sm border border-purple-100">
-                                                {article.tags[0]}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-6 md:p-8 flex flex-col flex-grow">
-                                            <div className="text-xs font-semibold text-gray-400 mb-3 flex items-center justify-between">
-                                                <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                                            </div>
-                                            <h3 className="text-lg font-black text-gray-900 leading-snug mb-3 group-hover:text-purple-600 transition-colors line-clamp-2">
-                                                {article.title}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-6">
-                                                {article.shortDescription}
-                                            </p>
-                                            <div className="mt-auto pt-5 border-t border-gray-50 flex justify-between items-center">
-                                                <Link 
-                                                    to={`/news/${article.slug}`} 
-                                                    className="inline-flex items-center text-sm font-bold text-gray-900 hover:text-purple-700 transition-colors group-hover:gap-2 gap-1"
-                                                >
-                                                    Read Article <ChevronRight size={16} />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </motion.div>
+                                    <NewsCard key={article._id || i} article={article} index={i} />
                                 ))}
                             </div>
                         )}
