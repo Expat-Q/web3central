@@ -124,17 +124,26 @@ export const updateCommunitySpotlight = async (spotlightData) => {
   return apiClient.put('/community-spotlight', spotlightData, { auth: true });
 };
 
-export const fetchLessons = async () => {
+export const fetchLatestNews = async () => {
   const data = await cachedGet({
-    cacheKey: 'academy-lessons',
-    endpoint: '/academy/lessons',
-    requestKey: 'fetchLessons'
+    cacheKey: 'latest-news',
+    endpoint: '/news',
+    requestKey: 'fetchNews'
   });
+  return data.data || [];
+};
+
+export const fetchNewsBySlug = async (slug) => {
+  const data = await apiClient.get(`/news/${slug}`, { requestKey: `fetchNews-${slug}` });
   return data.data;
 };
 
-export const createAcademyLesson = async (lessonData) => {
-  return apiClient.post('/academy', lessonData, { auth: true });
+export const publishNewsArticle = async (newsData) => {
+  return apiClient.post('/news', newsData, { auth: true });
+};
+
+export const deleteNewsArticle = async (id) => {
+  return apiClient.delete(`/news/${id}`, { auth: true });
 };
 
 export const fetchCuratedCourses = async () => {

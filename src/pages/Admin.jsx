@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import {
   fetchStatsOverview, fetchToolsData, deleteTool, createTool,
-  createAcademyLesson, fetchCommunitySpotlight, updateCommunitySpotlight,
-  reviewTool, fetchCuratedCourses, createCuratedCourse, deleteCuratedCourse
+  fetchCommunitySpotlight, updateCommunitySpotlight,
+  reviewTool, fetchCuratedCourses, createCuratedCourse, deleteCuratedCourse,
+  publishNewsArticle
 } from '../services/apiService';
 
 const ADMIN_PASSWORD = '213478';
@@ -58,11 +59,11 @@ export default function Admin() {
     logo: ''
   });
 
-  // Academy Suite State
-  const [lessonForm, setLessonForm] = useState({
-    title: '', description: '', duration: '', xpReward: 100,
-    level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations'
+  // News Engine State
+  const [newsForm, setNewsForm] = useState({
+    title: '', shortDescription: '', content: '', thumbnailUrl: '', tags: ''
   });
+  const [publishingNews, setPublishingNews] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
   // Curated Courses State
@@ -253,27 +254,32 @@ export default function Admin() {
     setUpdatingSpotlight(false);
   };
 
-  // Academy handlers
-  const handlePublishLesson = async () => {
-    if (!lessonForm.title || !lessonForm.content) return alert("Complete all lesson content fields.");
-
-    setPublishing(true);
-    try {
-      const slug = lessonForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const payload = {
-        ...lessonForm,
-        contentMarkdown: lessonForm.content,
-        quiz: { questions: [] }, // Sending empty array to satisfy any existing backend DB schema
-        slug,
-        id: slug
-      };
-      await createAcademyLesson(payload);
-      alert("Lesson Published Successfully!");
-      setLessonForm({ title: '', description: '', duration: '', xpReward: 100, level: 'Beginner', order: 1, content: '', module: 'Web3 Foundations' });
-    } catch (e) {
-      alert("Error publishing lesson: " + e.message);
+  // News Handlers
+  const handlePublishNews = async () => {
+    if (!newsForm.title || !newsForm.content || !newsForm.shortDescription || !newsForm.thumbnailUrl) {
+      return alert("Complete all required news fields (Title, Description, Content, Thumbnail).");
     }
-    setPublishing(false);
+
+    setPublishingNews(true);
+    try {
+      const slug = newsForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const tagsArray = newsForm.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      
+      const payload = {
+        title: newsForm.title,
+        shortDescription: newsForm.shortDescription,
+        contentMarkdown: newsForm.content,
+        thumbnailUrl: newsForm.thumbnailUrl,
+        tags: tagsArray,
+        slug
+      };
+      await publishNewsArticle(payload);
+      alert("News Article Published Successfully!");
+      setNewsForm({ title: '', shortDescription: '', content: '', thumbnailUrl: '', tags: '' });
+    } catch (e) {
+      alert("Error publishing news: " + e.message);
+    }
+    setPublishingNews(false);
   };
 
   // ── PASSWORD GATE ──
@@ -744,74 +750,53 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Academy Content Suite */}
+        {/* Crypto News Content Engine */}
         <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 bg-slate-900 flex justify-between items-center">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Database size={20} className="text-indigo-400" />
-              Academy Content Engine
+              Crypto News Engine
             </h2>
           </div>
           <div className="p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Lesson Title</label>
-                <input type="text" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="Understanding Oracles" />
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">News Headline *</label>
+                <input type="text" value={newsForm.title} onChange={e => setNewsForm({ ...newsForm, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="Bitcoin surpasses new ATH..." />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Short Description</label>
-                <input type="text" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="How external data reaches the blockchain..." />
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Short Description *</label>
+                <input type="text" value={newsForm.shortDescription} onChange={e => setNewsForm({ ...newsForm, shortDescription: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="A brief summary for the card..." />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Module</label>
-                <select value={lessonForm.module} onChange={e => setLessonForm({ ...lessonForm, module: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
-                  <option>Web3 Foundations</option>
-                  <option>DeFi Architecture</option>
-                  <option>Smart Contract Security</option>
-                </select>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thumbnail Image URL *</label>
+                <input type="url" value={newsForm.thumbnailUrl} onChange={e => setNewsForm({ ...newsForm, thumbnailUrl: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://image-url.jpg" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Duration</label>
-                <input type="text" value={lessonForm.duration} onChange={e => setLessonForm({ ...lessonForm, duration: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="10 min" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">XP Reward</label>
-                <input type="number" value={lessonForm.xpReward} onChange={e => setLessonForm({ ...lessonForm, xpReward: parseInt(e.target.value) })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Level</label>
-                <select value={lessonForm.level} onChange={e => setLessonForm({ ...lessonForm, level: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
-                  <option>Beginner</option>
-                  <option>Intermediate</option>
-                  <option>Advanced</option>
-                  <option>Expert</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Syllabus Order</label>
-                <input type="number" value={lessonForm.order} onChange={e => setLessonForm({ ...lessonForm, order: parseInt(e.target.value) })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" />
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tags (comma separated)</label>
+                <input type="text" value={newsForm.tags} onChange={e => setNewsForm({ ...newsForm, tags: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="DeFi, Market, Security" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Markdown Content Body</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Markdown Content Body *</label>
               <textarea
-                value={lessonForm.content}
-                onChange={e => setLessonForm({ ...lessonForm, content: e.target.value })}
+                value={newsForm.content}
+                onChange={e => setNewsForm({ ...newsForm, content: e.target.value })}
                 className="w-full h-[300px] bg-slate-900 text-slate-300 font-mono text-sm border border-slate-800 p-5 rounded-xl focus:ring-2 focus:ring-indigo-500/50 custom-scrollbar"
-                placeholder="# Write your content here..."
+                placeholder="# Write your news content here in Markdown..."
               />
             </div>
 
             <button
-              onClick={handlePublishLesson}
-              disabled={publishing}
+              onClick={handlePublishNews}
+              disabled={publishingNews}
               className="w-full py-4 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:-translate-y-0.5 disabled:opacity-50"
             >
-              {publishing ? 'Publishing...' : 'Publish Masterclass to DB'}
+              {publishingNews ? 'Publishing...' : 'Publish Article to DB'}
             </button>
           </div>
         </div>

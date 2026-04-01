@@ -28,7 +28,7 @@ export default function OAuthCallback() {
                     if (data.success) {
                         localStorage.setItem('user', JSON.stringify(data.user));
                         // Reload the page to reset AuthContext state and load the user natively
-                        window.location.href = '/academy';
+                        window.location.href = '/';
                     } else {
                         console.error('Failed to fetch user after OAuth');
                         navigate('/login?error=OAuth_User_Fetch_Failed');

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
-import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview } from "../services/apiService";
+import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview, fetchLatestNews } from "../services/apiService";
 import { Star, ExternalLink, ChevronRight, Zap, Sparkles } from "lucide-react";
 import BuilderSpotlightCard from "../components/BuilderSpotlightCard";
 import ToolLogo from "../components/ToolLogo";
@@ -62,6 +62,7 @@ export default function Home() {
   const [appsData, setAppsData] = useState(null);
   const [communitySpotlight, setCommunitySpotlight] = useState(null);
   const [platformStats, setPlatformStats] = useState(null);
+  const [newsFeed, setNewsFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toolsLoading, setToolsLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
@@ -70,12 +71,14 @@ export default function Home() {
     const fetchCriticalData = async () => {
       try {
         setLoading(true);
-        const [spotlightData, statsData] = await Promise.all([
+        const [spotlightData, statsData, newsData] = await Promise.all([
           fetchCommunitySpotlight(),
-          fetchStatsOverview()
+          fetchStatsOverview(),
+          fetchLatestNews()
         ]);
         setCommunitySpotlight(spotlightData);
         setPlatformStats(statsData);
+        setNewsFeed(newsData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -413,6 +416,63 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── LATEST CRYPTO NEWS (3-COLUMN GRID) ── */}
+      {newsFeed && newsFeed.length > 0 && (
+        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-900">Latest Crypto News</h2>
+              <p className="text-slate-400 text-sm mt-1">Market updates, protocol launches, and Web3 insights.</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {newsFeed.slice(0, 3).map((article, i) => (
+              <motion.div 
+                key={article._id || i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="group flex flex-col bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
+              >
+                <div className="relative h-48 overflow-hidden bg-slate-100">
+                  <img 
+                    src={article.thumbnailUrl} 
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {article.tags && article.tags[0] && (
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-indigo-600 shadow-sm">
+                      {article.tags[0]}
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="text-[11px] font-semibold text-slate-400 mb-3 flex items-center justify-between">
+                    <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="text-[17px] font-bold text-slate-900 leading-snug mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-slate-500 leading-relaxed line-clamp-2 mb-6">
+                    {article.shortDescription}
+                  </p>
+                  <div className="mt-auto">
+                    <Link 
+                      to={`/news/${article.slug}`} 
+                      className="inline-flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                    >
+                      Read Full Article <ChevronRight size={16} className="ml-0.5" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── FAQ + Newsletter ── */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-white/8">

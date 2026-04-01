@@ -1,0 +1,16 @@
+[dotenv@17.2.3] injecting env (18) from .env -- tip: ≡ƒùé∩╕Å backup and recover secrets: https://dotenvx.com/ops
+{"timestamp":"2026-04-01T09:58:12.179Z","level":"info","message":"Server started","service":"web3central-backend","environment":"development","port":"5000"}
+{"timestamp":"2026-04-01T09:58:17.178Z","level":"info","message":"Starting initial DeFiLlama sync","service":"web3central-backend","environment":"development"}
+--- DeFiLlama Sync Started ---
+MongoDB Connected: ac-fkcsn5t-shard-00-00.zxgqkbg.mongodb.net
+DeFiLlama protocols: 7256
+Volume entries: 1663
+Volume fetch failed for derivatives: Request failed with status code 402
+Local tools: 214
+Token data fetched for 41 coins
+--- Sync Complete ---
+Matched: 54 / 214
+Total Updated: 54
+Unmatched (160): Wormhole, Relay, 0x, Bantr, Cookie, Anti Drain Tool by @zun2025, Lunar Strategy, Kaito Radar, Stargate, LayerSwap, Gas.zip, Matcha, Wallchain, Xeet, Galxe Starboard, Rollbit Perps, Tenderly, Undrained Asset Recovery from a compromised wallet, Blix Editor, Hyperlane, Kamino Finance, Revoke Delegation Tool by @zun2025, Web3 Toolkits by 0xMoei, Elsa, Gomtu, Base Sport Fantasy, Anti Drain extension., Time Travel (Extension), Seed Phrase Recovery Tool, Sol Incinerator, Twitter interaction circle, Sol wallet cleaner( Claim your sol), Twitter Video Downloader, Rapid Bridge, Wizz, Stallion, First Dollar, Scribble, Gib.Work, Superteam Earn, Cre8core Labs, Onboard3, Tunnl, ENB Ecosystem, Alchioscy, Alchemy , Yearn Finance, Convex Finance, Pendle, Axie Infinity, Illuvium, Immunefi, Sherlock, OpenZeppelin, Forta, Dune Analytics, Nansen, Token Terminal, DeFiLlama, Arkham Intelligence, Messari, Flipside Crypto, MetaMask, Rabby Wallet, Phantom, Rainbow, Backpack, Coinbase Wallet, Ledger Live, RAILGUN, Aztec, Zcash, Secret Network, Polymarket, Azuro, Overtime Markets, Augur, Omen, Curve Finance, SushiSwap, Radiant Capital, Venus, Maple Finance, Goldfinch, Revoke.cash, Wallet Guard, Blowfish, Scam Sniffer, Pocket Universe, Safe, CertiK, PeckShield, SlowMist, GoPlus Security, Blockaid, Hypernative, Hexagate, Glassnode, CryptoQuant, DexScreener, DexTools, GeckoTerminal, Zapper, DeBank, L2Beat, Santiment, Trust Wallet, OKX Wallet, Argent, Keplr, Solflare, Trezor Suite, Petra, Leap Wallet, Zerion Wallet, Magic Eden, Zora, Foundation, Rarible, Manifold, SuperRare, Art Blocks, Tensor, Sound.xyz, Highlight, Mint.fun, Star Atlas, Big Time, Parallel, Pixels, Gods Unchained, The Sandbox, Decentraland, Shrapnel, DeFi Kingdoms, Splinterlands, Sorare, Aurory, Guild of Guardians, Manta Network, Aleph Zero, Oasis Network, Phala Network, Iron Fish, Threshold Network, Zeitgeist, SX Network, Polkamarkets, Reality.eth, OpenSea, BrandOS, Jumper, BRIDGEGG, WPL, HackenProof, Code4rena, Hats Finance, Hashlock, Bugcrowd, HackerOne
+{"timestamp":"2026-04-01T09:58:25.977Z","level":"info","message":"Initial DeFiLlama sync completed","service":"web3central-backend","environment":"development"}
+{"timestamp":"2026-04-01T10:01:03.178Z","level":"info","message":"Request completed","service":"web3central-backend","environment":"development","correlationId":"req-1775037663173-3b0b8087","route":"/api/health","method":"GET","statusCode":200,"latencyMs":4,"userAgent":"curl/8.9.1","ip":"::1"}

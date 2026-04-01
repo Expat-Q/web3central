@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
@@ -15,6 +15,18 @@ export default function Login() {
 
     const { login, oauthLogin } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Read ?error query param set by OAuth redirect
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const oauthError = params.get('error');
+        if (oauthError === 'account_exists') {
+            setError('account_exists');
+        } else if (oauthError) {
+            setError('Google sign-in failed. Please try again or use email/password.');
+        }
+    }, [location.search]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,7 +40,7 @@ export default function Login() {
         const res = await login(formData);
 
         if (res.success) {
-            navigate('/academy');
+            navigate('/');
         } else {
             setError(res.message);
         }
@@ -67,7 +79,16 @@ export default function Login() {
 
 
                     <form onSubmit={handleSubmit} className="space-y-8">
-                        {error && (
+                        {error === 'account_exists' ? (
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className="bg-purple-50 border border-purple-200 text-purple-800 px-6 py-4 rounded-2xl text-sm font-medium"
+                            >
+                                <p className="font-bold mb-1">You already have an account 👋</p>
+                                <p>This email is registered with a password. Please sign in below using your <strong>email and password</strong> instead.</p>
+                            </motion.div>
+                        ) : error ? (
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -75,7 +96,7 @@ export default function Login() {
                             >
                                 {error}
                             </motion.div>
-                        )}
+                        ) : null}
 
                         <div className="space-y-3">
                             <label className="text-xs font-semibold text-gray-500 pl-2">Email</label>
