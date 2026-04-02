@@ -5,6 +5,16 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { normalizeLearningProgressMap, serializeLearningProgress } = require('../utils/learningProgress');
+const fs = require('fs');
+const path = require('path');
+
+// Universal trace for ALL auth routes
+router.use((req, res, next) => {
+    const logPath = path.join(__dirname, '../oauth_trace.txt');
+    const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
+    fs.appendFileSync(logPath, logEntry);
+    next();
+});
 
 const registerSchema = {
     body: {
@@ -91,7 +101,10 @@ const passport = require('passport');
 // @desc    OAuth - Initiate Google Login
 // @route   GET /api/auth/google
 // @access  Public
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', (req, res, next) => {
+    console.log('[DEBUG OAuth] Initiation route hit: /api/auth/google');
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
 // @desc    OAuth - Google Callback
 // @route   GET /api/auth/google/callback

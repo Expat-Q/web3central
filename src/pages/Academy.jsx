@@ -8,7 +8,7 @@ import {
     BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
     Award, CheckCircle2, Sparkles, Lock, ExternalLink,
     Play, Globe, Bookmark, Search, Users, Plus, Star, Heart, Edit3,
-    ThumbsUp, ThumbsDown, Zap, Eye, PenLine, Share2
+    ThumbsUp, ThumbsDown, Zap, Eye, PenLine, Share2, Trash2
 } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
 import { FeedSkeleton, CardSkeleton } from '../components/Skeleton';
@@ -41,6 +41,7 @@ export default function Academy() {
     const [communityMenuOpen, setCommunityMenuOpen] = useState(null); // holds lesson._id of open menu
     const [editingLesson, setEditingLesson] = useState(null); // { _id, title, description, contentMarkdown }
     const [showCommunityModal, setShowCommunityModal] = useState(false);
+    const [communityPostSuccess, setCommunityPostSuccess] = useState(false);
     const [submittingPost, setSubmittingPost] = useState(false);
     const [newPostData, setNewPostData] = useState({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
     const [communityPostError, setCommunityPostError] = useState('');
@@ -242,10 +243,27 @@ export default function Academy() {
                 level: 'Intermediate' 
             });
             if (res.success) {
-                const refreshed = await fetchCommunityLessons();
-                setCommunityLessons(refreshed);
+                // Instant Reflection: Manually update the state with the new lesson
+                // We supplement the author data since it hasn't been re-fetched yet
+                const newLesson = {
+                    ...res.data,
+                    author: {
+                        _id: user.id || user._id,
+                        name: user.name,
+                        username: user.username,
+                        avatarUrl: user.avatarUrl
+                    },
+                    upvotes: [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                setCommunityLessons(prev => [newLesson, ...prev]);
                 setShowCommunityModal(false);
                 setNewPostData({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
+                
+                // Show Success Toast
+                setCommunityPostSuccess(true);
+                setTimeout(() => setCommunityPostSuccess(false), 3000);
             }
         } catch (err) {
             console.error("Failed to create post:", err);
@@ -262,6 +280,23 @@ export default function Academy() {
                 <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-60" />
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[120px] translate-y-1/2 translate-x-1/2 opacity-60" />
             </div>
+
+            {/* Success Toast */}
+            <AnimatePresence>
+                {communityPostSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-8 py-4 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl flex items-center gap-3"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                            <CheckCircle2 size={20} />
+                        </div>
+                        <p className="text-white font-black tracking-tight">Your post has been published!</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
@@ -569,145 +604,133 @@ export default function Academy() {
                                 <p className="text-sm mt-1">Be the first to share your Web3 knowledge!</p>
                             </div>
                         ) : (
-                            <div className="max-w-[600px] mx-auto border border-gray-200 rounded-2xl overflow-hidden bg-white divide-y divide-gray-100">
+                            <div className="max-w-[700px] mx-auto flex flex-col gap-6">
                                 {communityLessons.map((lesson, i) => {
                                     const initials = lesson.author?.username
                                         ? lesson.author.username.charAt(0).toUpperCase()
                                         : (lesson.author?.name ? lesson.author.name.charAt(0).toUpperCase() : '?');
-                                    const isLiked = lesson.upvotes?.includes(user?.id);
+                                    const isLiked = lesson.upvotes?.includes(user?.id || user?._id);
                                     const diff = Date.now() - new Date(lesson.createdAt).getTime();
-                                    const timeAgo = diff < 3600000
+                                    const timeAgo = diff < 0 ? 'just now' : diff < 3600000
                                         ? `${Math.floor(diff / 60000)}m`
                                         : diff < 86400000
                                             ? `${Math.floor(diff / 3600000)}h`
                                             : `${Math.floor(diff / 86400000)}d`;
 
-                                    return (
-                                        <div
-                                            key={lesson._id}
-                                            className="flex gap-3 px-4 py-3 hover:bg-gray-50/80 transition-colors cursor-pointer"
-                                            onClick={() => navigate(`/academy/${lesson.slug}`)}
-                                        >
-                                            {/* Avatar */}
-                                            <div className="shrink-0 pt-0.5">
-                                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm text-gray-600 overflow-hidden">
-                                                    {lesson.author?.avatarUrl
-                                                        ? <img src={lesson.author.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-                                                        : <span>{initials}</span>
-                                                    }
-                                                </div>
-                                            </div>
+                                    const isLong = lesson.contentMarkdown?.length > 450;
 
-                                            {/* Right column */}
-                                            <div className="flex-grow min-w-0">
-                                                {/* Header: Name · @handle · time · ··· */}
-                                                <div className="flex items-center justify-between mb-0.5">
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-[15px] text-gray-900 leading-tight">{lesson.author?.username || lesson.author?.name || 'Anonymous'}</span>
-                                                        <div className="flex items-center gap-1 flex-wrap">
-                                                            <span className="text-gray-500 text-[13px]">@{lesson.author?.username || (lesson.author?.name || 'user').toLowerCase().replace(/\s+/g, '')}</span>
-                                                            <span className="text-gray-400 text-[13px]">·</span>
-                                                            <span className="text-gray-500 text-[13px]">{timeAgo}</span>
+                                    return (
+                                        <motion.div
+                                            key={lesson._id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: i * 0.05 }}
+                                            className="group bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-300"
+                                        >
+                                            <div className="p-6 md:p-8">
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center font-black text-lg text-purple-600 shadow-sm border border-white">
+                                                            {lesson.author?.avatarUrl ? (
+                                                                <img src={lesson.author.avatarUrl} alt="avatar" className="w-full h-full object-cover rounded-2xl" />
+                                                            ) : (
+                                                                <span>{initials}</span>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-black text-gray-900 tracking-tight leading-none mb-1">
+                                                                {lesson.author?.username || lesson.author?.name || 'Anonymous Builder'}
+                                                            </div>
+                                                            <div className="text-gray-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                                                                {timeAgo}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    {/* ⋯ menu */}
-                                                    <div className="relative shrink-0 ml-1">
-                                                        <button
-                                                            onClick={e => { e.stopPropagation(); setCommunityMenuOpen(communityMenuOpen === lesson._id ? null : lesson._id); }}
-                                                            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-                                                            title="More"
-                                                        >
-                                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                                <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
-                                                            </svg>
-                                                        </button>
-                                                        {communityMenuOpen === lesson._id && (
-                                                            <>
-                                                                <div className="fixed inset-0 z-40" onClick={() => setCommunityMenuOpen(null)} />
-                                                                <div className="absolute right-0 top-8 z-50 bg-white border border-gray-100 rounded-2xl shadow-xl py-1 min-w-[140px] text-sm overflow-hidden">
-                                                                    <button
-                                                                        onClick={e => { e.stopPropagation(); setCommunityMenuOpen(null); }}
-                                                                        className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
-                                                                    >Follow</button>
-                                                                    {user?.id === lesson.author?._id && (
-                                                                        <>
-                                                                            <button
-                                                                                onClick={e => { e.stopPropagation(); setEditingLesson({ _id: lesson._id, title: lesson.title, description: lesson.description || '', contentMarkdown: lesson.contentMarkdown || '' }); setCommunityMenuOpen(null); }}
-                                                                                className="w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
-                                                                            >Edit</button>
-                                                                            <button
-                                                                                onClick={e => { e.stopPropagation(); handleDeleteLesson(lesson._id); }}
-                                                                                className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
-                                                                            >Delete</button>
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-
+                                                    
+                                                    {/* Context Menu for Author */}
+                                                    {user && (user.id === lesson.author?._id || user._id === lesson.author?._id) && (
+                                                        <div className="relative">
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); setCommunityMenuOpen(communityMenuOpen === lesson._id ? null : lesson._id); }}
+                                                                className="w-10 h-10 rounded-xl hover:bg-gray-50 flex items-center justify-center text-gray-400 transition-colors"
+                                                            >
+                                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                                            </button>
+                                                            {communityMenuOpen === lesson._id && (
+                                                                <>
+                                                                    <div className="fixed inset-0 z-40" onClick={() => setCommunityMenuOpen(null)} />
+                                                                    <div className="absolute right-0 top-12 z-50 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 min-w-[160px] overflow-hidden">
+                                                                        <button 
+                                                                            onClick={() => { setEditingLesson({ ...lesson }); setCommunityMenuOpen(null); }}
+                                                                            className="w-full text-left px-5 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                                                                        >
+                                                                            <Edit3 size={16} /> Edit Post
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => { handleDeleteLesson(lesson._id); setCommunityMenuOpen(null); }}
+                                                                            className="w-full text-left px-5 py-3 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                                                                        >
+                                                                            <Trash2 size={16} /> Delete Post
+                                                                        </button>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
 
-                                                {/* Post text */}
-                                                <p className="text-[15px] text-gray-900 leading-relaxed mb-3">
-                                                    {lesson.title}
-                                                    {lesson.description && (
-                                                        <span className="text-gray-500"> — {lesson.description}</span>
-                                                    )}
-                                                </p>
-
-                                                {/* Action bar — 3 buttons only: comment, like, share */}
-                                                <div
-                                                    className="flex items-center gap-1 -ml-2"
-                                                    onClick={e => e.stopPropagation()}
+                                                <h3 
+                                                    className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tight leading-tight cursor-pointer hover:text-purple-600 transition-colors"
+                                                    onClick={() => navigate(`/academy/${lesson.slug}`)}
                                                 >
-                                                    {/* Comment — opens the lesson */}
-                                                    <button
-                                                        onClick={() => navigate(`/academy/${lesson.slug}`)}
-                                                        className="flex items-center gap-1 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
-                                                        title="Read lesson"
-                                                    >
-                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                                        </svg>
-                                                    </button>
+                                                    {lesson.title}
+                                                </h3>
 
-                                                    {/* Like */}
-                                                    <button
-                                                        onClick={() => handleUpvote(lesson._id)}
-                                                        className={`flex items-center gap-1 p-2 rounded-full transition-all ${isLiked ? 'text-pink-500 bg-pink-50' : 'text-gray-500 hover:text-pink-500 hover:bg-pink-50'}`}
-                                                        title="Like"
-                                                    >
-                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                                        </svg>
-                                                        {(lesson.upvotes?.length || 0) > 0 && (
-                                                            <span className="text-[13px] tabular-nums">{lesson.upvotes.length}</span>
-                                                        )}
-                                                    </button>
+                                                {/* Content Rendering */}
+                                                <div className="prose prose-slate prose-sm max-w-none text-gray-600 leading-relaxed font-medium mb-6">
+                                                    <ReactMarkdown>
+                                                        {isLong 
+                                                            ? `${lesson.contentMarkdown.substring(0, 450)}...` 
+                                                            : lesson.contentMarkdown
+                                                        }
+                                                    </ReactMarkdown>
+                                                </div>
 
-                                                    {/* Share — platform link */}
-                                                    <button
+                                                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
+                                                    <div className="flex items-center gap-4">
+                                                        <button 
+                                                            onClick={() => handleUpvote(lesson._id)}
+                                                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${isLiked ? 'bg-pink-50 text-pink-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-pink-600'}`}
+                                                        >
+                                                            <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={isLiked ? 1 : 2} />
+                                                            {lesson.upvotes?.length || 0}
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => navigate(`/academy/${lesson.slug}`)}
+                                                            className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm text-gray-400 hover:bg-gray-50 hover:text-indigo-600 transition-all"
+                                                        >
+                                                            <Eye size={18} /> {isLong ? 'Read More' : 'Details'}
+                                                        </button>
+                                                    </div>
+
+                                                    <button 
                                                         onClick={() => {
                                                             const shareUrl = `${window.location.origin}/academy/${lesson.slug}`;
                                                             if (navigator.share) {
-                                                                navigator.share({ title: lesson.title, text: lesson.description || '', url: shareUrl }).catch(() => {});
+                                                                navigator.share({ title: lesson.title, url: shareUrl }).catch(() => {});
                                                             } else {
                                                                 navigator.clipboard.writeText(shareUrl);
                                                                 alert('Link copied to clipboard!');
                                                             }
                                                         }}
-                                                        className="flex items-center gap-1 p-2 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                                                        className="w-10 h-10 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-blue-600 flex items-center justify-center transition-all"
                                                         title="Share"
                                                     >
-                                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                                                            <polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
-                                                        </svg>
+                                                        <Share2 size={18} />
                                                     </button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     );
                                 })}
                             </div>
@@ -740,16 +763,6 @@ export default function Academy() {
                                     onChange={e => setNewPostData(prev => ({...prev, title: e.target.value}))}
                                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
                                     placeholder="e.g. A Deep Dive into Zero-Knowledge Proofs"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Short Description (Optional)</label>
-                                <input 
-                                    type="text" 
-                                    value={newPostData.description}
-                                    onChange={e => setNewPostData(prev => ({...prev, description: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
-                                    placeholder="A brief summary of what this covers."
                                 />
                             </div>
                             <div>
@@ -806,15 +819,6 @@ export default function Academy() {
                                     type="text" 
                                     value={editingLesson.title}
                                     onChange={e => setEditingLesson(prev => ({...prev, title: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Short Description (Optional)</label>
-                                <input 
-                                    type="text" 
-                                    value={editingLesson.description}
-                                    onChange={e => setEditingLesson(prev => ({...prev, description: e.target.value}))}
                                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
                                 />
                             </div>
