@@ -97,30 +97,35 @@ module.exports.AccountExistsError = AccountExistsError;
 // ============================================
 // Priority: GOOGLE_CALLBACK_URL > BACKEND_URL > RENDER_EXTERNAL_URL (built-in) > localhost
 const getAbsoluteCallback = (path) => {
-    const base =
+    let base =
         process.env.BACKEND_URL ||
-        process.env.RENDER_EXTERNAL_URL ||   // Render auto-injects this on all services
+        process.env.RENDER_EXTERNAL_URL ||
         'http://localhost:5000';
-    return `${base}${path}`;
+    
+    // Safety check: remove trailing slash from base if present
+    base = base.endsWith('/') ? base.slice(0, -1) : base;
+    
+    const finalUrl = `${base}${path}`;
+    console.log(`[DEBUG OAuth] Setting absolute callback URL to: ${finalUrl}`);
+    return finalUrl;
 };
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || 'placeholder_google_id',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'placeholder_google_secret',
+clientID: process.env.GOOGLE_CLIENT_ID,`r`n    clientSecret: process.env.GOOGLE_CLIENT_SECRET,`r`n    callbackURL: process.env.GOOGLE_CALLBACK_URL || getAbsoluteCallback('/api/auth/google/callback'),`r`n    proxy: true`r`n
+=======
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+>>>>>>> fix-community-oauth
     callbackURL: process.env.GOOGLE_CALLBACK_URL || getAbsoluteCallback('/api/auth/google/callback'),
     proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        console.log('[DEBUG OAuth] Received profile from Google:', {
-            id: profile.id,
-            displayName: profile.displayName,
-            emails: profile.emails
-        });
+        console.log('[DEBUG OAuth] Strategy successfully received Google profile:', profile.id);
         const avatar = profile.photos && profile.photos.length > 0 ? profile.photos[0].value : '';
         const user = await findOrCreateUser('googleId', profile, 'emails', 'displayName', avatar);
         done(null, user);
     } catch (err) {
-        console.error('[DEBUG OAuth] GoogleStrategy overall error:', err);
+        console.error('[DEBUG OAuth] Critical error in Strategy callback:', err);
         if (err.name === 'AccountExistsError') {
             return done(null, false, { message: 'ACCOUNT_EXISTS_USE_PASSWORD' });
         }

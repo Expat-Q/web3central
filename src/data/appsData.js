@@ -1896,10 +1896,12 @@ module.exports = {
     },
     {
       id: "drift",
-      name: "Drift Finance",
-      url: "https://drift.trade",
-      description: "Solana-based decentralized perpetual exchange.",
+      name: "Drift Protocol",
+      url: "https://app.drift.trade",
+      description: "Trade perps on Solana with ultimate performance: Deep liquidity, multi-asset collateral and yield on all deposits.",
       category: "web3Chat",
+      llamaSlug: "drift",
+      geckoId: "drift-protocol",
       tags: [
         "Perps",
         "Solana",
