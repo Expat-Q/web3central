@@ -111,11 +111,8 @@ const getAbsoluteCallback = (path) => {
 };
 
 passport.use(new GoogleStrategy({
-clientID: process.env.GOOGLE_CLIENT_ID,`r`n    clientSecret: process.env.GOOGLE_CLIENT_SECRET,`r`n    callbackURL: process.env.GOOGLE_CALLBACK_URL || getAbsoluteCallback('/api/auth/google/callback'),`r`n    proxy: true`r`n
-=======
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
->>>>>>> fix-community-oauth
     callbackURL: process.env.GOOGLE_CALLBACK_URL || getAbsoluteCallback('/api/auth/google/callback'),
     proxy: true
 }, async (accessToken, refreshToken, profile, done) => {
