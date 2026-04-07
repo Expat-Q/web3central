@@ -93,9 +93,9 @@ const CATEGORY_META = {
   wallets:     { title: 'Wallets',            desc: 'Wallet tools and infrastructure',    color: 'slate',   comingSoon: false },
   l2:          { title: 'Layer 2',            desc: 'Scaling solutions built on L1 networks', color: 'violet',  comingSoon: false },
   nft:         { title: 'NFT',                desc: 'NFT minting, trading and management', color: 'pink',    comingSoon: false },
-  gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: true  },
+  gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: false },
   privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: true  },
-  predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: true  },
+  predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: false  },
   community:   { title: 'Community',          desc: 'DAO tools and decentralized coordination', color: 'teal',    comingSoon: false },
   // --- Legacy support ---
   dex:              { title: 'DEX',                    desc: 'Decentralized exchanges',           color: 'purple',  comingSoon: false },

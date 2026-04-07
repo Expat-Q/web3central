@@ -2428,5 +2428,28 @@ module.exports = {
       narrative: "Attention & InfoFi Layer",
       narrativeDescription: "AI and AGI learning platforms in Web3"
     }
+  ],
+  predictions: [
+    {
+      id: "limitless",
+      name: "Limitless",
+      url: "https://limitless.exchange/markets",
+      description: "Predict crypto & stock prices with nonstop hourly and daily markets.",
+      category: "predictions",
+      tags: ["Prediction Markets", "Crypto", "Stocks"],
+      builder: {
+        name: "Limitless",
+        handle: "@trylimitless",
+        twitter: "https://twitter.com/trylimitless"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      monthlyUsers: "New",
+      popularWith: ["Traders", "Crypto Enthusiasts"],
+      narrative: "Prediction Markets",
+      narrativeDescription: "Hourly and daily predictions"
+    }
   ]
 };

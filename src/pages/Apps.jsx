@@ -88,9 +88,9 @@ const SECTIONS = [
   { key: "wallets",     label: "Wallets",           dbKeys: ["wallets"],                     comingSoon: false },
   { key: "l2",          label: "Layer 2",           dbKeys: ["l2"],                          comingSoon: false },
   { key: "nft",         label: "NFT",               dbKeys: ["nft"],                         comingSoon: false },
-  { key: "gaming",      label: "Gaming",            dbKeys: ["gaming"],                      comingSoon: true  },
+  { key: "gaming",      label: "Gaming",            dbKeys: ["gaming"],                      comingSoon: false },
   { key: "privacy",     label: "Privacy",           dbKeys: ["privacy"],                     comingSoon: true  },
-  { key: "predictions", label: "Predictions",       dbKeys: ["predictions"],                 comingSoon: true  },
+  { key: "predictions", label: "Predictions",       dbKeys: ["predictions"],                 comingSoon: false },
   { key: "community",   label: "Community",         dbKeys: ["communityTools", "community"], comingSoon: false },
 ];
 
