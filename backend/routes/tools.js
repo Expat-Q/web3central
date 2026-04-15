@@ -102,6 +102,7 @@ const CATEGORY_ALIASES = {
   community:       ['communityTools', 'community'],
   'bounty-hub':    ['bountyHub', 'bounty-hub'],
   'rwa':           ['rwa'],
+  cex:             ['cex'],
   // Legacy keys still work directly
   dex:             ['dex'],
   perps:           ['perps'],

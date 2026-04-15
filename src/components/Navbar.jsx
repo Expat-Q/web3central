@@ -5,7 +5,7 @@ import logo from "../assets/logo.jpg";
 import {
   ArrowLeftRight, Share2, Landmark, Sparkles, ShieldCheck, BarChart3,
   Wallet, Layers, Image, Gamepad2, Lock, Activity, Users, DollarSign,
-  ChevronRight, ArrowRight
+  ChevronRight, ArrowRight, Building, Coins
 } from "lucide-react";
 
 /**
@@ -34,12 +34,12 @@ export default function Navbar() {
     { name: "Trading",     to: "/apps/trading",     icon: <ArrowLeftRight size={15} />, color: "from-violet-500 to-purple-600"  },
     { name: "Bridges",     to: "/apps/bridges",     icon: <Share2 size={15} />,         color: "from-blue-500 to-cyan-600"      },
     { name: "DeFi",        to: "/apps/defi",        icon: <Landmark size={15} />,       color: "from-emerald-500 to-green-600"  },
-    { name: "Staking",     to: "/apps/staking",     icon: <Sparkles size={15} />,       color: "from-indigo-500 to-violet-600"  },
+    { name: "RWA",         to: "/apps/rwa",         icon: <Building size={15} />,       color: "from-emerald-500 to-teal-600"   },
     { name: "Security",    to: "/apps/security",    icon: <ShieldCheck size={15} />,    color: "from-red-500 to-rose-600"       },
     { name: "InfoFi",      to: "/apps/infofi",      icon: <Activity size={15} />,       color: "from-purple-500 to-indigo-600"  },
     { name: "Analytics",   to: "/apps/analytics",   icon: <BarChart3 size={15} />,      color: "from-cyan-500 to-sky-600"       },
     { name: "Wallets",     to: "/apps/wallets",     icon: <Wallet size={15} />,         color: "from-slate-500 to-gray-600"     },
-    { name: "Layer 2",     to: "/apps/l2",          icon: <Layers size={15} />,         color: "from-violet-500 to-indigo-600"  },
+    { name: "CEX",         to: "/apps/cex",         icon: <Coins size={15} />,          color: "from-yellow-400 to-orange-500"  },
     { name: "NFT",         to: "/apps/nft",         icon: <Image size={15} />,          color: "from-pink-500 to-fuchsia-600"   },
     { name: "Gaming",      to: "/apps/gaming",      icon: <Gamepad2 size={15} />,       color: "from-green-500 to-teal-600"     },
     { name: "Privacy",     to: "/apps/privacy",     icon: <Lock size={15} />,           color: "from-gray-500 to-zinc-600"      },

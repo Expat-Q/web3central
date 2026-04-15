@@ -2450,6 +2450,315 @@ module.exports = {
       popularWith: ["Traders", "Crypto Enthusiasts"],
       narrative: "Prediction Markets",
       narrativeDescription: "Hourly and daily predictions"
+    },
+    {
+      id: "kalshi",
+      name: "Kalshi",
+      url: "https://kalshi.com/x",
+      description: "Trade on anything: politics, sports, entertainment, crypto, weather, and so much more. For sports: ",
+      category: "predictions",
+      tags: ["Prediction Markets", "Real World Events"],
+      builder: {
+        name: "Kalshi",
+        handle: "@Kalshi",
+        twitter: "https://twitter.com/Kalshi"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      monthlyUsers: "New",
+      popularWith: ["Traders", "Event Forecasters"],
+      narrative: "Prediction Markets",
+      narrativeDescription: "Real world event predictions"
+    }
+  ],
+  gaming: [
+    {
+      id: "enb-blast",
+      name: "enb blast",
+      url: "https://blast.enb.fun/",
+      description: "play enb blast on base,top the table and win $ENB tokens.",
+      category: "gaming",
+      tags: ["Gaming", "Base", "Play-to-Earn"],
+      builder: {
+        name: "EverybNeedsBase",
+        handle: "@EverybNeedsBase",
+        twitter: "https://twitter.com/EverybNeedsBase"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      monthlyUsers: "New",
+      popularWith: ["Gamers", "Base Users"],
+      narrative: "Onchain Gaming",
+      narrativeDescription: "Play to earn on Base"
+    }
+  ],
+  rwa: [
+    {
+      id: "ondo-finance",
+      name: "Ondo Finance",
+      url: "https://ondo.finance",
+      description: "Institutional-grade DeFi products bridging traditional finance and decentralized markets.",
+      category: "rwa",
+      tags: ["Treasuries", "Yield", "Institutional"],
+      builder: { name: "Ondo Team", twitter: "https://twitter.com/OndoFinance" },
+      status: "active",
+      verified: true,
+      trending: true,
+      monthlyUsers: "15,000+",
+      popularWith: ["Institutional Investors", "Yield Seekers"]
+    },
+    {
+      id: "securitize",
+      name: "Securitize",
+      url: "https://securitize.io",
+      description: "End-to-end platform for tokenizing real-world assets like private equity and real estate.",
+      category: "rwa",
+      tags: ["Tokenization", "Compliance", "Assets"],
+      builder: { name: "Securitize", twitter: "https://twitter.com/Securitize" },
+      status: "active",
+      verified: true,
+      monthlyUsers: "25,000+",
+      popularWith: ["Asset Managers", "Regulated Investors"]
+    },
+    {
+      id: "centrifuge",
+      name: "Centrifuge",
+      url: "https://centrifuge.io",
+      description: "Institutional-grade decentralized protocol for tokenizing real-world assets into DeFi.",
+      category: "rwa",
+      tags: ["Credit", "Tokenization", "Pools"],
+      builder: { name: "Centrifuge", twitter: "https://twitter.com/centrifuge" },
+      status: "active",
+      verified: true,
+      monthlyUsers: "8,000+",
+      popularWith: ["Lenders", "Onchain Credit"]
+    },
+    {
+      id: "superstate",
+      name: "Superstate",
+      url: "https://superstate.co",
+      description: "Blockchain-native investment products for the modern financial system.",
+      category: "rwa",
+      tags: ["Funds", "Treasuries", "Governance"],
+      builder: { name: "Superstate", twitter: "https://twitter.com/superstate" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "openeden",
+      name: "OpenEden",
+      url: "https://openeden.com",
+      description: "Compliant on-chain treasury management through tokenized U.S. T-Bills.",
+      category: "rwa",
+      tags: ["T-Bills", "Treasury", "Yield"],
+      builder: { name: "OpenEden", twitter: "https://twitter.com/OpenEden" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "backed",
+      name: "Backed",
+      url: "https://backed.fi",
+      description: "Fully backed ERC-20 tokens tracking the value of stocks and ETFs.",
+      category: "rwa",
+      tags: ["Stocks", "ETFs", "Tokenized"],
+      builder: { name: "Backed", twitter: "https://twitter.com/backedfi" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "landshare",
+      name: "Landshare",
+      url: "https://landshare.io",
+      description: "Tokenized real estate platform bringing fractional property ownership to the blockchain.",
+      category: "rwa",
+      tags: ["Real Estate", "Fractional", "Yield"],
+      builder: { name: "Landshare", twitter: "https://twitter.com/LandshareIO" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "mountain-protocol",
+      name: "Mountain Protocol",
+      url: "https://mountainprotocol.com",
+      description: "Issuer of USDM, a yield-bearing stablecoin fully backed by U.S. Treasuries.",
+      category: "rwa",
+      tags: ["Stablecoin", "Yield-bearing", "Treasuries"],
+      builder: { name: "Mountain Protocol", twitter: "https://twitter.com/MountainUSDM" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "goldfinch",
+      name: "Goldfinch",
+      url: "https://goldfinch.finance",
+      description: "Decentralized credit protocol for emerging markets without crypto collateral.",
+      category: "rwa",
+      tags: ["Credit", "Uncollateralized", "Emerging Markets"],
+      builder: { name: "Goldfinch", twitter: "https://twitter.com/goldfinch_fi" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "maple-finance",
+      name: "Maple Finance",
+      url: "https://maple.finance",
+      description: "Institutional credit marketplace for undercollateralized lending.",
+      category: "rwa",
+      tags: ["Institutional", "Lending", "Credit"],
+      builder: { name: "Maple Finance", twitter: "https://twitter.com/maplefinance" },
+      status: "active",
+      verified: true
+    }
+  ],
+  defi: [
+    {
+      id: "aave",
+      name: "Aave",
+      url: "https://aave.com",
+      description: "Leading decentralized liquidity protocol for borrowing and lending assets.",
+      category: "defi",
+      tags: ["Lending", "Borrowing", "Liquidity"],
+      builder: { name: "Aave Labs", twitter: "https://twitter.com/aave" },
+      status: "active",
+      verified: true,
+      trending: true,
+      monthlyUsers: "150,000+",
+      popularWith: ["DeFi Natives", "Institutions"]
+    },
+    {
+      id: "morpho",
+      name: "Morpho",
+      url: "https://morpho.org",
+      description: "Peer-to-peer lending optimizer built on top of existing lending pools.",
+      category: "defi",
+      tags: ["Optimization", "P2P", "Lending"],
+      builder: { name: "Morpho Labs", twitter: "https://twitter.com/MorphoLabs" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "sky-maker",
+      name: "Sky (Maker)",
+      url: "https://sky.money",
+      description: "Decentralized protocol behind the DAI and USDS stablecoins.",
+      category: "defi",
+      tags: ["Stablecoin", "DAI", "CDP"],
+      builder: { name: "Sky Ecosystem", twitter: "https://twitter.com/SkyEcosystem" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "compound",
+      name: "Compound",
+      url: "https://compound.finance",
+      description: "Algorithmic, autonomous interest rate protocol for lending and borrowing.",
+      category: "defi",
+      tags: ["Lending", "Interest Rate", "DAO"],
+      builder: { name: "Compound Labs", twitter: "https://twitter.com/compoundfinance" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "ethena",
+      name: "Ethena",
+      url: "https://ethena.fi",
+      description: "Synthetic dollar protocol providing a crypto-native, yield-bearing alternative to fiat.",
+      category: "defi",
+      tags: ["Synthetic Dollar", "Yield", "Delta-Neutral"],
+      builder: { name: "Ethena Labs", twitter: "https://twitter.com/ethena_labs" },
+      status: "active",
+      verified: true,
+      trending: true
+    },
+    {
+      id: "yearn-finance",
+      name: "Yearn Finance",
+      url: "https://yearn.fi",
+      description: "DeFi yield optimizer that automates the pursuit of the best yield strategies.",
+      category: "defi",
+      tags: ["Yield", "Optimizer", "Vaults"],
+      builder: { name: "Yearn DAO", twitter: "https://twitter.com/iearnfinance" },
+      status: "active",
+      verified: true
+    },
+    {
+      id: "pendle-finance",
+      name: "Pendle Finance",
+      url: "https://pendle.finance",
+      description: "Yield-trading protocol that allows for the separation of principal and yield.",
+      category: "defi",
+      tags: ["Yield Trading", "LSD", "Fixed Income"],
+      builder: { name: "Pendle Team", twitter: "https://twitter.com/pendle_fi" },
+      status: "active",
+      verified: true,
+      trending: true
+    },
+    {
+      id: "moonwell",
+      name: "Moonwell",
+      url: "https://moonwell.fi",
+      description: "Open lending and borrowing protocol on Base and Moonbeam.",
+      category: "defi",
+      tags: ["Lending", "Base", "Moonbeam"],
+      builder: { name: "Moonwell Team", twitter: "https://twitter.com/Lunar_Strategy" },
+      status: "active",
+      verified: true
+    }
+  ],
+  security: [
+    {
+      id: "3dns",
+      name: "3DNS",
+      url: "https://3dns.box",
+      description: "The first decentralized domain name registrar for Web3 and beyond.",
+      category: "security",
+      tags: ["Domains", "DNS", "Infrastructure"],
+      builder: { name: "3DNS Team", twitter: "https://twitter.com/3dns_official" },
+      status: "active",
+      verified: true
+    }
+  ],
+  gaming: [
+    {
+      id: "treasure",
+      name: "Treasure",
+      url: "https://treasure.lol",
+      description: "Decentralized gaming ecosystem on Arbitrum connecting players and metaverses.",
+      category: "gaming",
+      tags: ["Ecosystem", "Arbitrum", "NFT"],
+      builder: { name: "Treasure DAO", twitter: "https://twitter.com/Treasure_DAO" },
+      status: "active",
+      verified: true,
+      trending: true
+    },
+    {
+      id: "ai-arena",
+      name: "AI Arena",
+      url: "https://aiarena.io",
+      description: "Competitive gaming platform powered by AI-integrated characters.",
+      category: "gaming",
+      tags: ["AI", "Competitive", "PvP"],
+      builder: { name: "ArenaX Lab", twitter: "https://twitter.com/aiarena_" },
+      status: "active",
+      verified: true
+    }
+  ],
+  nft: [
+    {
+      id: "element-market",
+      name: "Element Market",
+      url: "https://element.market",
+      description: "Multi-chain NFT marketplace aggregator with community-driven rewards.",
+      category: "nft",
+      tags: ["Marketplace", "Aggregator", "Multi-chain"],
+      builder: { name: "Element Team", twitter: "https://twitter.com/Element_Market" },
+      status: "active",
+      verified: true
     }
   ]
 };

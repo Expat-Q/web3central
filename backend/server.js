@@ -202,17 +202,10 @@ app.use((err, req, res, next) => {
 });
 
 // --------------- Background Workers ---------------
+const { startCronJobs } = require('./services/cronService');
 
-// DeFiLlama Sync Worker (Every 6 hours)
-const SYNC_INTERVAL = 6 * 60 * 60 * 1000;
-setInterval(async () => {
-  try {
-    await fetchLlamaData();
-  } catch (err) {
-    logger.error('Scheduled DeFiLlama sync failed', { error: err });
-    incrementError('transaction');
-  }
-}, SYNC_INTERVAL);
+// Start hourly background sync
+startCronJobs();
 
 // Initial Sync on Boot
 setTimeout(async () => {

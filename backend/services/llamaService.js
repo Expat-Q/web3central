@@ -187,6 +187,8 @@ const GECKO_MAP = {
     'frax': 'frax-share',
 };
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
  * Fetch token prices, mcap, and fdv from CoinGecko markets API for a batch of gecko IDs.
  * Returns a Map of geckoId -> { price, mcap, fdv }.
@@ -194,25 +196,39 @@ const GECKO_MAP = {
 const fetchTokenPrices = async (geckoIds) => {
     if (!geckoIds.length) return new Map();
     const prices = new Map();
-    try {
-        // Batch in groups of 50 to avoid URL length limits
-        const batchSize = 50;
-        for (let i = 0; i < geckoIds.length; i += batchSize) {
-            const batch = geckoIds.slice(i, i + batchSize);
-            const { data } = await axios.get(
-                `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${batch.join(',')}`,
-                { timeout: 15000 }
-            );
-            for (const coin of data) {
-                prices.set(coin.id, {
-                    price: coin.current_price || 0,
-                    mcap: coin.market_cap || 0,
-                    fdv: coin.fully_diluted_valuation || 0,
-                });
+    
+    // Batch in groups of 50 to avoid URL length limits
+    const batchSize = 50;
+    for (let i = 0; i < geckoIds.length; i += batchSize) {
+        const batch = geckoIds.slice(i, i + batchSize);
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                const { data } = await axios.get(
+                    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${batch.join(',')}`,
+                    { timeout: 15000 }
+                );
+                for (const coin of data) {
+                    prices.set(coin.id, {
+                        price: coin.current_price || 0,
+                        mcap: coin.market_cap || 0,
+                        fdv: coin.fully_diluted_valuation || 0,
+                    });
+                }
+                break; // success
+            } catch (err) {
+                retries--;
+                console.warn(`Token price fetch failed for batch (retries left: ${retries}):`, err.message);
+                if (retries === 0) break;
+                // Rate limit (429) implies CoinGecko is throttling
+                const isRateLimit = err.response && err.response.status === 429;
+                await delay(isRateLimit ? 5000 : 2000);
             }
         }
-    } catch (err) {
-        console.warn('Token price fetch failed:', err.message);
+        // Always delay 2s between normal batches
+        if (i + batchSize < geckoIds.length) {
+            await delay(2000);
+        }
     }
     return prices;
 };
@@ -257,20 +273,25 @@ const fetchDexVolumes = async () => {
  */
 const findAndAggregate = (tool, protocols) => {
     const config = PARENT_MAP[tool.id];
-    if (!config) return null;
-
     let matchedProtocols = [];
 
-    if (config.parent) {
-        // Get ALL children of this parent protocol
-        matchedProtocols = protocols.filter(p => p.parentProtocol === config.parent);
-    }
+    if (!config) {
+        const p = protocols.find(p => p.slug === tool.id || (tool.llamaSlug && p.slug === tool.llamaSlug));
+        if (p) matchedProtocols = [p];
+        else return null;
+    } else {
 
-    if (matchedProtocols.length === 0 && config.slugs) {
-        // Fall back to explicit slugs
-        matchedProtocols = config.slugs
-            .map(slug => protocols.find(p => p.slug === slug))
-            .filter(Boolean);
+        if (config.parent) {
+            // Get ALL children of this parent protocol
+            matchedProtocols = protocols.filter(p => p.parentProtocol === config.parent);
+        }
+
+        if (matchedProtocols.length === 0 && config.slugs) {
+            // Fall back to explicit slugs
+            matchedProtocols = config.slugs
+                .map(slug => protocols.find(p => p.slug === slug))
+                .filter(Boolean);
+        }
     }
 
     if (matchedProtocols.length === 0) return null;
@@ -304,7 +325,7 @@ const findAndAggregate = (tool, protocols) => {
         change1d,
         change7d,
         chains: [...allChains],
-        parentId: config.parent,
+        parentId: config ? config.parent : matchedProtocols[0]?.parentProtocol,
         primarySlug: matchedProtocols[0]?.slug
     };
 };
@@ -335,7 +356,7 @@ const fetchLlamaData = async () => {
             const result = findAndAggregate(tool, llamaProtocols);
             if (result) {
                 // Determine gecko_id from GECKO_MAP (most reliable)
-                const geckoId = GECKO_MAP[tool.id] || null;
+                const geckoId = GECKO_MAP[tool.id] || tool.geckoId || tool.id || null;
                 if (geckoId) geckoIdsToFetch.add(geckoId);
 
                 matchedPairs.push({ tool, result, geckoId });
