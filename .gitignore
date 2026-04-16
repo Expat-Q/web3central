@@ -37,12 +37,28 @@ all_slugs.txt
 coins_response*.txt
 gecko_response*.txt
 gecko_markets.txt
+push_output.txt
 parent_*.txt
 verify_results.txt
 seed.log
 seed_error.json
 backend.log
 backend/server_error.log
+backend/*.txt
+!backend/.env.example
+
+# ── Internal Planning & Scratch Scripts ───────────────────────────────────────
+mvp.md
+apps-category.md
+inspect-data.js
+list-categories.js
+backend/scratch*.js
+backend/migration_dry_run.txt
+backend/fixThumbnails.js
+backend/insertBounties.js
+backend/seed*.js
+backend/updateBounties.js
+backend/test_mongoose.js
 
 # ── Debug logs ────────────────────────────────────────────────────────────────
 npm-debug.log*
