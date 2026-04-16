@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info, Landmark, Globe, ShieldCheck, User, Tag, Coins, Users, Star, MessageSquare } from 'lucide-react';
+import { X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info, Landmark, Globe, ShieldCheck, User, Tag, Coins, Users, Star, MessageSquare, Twitter } from 'lucide-react';
 import ToolLogo from './ToolLogo';
 
 const metricsCache = new Map();
@@ -381,6 +381,14 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
 
                     <div className="border-t border-gray-100 pt-2">
                       <DetailRow icon={<Globe size={14} />} label="Website" value={protocol?.url?.replace(/^https?:\/\//, '')} href={protocol?.url} />
+                      {(protocol?.builder?.twitter || protocol?.twitter) && (
+                        <DetailRow 
+                          icon={<Twitter size={14} />} 
+                          label="X Profile" 
+                          value={protocol?.builder?.handle || (protocol?.builder?.twitter || protocol?.twitter)?.split('/').pop()?.split('?')[0]} 
+                          href={protocol?.builder?.twitter || protocol?.twitter} 
+                        />
+                      )}
                       <DetailRow icon={<Tag size={14} />} label="Category" value={protocol?.category} />
                       <DetailRow icon={<User size={14} />} label="Builder" value={protocol?.builder?.name || protocol?.builder?.handle} />
                       {protocol?.verified && (
