@@ -20,6 +20,14 @@ const RatingSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    developerReply: {
+        type: String,
+        default: null
+    },
+    developerRepliedAt: {
+        type: Date,
+        default: null
     }
 });
 

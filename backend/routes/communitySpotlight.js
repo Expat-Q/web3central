@@ -29,14 +29,11 @@ const projectUpdateSchema = {
 // GET community spotlight
 router.get('/', async (req, res) => {
   try {
-    // Assuming we only have one spotlight document. 
-    // If not exists, we should probably create one or return null?
-    // The seed script created one.
-    const spotlight = await Spotlight.findOne();
-    if (!spotlight) {
+    const spotlights = await Spotlight.find();
+    if (!spotlights || spotlights.length === 0) {
       return res.status(404).json({ error: 'Spotlight data not found' });
     }
-    res.json(spotlight);
+    res.json(spotlights);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });

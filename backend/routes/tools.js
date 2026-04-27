@@ -32,6 +32,184 @@ router.post('/sync', protect, admin, async (req, res) => {
   }
 });
 
+// @desc    Increment click count for a tool (fire-and-forget analytics)
+// @route   POST /api/tools/:id/click
+// @access  Public
+router.post('/:id/click', async (req, res) => {
+  try {
+    const tool = await Tool.findOneAndUpdate(
+      { id: req.params.id },
+      { $inc: { clickCount: 1 } },
+      { new: true, select: 'id clickCount' }
+    );
+    if (!tool) return res.status(404).json({ success: false });
+    res.json({ success: true, clickCount: tool.clickCount });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// @desc    Full-text search across tools
+// @route   GET /api/tools/search?q=
+// @access  Public
+router.get('/search', async (req, res) => {
+  try {
+    const { q = '' } = req.query;
+    if (!q.trim()) return res.json([]);
+
+    const regex = new RegExp(q.trim(), 'i');
+    const tools = await Tool.find({
+      status: { $ne: 'rejected' },
+      $or: [
+        { name: regex },
+        { description: regex },
+        { category: regex },
+        { tags: { $elemMatch: { $regex: regex } } }
+      ]
+    })
+      .sort({ weeklyTrendScore: -1, clickCount: -1 })
+      .limit(20)
+      .lean();
+
+    res.json(tools.map(decorateToolWithLogo));
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// @desc    Get top 5 apps per category (for Home page Top Charts tabs)
+// @route   GET /api/tools/top-charts
+// @access  Public
+router.get('/top-charts', async (req, res) => {
+  try {
+    const tools = await Tool.find({ status: 'active' })
+      .sort({ weeklyTrendScore: -1, clickCount: -1 })
+      .lean();
+
+    const grouped = tools.reduce((acc, tool) => {
+      const cat = tool.category || 'other';
+      if (!acc[cat]) acc[cat] = [];
+      if (acc[cat].length < 5) acc[cat].push(decorateToolWithLogo(tool));
+      return acc;
+    }, {});
+
+    res.json({ success: true, data: grouped });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @desc    Get trending tools platform-wide
+// @route   GET /api/tools/trending
+// @access  Public
+router.get('/trending', async (req, res) => {
+  try {
+    const tools = await Tool.find({ status: 'active' })
+      .sort({ weeklyTrendScore: -1, clickCount: -1 })
+      .limit(10)
+      .lean();
+    res.json({ success: true, data: tools.map(decorateToolWithLogo) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @desc    Developer claims ownership of a tool (pending admin approval)
+// @route   POST /api/tools/:id/claim
+// @access  Private
+router.post('/:id/claim', protect, async (req, res) => {
+  try {
+    const tool = await Tool.findOne({ id: req.params.id });
+    if (!tool) return res.status(404).json({ error: 'App not found' });
+    if (tool.developerClaimedBy) return res.status(400).json({ error: 'This app has already been claimed.' });
+
+    tool.developerClaimPending = true;
+    await tool.save();
+
+    // Email admin for approval
+    try {
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+        });
+        await transporter.sendMail({
+          from: `"Web3Central" <${process.env.SMTP_USER}>`,
+          to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
+          subject: `🏷️ Developer Claim Request: ${tool.name}`,
+          html: `<p>User <strong>${req.user.name}</strong> (${req.user.email}) has requested to claim <strong>${tool.name}</strong>.</p><p>Please review and approve in the Admin panel.</p>`
+        });
+      }
+    } catch (e) { /* silent */ }
+
+    res.json({ success: true, message: 'Claim request submitted. Our team will verify and approve within 24h.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// @desc    Get developer dashboard analytics for authenticated user
+// @route   GET /api/tools/developer/dashboard
+// @access  Private
+router.get('/developer/dashboard', protect, async (req, res) => {
+  try {
+    const Rating = require('../models/Rating');
+    // Tools submitted by OR claimed by this user
+    const tools = await Tool.find({
+      $or: [
+        { submitter: req.user.id },
+        { developerClaimedBy: req.user.id }
+      ]
+    }).lean();
+
+    const toolIds = tools.map(t => t.id);
+
+    // Fetch all ratings for their tools
+    const ratings = await Rating.find({ tool: { $in: toolIds } })
+      .populate('user', 'name avatarUrl')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Attach ratings summary to each tool
+    const enriched = tools.map(tool => {
+      const toolRatings = ratings.filter(r => r.tool === tool.id);
+      const avgRating = toolRatings.length
+        ? (toolRatings.reduce((s, r) => s + r.score, 0) / toolRatings.length).toFixed(1)
+        : null;
+      return {
+        ...decorateToolWithLogo(tool),
+        ratingCount: toolRatings.length,
+        averageRating: avgRating ? parseFloat(avgRating) : null,
+      };
+    });
+
+    res.json({ success: true, tools: enriched, ratings });
+  } catch (err) {
+    console.error('Developer dashboard error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// @desc    Admin approves a developer claim
+// @route   PUT /api/tools/:id/claim/approve
+// @access  Private/Admin
+router.put('/:id/claim/approve', protect, admin, async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const tool = await Tool.findOneAndUpdate(
+      { id: req.params.id },
+      { developerClaimedBy: userId, developerClaimPending: false },
+      { new: true }
+    );
+    if (!tool) return res.status(404).json({ error: 'Tool not found' });
+    res.json({ success: true, tool });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET all tools
 // When returning all tools, we need to reconstruct the category-based object structure
 // expected by the frontend (e.g. { category1: [tools], category2: [tools] })

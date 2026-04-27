@@ -153,7 +153,7 @@ export default function LessonDetail() {
                 style={{ width: `${scrollProgress * 100}%` }}
             />
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-24">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-24">
 
                 {/* ── Back nav ── */}
                 <button

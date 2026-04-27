@@ -14,24 +14,19 @@ import {
 const ADMIN_PASSWORD = '213478';
 
 const CATEGORIES = [
-  { id: 'dex',             name: 'Trading — DEX' },
-  { id: 'web3Chat',        name: 'Trading — Perpetuals' },
-  { id: 'defi',            name: 'DeFi' },
-  { id: 'staking',         name: 'Staking' },
-  { id: 'interoperability',name: 'Bridges' },
-  { id: 'security',        name: 'Security' },
-  { id: 'analytics',       name: 'Analytics' },
-  { id: 'wallets',         name: 'Wallets' },
-  { id: 'l2',              name: 'Layer 2' },
-  { id: 'nft',             name: 'NFT' },
-  { id: 'gaming',          name: 'Gaming' },
-  { id: 'privacy',         name: 'Privacy' },
-  { id: 'predictions',     name: 'Predictions' },
-  { id: 'communityTools',  name: 'Community Tools' },
-  { id: 'bountyHub',       name: 'Bounty Hub' },
-  { id: 'rwa',             name: 'RWA' },
-  { id: 'onchainAutonomy', name: 'Onchain Autonomy' },
-  { id: 'researchFiles',   name: 'Research Platforms' },
+  { id: "trading", name: "Trading / DEX / Perps" },
+  { id: "defi", name: "DeFi (Lending / Yield)" },
+  { id: "bridges", name: "Bridges & Cross-chain" },
+  { id: "wallets", name: "Wallets" },
+  { id: "security", name: "Security" },
+  { id: "analytics", name: "Analytics" },
+  { id: "nft", name: "NFT" },
+  { id: "gaming", name: "Gaming / GameFi" },
+  { id: "community", name: "Community & DAO" },
+  { id: "rwa", name: "Real World Assets (RWA)" },
+  { id: "cex", name: "Centralized Exchanges (CEX)" },
+  { id: "privacy", name: "Privacy" },
+  { id: "predictions", name: "Prediction Markets" },
 ];
 
 export default function Admin() {
@@ -41,6 +36,7 @@ export default function Admin() {
   const [passwordError, setPasswordError] = useState('');
 
   // Dashboard State
+  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [toolsList, setToolsList] = useState([]);
   const [spotlightData, setSpotlightData] = useState(null);
@@ -285,7 +281,7 @@ export default function Admin() {
   // ── PASSWORD GATE ──
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 pt-20">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 pt-16">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -339,7 +335,7 @@ export default function Admin() {
 
   // ── DASHBOARD ──
   return (
-    <div className="min-h-screen bg-slate-50 pt-28 pb-12">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
@@ -357,41 +353,76 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Dashboard Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Users size={28} />
-            </div>
-            <div>
-              <p className="text-slate-500 font-medium text-sm">Registered Users</p>
-              <h3 className="text-3xl font-black text-slate-900">{stats?.users || 0}</h3>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Database size={28} />
-            </div>
-            <div>
-              <p className="text-slate-500 font-medium text-sm">Active Tools</p>
-              <h3 className="text-3xl font-black text-slate-900">{stats?.activeTools || 0}</h3>
-            </div>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Activity size={28} />
-            </div>
-            <div>
-              <p className="text-slate-500 font-medium text-sm">Pending Submissions</p>
-              <h3 className="text-3xl font-black text-slate-900">{stats?.pendingTools || 0}</h3>
-            </div>
-          </motion.div>
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap items-center gap-2 mb-8 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+          {[
+            { id: 'overview', label: 'Overview' },
+            { id: 'tools', label: 'Manage Tools', count: activeTools.length },
+            { id: 'pending', label: 'Pending Reviews', count: pendingTools.length, highlight: pendingTools.length > 0 },
+            { id: 'content', label: 'Content Engine' },
+            { id: 'spotlight', label: 'Builder Spotlight' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+                activeTab === tab.id
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {tab.label}
+              {tab.count !== undefined && (
+                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.id 
+                    ? 'bg-white/20 text-white' 
+                    : tab.highlight ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700'
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Tool Management + Add Tool */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* ── OVERVIEW TAB ── */}
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Users size={28} />
+              </div>
+              <div>
+                <p className="text-slate-500 font-medium text-sm">Registered Users</p>
+                <h3 className="text-3xl font-black text-slate-900">{stats?.users || 0}</h3>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <Database size={28} />
+              </div>
+              <div>
+                <p className="text-slate-500 font-medium text-sm">Active Tools</p>
+                <h3 className="text-3xl font-black text-slate-900">{stats?.activeTools || 0}</h3>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Activity size={28} />
+              </div>
+              <div>
+                <p className="text-slate-500 font-medium text-sm">Pending Submissions</p>
+                <h3 className="text-3xl font-black text-slate-900">{stats?.pendingTools || 0}</h3>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* ── MANAGE TOOLS TAB ── */}
+        {activeTab === 'tools' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
           {/* Existing Tools List */}
           <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-[600px]">
@@ -596,9 +627,11 @@ export default function Admin() {
             </form>
           </div>
         </div>
+        )}
 
-        {/* Pending Submissions */}
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-8">
+        {/* ── PENDING REVIEWS TAB ── */}
+        {activeTab === 'pending' && (
+          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-8">
           <div className="p-6 border-b border-slate-100 bg-amber-50/50 flex justify-between items-center shrink-0">
             <h2 className="text-xl font-bold text-amber-900 flex items-center gap-2">
               <Activity size={20} className="text-amber-600" />
@@ -749,9 +782,13 @@ export default function Admin() {
             )}
           </div>
         </div>
+        )}
 
-        {/* Crypto News Content Engine */}
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+        {/* ── CONTENT ENGINE TAB ── */}
+        {activeTab === 'content' && (
+          <div className="space-y-8">
+            {/* Crypto News Content Engine */}
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
           <div className="p-6 border-b border-slate-100 bg-slate-900 flex justify-between items-center">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Database size={20} className="text-indigo-400" />
@@ -860,9 +897,12 @@ export default function Admin() {
             </form>
           </div>
         </div>
+        </div>
+        )}
 
-        {/* ── Builder Spotlight Manager ── */}
-        <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
+        {/* ── BUILDER SPOTLIGHT TAB ── */}
+        {activeTab === 'spotlight' && (
+          <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white">
               <Users size={18} />
@@ -971,6 +1011,7 @@ export default function Admin() {
             })()}
           </div>
         </div>
+        )}
 
       </div>
     </div>

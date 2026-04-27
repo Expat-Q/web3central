@@ -81,6 +81,29 @@ const ToolSchema = new mongoose.Schema({
         pool2: Number,
         chains: [String],
         lastUpdated: { type: Date, default: Date.now }
+    },
+    // --- Developer Dashboard & Analytics Fields ---
+    clickCount: {
+        type: Number,
+        default: 0
+    },
+    weeklyTrendScore: {
+        type: Number,
+        default: 0
+    },
+    securityLevel: {
+        type: String,
+        enum: ['unaudited', 'community', 'audited', 'verified'],
+        default: 'unaudited'
+    },
+    developerClaimedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
+    developerClaimPending: {
+        type: Boolean,
+        default: false
     }
 });
 

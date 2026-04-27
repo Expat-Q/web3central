@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link, useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SafeLink from "../../components/SafeLink";
 import Rating from "../../components/Rating";
@@ -90,7 +90,7 @@ const CATEGORY_META = {
   security:    { title: 'Security',           desc: 'Wallet protection and scam prevention', color: 'red',     comingSoon: false },
   analytics:   { title: 'Analytics',          desc: 'Onchain data and portfolio tracking', color: 'cyan',    comingSoon: false },
   wallets:     { title: 'Wallets',            desc: 'Wallet tools and infrastructure',    color: 'slate',   comingSoon: false },
-  cex:         { title: 'Centralized Exchanges', desc: 'Fiat on-ramps and multi-asset trading venues', color: 'yellow', comingSoon: true },
+  cex:         { title: 'Centralized Exchanges', desc: 'Fiat on-ramps and multi-asset trading venues', color: 'yellow' },
   gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: false },
   privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: false  },
   predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: false  },
@@ -116,6 +116,7 @@ const heroImages = {
 
 export default function CategoryPage({ categoryKey: propCategoryKey, title: propTitle, description: propDescription }) {
   const params = useParams();
+  const location = useLocation();
   const categoryKey = propCategoryKey || params.categoryKey;
   const meta = CATEGORY_META[categoryKey] || {};
   const title = propTitle || meta.title || categoryKey;
@@ -199,6 +200,37 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       }, 800);
     }
   }, [searchParams, loading, data.length]);
+
+  // ── Auto-open MetricsPanel when navigated from Home ──
+  useEffect(() => {
+    const id = location.state?.openToolId;
+    if (id && !loading && data.length > 0) {
+      const match = data.find(t => (t.id || t._id) === id || String(t.id) === String(id) || String(t._id) === String(id));
+      if (match) {
+        setSelectedMetricsProtocol({
+          id: match.id || match._id,
+          slug: match.llamaSlug || match.slug || match.id,
+          name: match.name,
+          description: match.description,
+          logoUrl: match.logoUrl,
+          logo: match.logo,
+          url: match.url,
+          twitter: match.twitter,
+          builder: match.builder,
+          category: match.category,
+          verified: match.verified,
+          metrics: match.metrics,
+          geckoId: match.geckoId,
+          monthlyUsers: match.monthlyUsers,
+          reviews: match.reviews,
+          rating: match.averageRating || match.rating,
+          ratingCount: match.ratingCount,
+        });
+        // Clear state so refresh doesn't re-open
+        window.history.replaceState({}, '');
+      }
+    }
+  }, [location.state, loading, data]);
 
   // ── App Store derived data ──
   const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all';
@@ -416,7 +448,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="min-h-screen bg-white pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
         </div>
@@ -430,7 +462,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     return (
       <div className="min-h-screen bg-white flex flex-col">
         {/* Header */}
-        <div className="pt-20 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="pt-16 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
           <div className="flex items-center gap-3">
             <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
               <ChevronLeft size={18} />
@@ -558,7 +590,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     <div className="bg-white min-h-screen text-gray-900">
 
       {/* ── Section 1: Header ── */}
-      <div className="pt-20 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="pt-16 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">

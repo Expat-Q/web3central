@@ -29,7 +29,7 @@ export default function NewsArticle() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-16">
         <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
@@ -37,7 +37,7 @@ export default function NewsArticle() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20 px-4">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-16 px-4">
         <div className="text-6xl mb-4">📰</div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Article Not Found</h2>
         <p className="text-slate-500 mb-6">{error}</p>

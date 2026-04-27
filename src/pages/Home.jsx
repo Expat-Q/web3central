@@ -1,493 +1,590 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Link } from "react-router-dom";
-import { fetchToolsData, fetchCommunitySpotlight, fetchStatsOverview, fetchLatestNews } from "../services/apiService";
-import { Star, ExternalLink, ChevronRight, Zap, Sparkles } from "lucide-react";
-import BuilderSpotlightCard from "../components/BuilderSpotlightCard";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchToolsData, fetchLatestNews, fetchCommunitySpotlight } from "../services/apiService";
+import {
+  Star, ExternalLink, ChevronRight, Search, X,
+  TrendingUp, Sparkles, ArrowLeftRight, Landmark,
+  Share2, Wallet, ShieldCheck, BarChart3, Users
+} from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
 import NewsCard from "../components/NewsCard";
+import CategorySidebar from "../components/CategorySidebar";
 import { PageSkeleton } from "../components/Skeleton";
 
-/* ── Animated Number Counter ── */
-const AnimatedCounter = ({ value, duration = 2, prefix = "", suffix = "" }) => {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
 
-  useEffect(() => {
-    if (isInView) {
-      let start = 0;
-      const end = parseInt(value, 10);
-      if (start === end) return;
-      const totalMilSecDur = parseInt(duration);
-      const incrementTime = (totalMilSecDur / end) * 1000;
-      const timer = setInterval(() => {
-        start += 1;
-        setCount(String(start));
-        if (start === end) clearInterval(timer);
-      }, incrementTime);
-      return () => clearInterval(timer);
-    }
-  }, [value, duration, isInView]);
-
-  return <span ref={ref}>{prefix}{count}{suffix}</span>;
+const CATEGORY_TO_ROUTE = {
+  dex: "trading", trading: "trading", perps: "trading",
+  interoperability: "bridges", bridge: "bridges", bridges: "bridges",
+  defi: "defi", nft: "nft", gaming: "gaming", wallets: "wallets",
+  wallet: "wallets", security: "security", analytics: "analytics",
+  community: "community", rwa: "rwa", cex: "cex", privacy: "privacy",
+  predictions: "predictions",
 };
 
-/* ── Material Symbol helper ── */
-const Icon = ({ name, size = 22 }) => (
-  <span
-    className="material-symbols-rounded"
-    style={{ fontSize: size, fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
-  >
-    {name}
-  </span>
+const norm = (cat = "") => cat.toLowerCase().replace(/[^a-z0-9]/g, "");
+const getCategoryRoute = (cat = "") => CATEGORY_TO_ROUTE[norm(cat)] || norm(cat) || "trading";
+
+/* ── Trending score: clicks + ratings + weeklyTrend ── */
+const trendScore = (t) =>
+  (t.weeklyTrendScore || 0) * 1.5 +
+  (t.clickCount || 0) * 0.5 +
+  (t.averageRating || t.rating || 0) * 10;
+
+/* ── Section Header ── */
+const SectionHeader = ({ icon: Icon, iconColor = "text-purple-600", title, subtitle, to }) => (
+  <div className="flex items-end justify-between mb-4">
+    <div>
+      <div className="flex items-center gap-2 mb-0.5">
+        {Icon && <Icon size={18} className={iconColor} />}
+        <h2 className="text-base font-black text-gray-900 tracking-tight">{title}</h2>
+      </div>
+      {subtitle && <p className="text-xs text-gray-400 pl-[26px]">{subtitle}</p>}
+    </div>
+    {to && (
+      <Link to={to} className="text-xs font-bold text-purple-600 hover:text-purple-500 flex items-center gap-1 transition-colors shrink-0">
+        See all <ChevronRight size={13} />
+      </Link>
+    )}
+  </div>
 );
 
-/* ── Category chip config ── */
-const CATEGORIES = [
-  { label: "Trading",     icon: "currency_exchange",      path: "/apps/trading",     bg: "bg-purple-50",  text: "text-purple-700", border: "border-purple-200", hoverBg: "hover:bg-purple-100" },
-  { label: "Bridges",     icon: "share",                  path: "/apps/bridges",     bg: "bg-blue-50",    text: "text-blue-700",   border: "border-blue-200",   hoverBg: "hover:bg-blue-100"   },
-  { label: "DeFi",        icon: "account_balance",        path: "/apps/defi",        bg: "bg-emerald-50", text: "text-emerald-700",border: "border-emerald-200",hoverBg: "hover:bg-emerald-100"},
-  { label: "Security",    icon: "shield",                 path: "/apps/security",    bg: "bg-red-50",     text: "text-red-700",    border: "border-red-200",    hoverBg: "hover:bg-red-100"    },
-  { label: "Analytics",   icon: "bar_chart",              path: "/apps/analytics",   bg: "bg-cyan-50",    text: "text-cyan-700",   border: "border-cyan-200",   hoverBg: "hover:bg-cyan-100"   },
-  { label: "Wallets",     icon: "account_balance_wallet", path: "/apps/wallets",     bg: "bg-slate-50",   text: "text-slate-700",  border: "border-slate-200",  hoverBg: "hover:bg-slate-100"  },
-  { label: "Layer 2",     icon: "layers",                 path: "/apps/l2",          bg: "bg-violet-50",  text: "text-violet-700", border: "border-violet-200", hoverBg: "hover:bg-violet-100" },
-  { label: "NFT",         icon: "image",                  path: "/apps/nft",         bg: "bg-pink-50",    text: "text-pink-700",   border: "border-pink-200",   hoverBg: "hover:bg-pink-100"   },
-  { label: "Gaming",      icon: "sports_esports",         path: "/apps/gaming",      bg: "bg-green-50",   text: "text-green-700",  border: "border-green-200",  hoverBg: "hover:bg-green-100"  },
-  { label: "Privacy",     icon: "lock",                   path: "/apps/privacy",     bg: "bg-gray-50",    text: "text-gray-700",   border: "border-gray-200",   hoverBg: "hover:bg-gray-100"   },
-  { label: "Predictions", icon: "monitoring",             path: "/apps/predictions", bg: "bg-orange-50",  text: "text-orange-700", border: "border-orange-200", hoverBg: "hover:bg-orange-100" },
-  { label: "Community",   icon: "group",                  path: "/apps/community",   bg: "bg-teal-50",    text: "text-teal-700",   border: "border-teal-200",   hoverBg: "hover:bg-teal-100"   },
-];
+/* ── App Card (Play Store style) ── */
+const AppCard = ({ tool, onOpen }) => {
+  const rating = tool.averageRating || tool.rating || 0;
+  return (
+    <div
+      className="flex flex-col gap-2 cursor-pointer group w-40 shrink-0"
+      onClick={() => onOpen(tool)}
+    >
+      <div className="w-40 h-40 rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm group-hover:shadow-md group-hover:border-purple-100 transition-all">
+        <ToolLogo tool={tool} className="w-full h-full object-contain p-2" />
+      </div>
+      <div className="space-y-0.5 px-0.5">
+        <p className="text-[13px] font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">{tool.name}</p>
+        <p className="text-[11px] text-gray-400 capitalize truncate">{tool.category}</p>
+        {rating > 0 && (
+          <div className="flex items-center gap-1">
+            <Star size={10} className="text-yellow-400 fill-yellow-400" />
+            <span className="text-[11px] text-gray-500 font-semibold">{rating.toFixed(1)}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
+/* ── Horizontal Scroll Row ── */
+const HScrollRow = ({ children }) => (
+  <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+    {children}
+  </div>
+);
+
+/* ── Category Row Section ── */
+const CategorySection = ({ icon, iconColor, title, subtitle, to, tools, onOpen, sectionId }) => {
+  if (!tools.length) return null;
+  return (
+    <section id={sectionId}>
+      <SectionHeader icon={icon} iconColor={iconColor} title={title} subtitle={subtitle} to={to} />
+      <HScrollRow>
+        {tools.map(tool => (
+          <div key={tool._id || tool.id} className="snap-start shrink-0">
+            <AppCard tool={tool} onOpen={onOpen} />
+          </div>
+        ))}
+      </HScrollRow>
+    </section>
+  );
+};
+
+/* ══════════════════════════════════════════════════
+   HOME PAGE
+═══════════════════════════════════════════════════ */
 export default function Home() {
-  const [appsData, setAppsData] = useState(null);
-  const [communitySpotlight, setCommunitySpotlight] = useState(null);
-  const [platformStats, setPlatformStats] = useState(null);
+  const [allTools, setAllTools] = useState([]);
   const [newsFeed, setNewsFeed] = useState([]);
+  const [spotlight, setSpotlight] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [toolsLoading, setToolsLoading] = useState(true);
-  const [openFaq, setOpenFaq] = useState(null);
 
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("for-you");
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [spotlightList, setSpotlightList] = useState([]);
+
+  const navigate = useNavigate();
+
+  /* ── Data fetch ── */
   useEffect(() => {
-    const fetchCriticalData = async () => {
-      try {
-        setLoading(true);
-        const [spotlightData, statsData, newsData] = await Promise.all([
-          fetchCommunitySpotlight(),
-          fetchStatsOverview(),
-          fetchLatestNews()
-        ]);
-        setCommunitySpotlight(spotlightData);
-        setPlatformStats(statsData);
-        setNewsFeed(newsData);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchTools = async () => {
-      try {
-        setToolsLoading(true);
-        const toolsData = await fetchToolsData();
-        setAppsData(toolsData);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setToolsLoading(false);
-      }
-    };
-
-    fetchCriticalData();
-    fetchTools();
+    Promise.all([fetchToolsData(), fetchLatestNews(), fetchCommunitySpotlight()])
+      .then(([toolsData, newsData, spotlightData]) => {
+        const tools = Object.values(toolsData || {})
+          .filter(Array.isArray).flat()
+          .filter(t => t.status === "active" || !t.status);
+        setAllTools(tools);
+        setNewsFeed(newsData || []);
+        
+        // Handle spotlight data — supports both array and legacy single object
+        const raw = spotlightData;
+        let spotlights = [];
+        if (Array.isArray(raw)) {
+          spotlights = raw.map(r => r?.builderSpotlight).filter(Boolean);
+        } else if (raw?.builderSpotlight) {
+          spotlights = [raw.builderSpotlight];
+        } else if (raw?.[0]?.builderSpotlight) {
+          spotlights = raw.map(r => r?.builderSpotlight).filter(Boolean);
+        }
+        setSpotlightList(spotlights);
+        if (spotlights[0]) setSpotlight(spotlights[0]);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const allTools = appsData
-    ? Object.values(appsData).filter(Array.isArray).flat()
-    : [];
-  const activeToolsCount = platformStats?.activeTools || allTools.length || 0;
-  const inReviewCount = platformStats?.pendingTools || 0;
-  const communityToolsList = appsData?.communityTools || [];
-  const recentlyAdded = [...communityToolsList]
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 8);
+  /* ── Spotlight Carousel Interval ── */
+  useEffect(() => {
+    if (spotlightList.length <= 1) return;
+    const interval = setInterval(() => {
+      setSpotlightIndex(prev => {
+        const next = (prev + 1) % spotlightList.length;
+        setSpotlight(spotlightList[next]);
+        return next;
+      });
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [spotlightList]);
 
-  const activeTrendingTools = allTools.length
-    ? [...allTools]
-      .filter(t => t.status === 'active' || !t.status)
-      .sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0))
-      .slice(0, 6)
-    : [];
+  /* ── Featured Carousel Interval ── */
+  useEffect(() => {
+    const trendingList = allTools
+      .sort((a, b) => trendScore(b) - trendScore(a))
+      .filter((v, i, a) => a.findIndex(t => t.name === v.name) === i);
+      
+    if (trendingList.length === 0) return;
+    const maxItems = Math.min(trendingList.length, 5);
+    const interval = setInterval(() => {
+      setCurrentFeaturedIndex((prev) => (prev + 1) % maxItems);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [allTools]);
 
-  const bs = communitySpotlight?.[0]?.builderSpotlight || communitySpotlight?.builderSpotlight;
+  /* ── Debounced search ── */
+  useEffect(() => {
+    if (!query.trim()) { setSearchResults([]); setSearchOpen(false); return; }
+    const t = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const res = await fetch(`${API}/tools/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        setSearchResults(Array.isArray(data) ? data.slice(0, 8) : []);
+        setSearchOpen(true);
+      } catch { setSearchResults([]); }
+      finally { setSearchLoading(false); }
+    }, 280);
+    return () => clearTimeout(t);
+  }, [query]);
 
-  const faqs = [
-    { q: "What is Web3Central?", a: "Web3Central is a clean, professional hub for all things decentralized — from academy tracks to protocol comparisons." },
-    { q: "How do I start learning?", a: "Visit our Academy section to explore structured paths designed by industry experts." },
-    { q: "Is it free to use?", a: "Yes, Web3Central is an open resource for the community to explore and learn about Web3." },
-    { q: "How do I submit a tool?", a: "Click 'Submit Tool' in the nav — our team reviews and lists verified tools within 48 hours." },
-  ];
+  useEffect(() => {
+    const h = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
-  const marqueeContent = (tools) => (
-    <>
-      {tools.map((t, i) => (
-        <span key={i} className="flex items-center gap-2 shrink-0">
-          <span className="text-purple-600 font-bold text-xs tracking-widest uppercase">NEW APP LISTED</span>
-          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shrink-0" />
-          <Link to={`/apps/${t.category}`} className="text-gray-600 hover:text-purple-600 transition-colors text-xs font-medium">
-            {t.name || t.title}
-          </Link>
-          <span className="mx-6 text-gray-200">|</span>
-        </span>
-      ))}
-    </>
-  );
+  /* ── Open tool → navigate to category page + open MetricsPanel ── */
+  const openTool = (tool) => {
+    const route = getCategoryRoute(tool.category);
+    navigate(`/apps/${route}`, {
+      state: { openToolId: tool.id || tool._id }
+    });
+  };
 
-  if (loading) {
-    return <PageSkeleton />;
-  }
+  /* ── Derived data ── */
+  const byCats = (cats) =>
+    allTools.filter(t => cats.includes(norm(t.category))).sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
 
+  const trending    = [...allTools].sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
+  const newArrivals = [...allTools].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 12);
+  const tradingApps  = byCats(["trading", "dex", "perps"]);
+  const defiApps     = byCats(["defi"]);
+  const bridgesApps  = byCats(["bridges", "interoperability", "bridge"]);
+  const walletsApps  = byCats(["wallets", "wallet"]);
+  const securityApps = byCats(["security"]);
+
+  if (loading) return <PageSkeleton />;
 
   return (
-    <div className="bg-white min-h-screen overflow-x-hidden text-gray-900">
-      {/* Spacer for fixed navbar */}
-      <div className="h-20" />
+    <div className="bg-[#FAFAFA] min-h-screen text-gray-900 flex">
 
-      {/* ── Marquee Ticker ── */}
-      {recentlyAdded.length > 0 && (
-        <div className="w-full bg-purple-50 border-b border-purple-100 overflow-hidden flex py-2">
+      {/* ── Desktop Sidebar (full height from top-0) ── */}
+      <CategorySidebar
+        activeSection={activeSection}
+        onSelect={setActiveSection}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* ── Scrollable content column ── */}
+      <div className="flex-1 min-w-0">
+      {/* Spacer for fixed navbar */}
+      <div className="h-16" />
+
+      {/* ── New arrivals ticker ── */}
+      {newArrivals.length > 0 && (
+        <div className="w-full bg-purple-50 border-b border-purple-100 overflow-hidden flex py-1.5">
           <div className="whitespace-nowrap flex items-center gap-4 animate-marquee">
-            {marqueeContent(recentlyAdded)}
-            <span aria-hidden="true" className="flex items-center gap-4">{marqueeContent(recentlyAdded)}</span>
+            {[...newArrivals, ...newArrivals].map((t, i) => (
+              <span key={i} className="flex items-center gap-2 shrink-0">
+                <span className="text-purple-600 font-bold text-[10px] tracking-widest uppercase">New</span>
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                <button
+                  onClick={() => openTool(t)}
+                  className="text-gray-500 hover:text-purple-600 transition-colors text-xs font-medium"
+                >
+                  {t.name}
+                </button>
+                <span className="mx-4 text-gray-200">|</span>
+              </span>
+            ))}
           </div>
         </div>
       )}
 
-      {/* ── HERO ── */}
-      <section className="relative px-4 sm:px-6 lg:px-8 pt-12 pb-0 overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-100/60 rounded-full blur-[120px]" />
-          <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[100px]" />
-        </div>
+      {/* ── Main content ── */}
+      <main className="px-4 sm:px-5 lg:px-7 py-5 space-y-8">
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            {/* Left column */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 space-y-8 text-center lg:text-left"
+        {/* Search bar + mobile hamburger */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors shrink-0"
+              aria-label="Open sidebar"
             >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
 
-              <div className="space-y-4">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-gray-900">
-                  Discover the Future
-                  <br />
-                  of <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Web3 Apps.</span>
-                </h1>
-                <p className="text-gray-500 text-base md:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                  The definitive marketplace for decentralized tools. Curated protocols across DeFi, security, analytics, and more.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <Link
-                  to="/apps"
-                  className="px-8 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-300/40 hover:scale-105 active:scale-95 text-sm"
-                >
-                  Explore Apps
-                </Link>
-                <Link
-                  to="/submit-tool"
-                  className="px-8 py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 hover:text-gray-900 transition-all text-sm"
-                >
-                  List Your Dapp
-                </Link>
-
-              </div>
-            </motion.div>
-
-            {/* Right column — 3D hero visual */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 hidden lg:flex items-center justify-center"
-            >
-              <div className="relative w-full max-w-md">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-indigo-600/20 rounded-3xl blur-2xl" />
-                <img
-                  src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800"
-                  alt="Web3 Ecosystem"
-                  className="relative rounded-3xl border border-white/10 shadow-2xl w-full object-cover h-[340px]"
+            <div ref={searchRef} className="relative flex-1">
+              <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-purple-400 transition-all shadow-sm">
+                <Search size={16} className="text-gray-300 shrink-0" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onFocus={() => searchResults.length > 0 && setSearchOpen(true)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && query.trim()) {
+                      navigate(`/apps?q=${encodeURIComponent(query)}`);
+                      setSearchOpen(false);
+                    }
+                  }}
+                  placeholder="Search apps, protocols, categories..."
+                  className="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder:text-gray-300 font-medium"
                 />
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-[#0b0b16]/60 to-transparent" />
+                {query && (
+                  <button onClick={() => { setQuery(""); setSearchResults([]); setSearchOpen(false); }}>
+                    <X size={14} className="text-gray-300 hover:text-gray-500" />
+                  </button>
+                )}
+                {searchLoading && (
+                  <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin shrink-0" />
+                )}
               </div>
-            </motion.div>
-          </div>
 
-          {/* ── Live Stats Bar ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 bg-gray-50 border border-gray-200 rounded-2xl px-6 py-5
-                       grid grid-cols-2 md:grid-cols-4 gap-4 divide-x divide-gray-200"
-          >
-            {[
-              { label: "ACTIVE TOOLS", value: activeToolsCount, suffix: "+" },
-              { label: "IN REVIEW", value: inReviewCount },
-              { label: "USERS", value: platformStats?.users || 0 },
-              { label: "CATEGORIES", value: 14 },
-            ].map((stat, i) => (
-              <div key={i} className="text-center px-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                <h3 className="text-2xl md:text-3xl font-black text-gray-900">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix || ""} />
-                </h3>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── CATEGORIES ── */}
-      <section className="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-gray-900">
-              Explore Categories
-            </h2>
-            <p className="text-gray-400 text-sm mt-1">Jump into any corner of Web3</p>
-          </div>
-          <Link to="/apps" className="text-purple-600 hover:text-purple-500 text-sm font-bold flex items-center gap-1 transition-colors">
-            View all <ChevronRight size={14} />
-          </Link>
-        </div>
-
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 sm:gap-3 sm:overflow-visible sm:snap-none sm:pb-0">
-          {CATEGORIES.map((cat, i) => {
-            /* Count tools from live data */
-            const catKey = cat.path.split('/').pop();
-            const count = appsData
-              ? Object.entries(appsData)
-                  .filter(([k]) => {
-                    const aliases = {
-                      trading: ['dex', 'perps', 'trading'],
-                      bridges: ['interoperability', 'bridges'],
-                      community: ['communityTools', 'community'],
-                    };
-                    return (aliases[catKey] || [catKey]).includes(k);
-                  })
-                  .flatMap(([, v]) => v)
-                  .filter(t => t.status === 'active' || !t.status).length
-              : 0;
-
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.03, duration: 0.3 }}
-                className="min-w-[130px] shrink-0 snap-start sm:min-w-0 sm:shrink"
-              >
-                <Link
-                  to={cat.path}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border ${cat.bg} ${cat.border} ${cat.hoverBg} transition-all group hover:shadow-lg hover:-translate-y-1 active:scale-[0.97] h-full`}
+              {/* Search dropdown — clicking opens MetricsPanel */}
+              {searchOpen && searchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden"
                 >
-                  <div className={`text-${cat.text.split('-')[1]}-600 group-hover:scale-110 transition-transform`}>
-                    <Icon name={cat.icon} size={32} />
+                  <div className="px-4 pt-3 pb-1">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{searchResults.length} results</p>
                   </div>
-                  <span className={`text-[13px] font-bold ${cat.text} text-center leading-tight`}>
-                    {cat.label}
-                  </span>
-                  {count > 0 && (
-                    <span className="text-[10px] font-semibold text-gray-400 bg-white/80 px-2 py-0.5 rounded-full border border-gray-100">
-                      {count} app{count !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── TOP CHARTS + BUILDER SPOTLIGHT ── */}
-      <section className="py-4 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-
-          {/* ── Top Charts (left, 3/5 width) ── */}
-          <div className="lg:col-span-3">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-black tracking-tight">Top Charts</h2>
-                <p className="text-white/40 text-sm mt-1">Trending protocols right now</p>
-              </div>
-              <Link to="/apps" className="text-purple-600 hover:text-purple-500 text-sm font-bold flex items-center gap-1 transition-colors">
-                See all <ChevronRight size={14} />
-              </Link>
-            </div>
-
-            <div className="space-y-2">
-              {toolsLoading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={`trend-skeleton-${i}`}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 animate-pulse"
-                  >
-                    <span className="w-6 h-6 rounded bg-gray-200 shrink-0" />
-                    <div className="w-12 h-12 rounded-2xl bg-gray-200 shrink-0" />
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="h-3.5 bg-gray-200 rounded w-2/5" />
-                      <div className="h-2.5 bg-gray-200 rounded w-1/3" />
-                    </div>
-                    <div className="w-12 h-7 rounded-full bg-gray-200 shrink-0" />
-                  </div>
-                ))
-              ) : activeTrendingTools.length > 0 ? activeTrendingTools.map((tool, i) => {
-                const rating = tool.averageRating || tool.rating || 0;
-                return (
-                  <motion.div
-                    key={tool._id || tool.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.06, duration: 0.4 }}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-purple-50 hover:border-purple-200 transition-all group"
-                  >
-                    {/* Rank */}
-                    <span className="text-xl font-black text-gray-200 w-6 text-center shrink-0">{i + 1}</span>
-
-                    {/* Logo */}
-                    <div className="w-12 h-12 rounded-2xl shrink-0 overflow-hidden border border-gray-200">
-                      <ToolLogo tool={tool} />
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm text-gray-900 truncate group-hover:text-purple-600 transition-colors">{tool.name}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-gray-400 text-[11px] capitalize">{tool.category || 'Protocol'}</span>
-                        {rating > 0 && (
-                          <>
-                            <span className="text-white/20 text-[10px]">•</span>
-                            <div className="flex items-center gap-0.5">
-                              <Star size={10} className="text-yellow-400 fill-yellow-400" />
-                              <span className="text-gray-600 text-[11px] font-bold">{rating.toFixed(1)}</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* GET button */}
-                    <a
-                      href={tool.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="shrink-0 px-4 py-1.5 bg-purple-50 hover:bg-purple-600 border border-purple-200 hover:border-purple-600 text-purple-600 hover:text-white text-[11px] font-bold rounded-full transition-all"
+                  {searchResults.map(tool => (
+                    <button
+                      key={tool._id || tool.id}
+                      onClick={() => { openTool(tool); setSearchOpen(false); setQuery(""); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition-colors text-left group"
                     >
-                      GET
-                    </a>
-                  </motion.div>
-                );
-              }) : (
-                <div className="text-center py-16 text-white/30">
-                  <Zap size={32} className="mx-auto mb-3 text-gray-300" />
-                  <p className="font-medium text-gray-500">No trending tools yet</p>
-                  <p className="text-sm mt-1 text-gray-400">Submit a protocol to get started</p>
-                </div>
+                      <div className="w-9 h-9 rounded-xl border border-gray-100 overflow-hidden shrink-0 bg-white">
+                        <ToolLogo tool={tool} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate group-hover:text-purple-700">{tool.name}</p>
+                        <p className="text-xs text-gray-400 capitalize">{tool.category}</p>
+                      </div>
+                      <ExternalLink size={12} className="text-gray-200 group-hover:text-purple-400 shrink-0" />
+                    </button>
+                  ))}
+                  <div className="px-4 py-3 border-t border-gray-50 bg-gray-50/50">
+                    <button
+                      onClick={() => { navigate(`/apps?q=${encodeURIComponent(query)}`); setSearchOpen(false); }}
+                      className="text-xs text-purple-600 font-bold flex items-center gap-1"
+                    >
+                      <Search size={11} /> See all results for "{query}"
+                    </button>
+                  </div>
+                </motion.div>
               )}
             </div>
           </div>
 
-          {/* ── Builder Spotlight (right, 2/5 width) ── */}
-          <div className="lg:col-span-2">
-            <div className="mb-6">
-              <h2 className="text-2xl font-black tracking-tight text-gray-900">Builder Spotlight</h2>
-              <p className="text-gray-400 text-sm mt-1">Featuring the community's best</p>
-            </div>
-
-            <BuilderSpotlightCard bs={bs} />
-          </div>
-        </div>
-      </section>
-
-      {/* ── LATEST CRYPTO NEWS (3-COLUMN GRID) ── */}
-      {newsFeed && newsFeed.length > 0 && (
-        <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-100">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-900">Latest Crypto News</h2>
-              <p className="text-slate-400 text-sm mt-1">Market updates, protocol launches, and Web3 insights.</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {newsFeed.slice(0, 3).map((article, i) => (
-              <NewsCard key={article._id || i} article={article} index={i} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── FAQ + Newsletter ── */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-white/8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-black tracking-tight text-gray-900">Got Questions?</h2>
-            <p className="text-gray-400 text-base mt-2">Everything you need to know about the platform.</p>
-          </div>
-
-          <div className="space-y-3 mb-14">
-            {faqs.map((faq, i) => (
-              <div key={i} className="rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden">
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full p-5 text-left flex items-center justify-between hover:bg-gray-100 transition-colors gap-4"
+          {/* ⓪ Featured Hero Banner Carousel */}
+          {trending.length > 0 && (
+            <div className="w-full rounded-[2rem] bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-900 p-8 md:p-10 text-white relative overflow-hidden shadow-2xl h-auto md:h-[280px] flex items-center">
+              {/* Background glow effects */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/3" />
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentFeaturedIndex}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="relative z-10 flex flex-col md:flex-row gap-8 items-center w-full"
                 >
-                  <span className="text-sm font-semibold text-gray-900 flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center text-[11px] font-bold text-purple-600 shrink-0">{i + 1}</span>
-                    {faq.q}
-                  </span>
-                  <svg className={`w-4 h-4 text-gray-400 transition-transform duration-300 shrink-0 ${openFaq === i ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {openFaq === i && (
-                  <div className="px-5 pb-5 text-gray-500 text-sm leading-relaxed pl-14">{faq.a}</div>
+                  {/* Hero App Logo */}
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-black/40 backdrop-blur-md p-4 border border-white/10 shrink-0 shadow-2xl">
+                    <ToolLogo tool={trending[currentFeaturedIndex]} className="w-full h-full object-contain drop-shadow-lg" />
+                  </div>
+                  
+                  <div className="flex-1 text-center md:text-left space-y-4">
+                    <div>
+                      <span className="text-[11px] font-black tracking-widest uppercase text-purple-300 mb-2 block">Featured</span>
+                      <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">{trending[currentFeaturedIndex].name}</h1>
+                    </div>
+                    
+                    <p className="text-purple-100/80 text-sm md:text-base leading-relaxed max-w-2xl line-clamp-2 md:line-clamp-3">
+                      {trending[currentFeaturedIndex].description}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-row md:flex-col items-center justify-center gap-3 shrink-0 md:ml-auto">
+                    {trending[currentFeaturedIndex].url && (
+                      <a 
+                        href={trending[currentFeaturedIndex].url} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex justify-center items-center gap-2 px-6 py-3 w-full md:w-40 bg-white text-gray-900 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-lg"
+                      >
+                        <ExternalLink size={16} /> Open App
+                      </a>
+                    )}
+                    <button 
+                      onClick={() => openTool(trending[currentFeaturedIndex])}
+                      className="flex justify-center items-center gap-2 px-6 py-3 w-full md:w-40 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl font-bold transition-colors backdrop-blur-sm"
+                    >
+                      Details
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Carousel Indicators */}
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                {Array.from({ length: Math.min(trending.length, 5) }).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentFeaturedIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all ${currentFeaturedIndex === idx ? 'w-6 bg-white' : 'w-1.5 bg-white/30'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ① Trending Now — all categories, ranked by clicks + ratings */}
+          <CategorySection
+            id="section-trending"
+            sectionId="section-trending"
+            icon={TrendingUp}
+            iconColor="text-orange-500"
+            title="Trending Now"
+            subtitle="Most active apps across all categories this week"
+            to="/apps"
+            tools={trending}
+            onOpen={openTool}
+          />
+          
+          {/* ── Builder Spotlight Carousel ── */}
+          {spotlightList.length > 0 && (
+            <section className="my-8">
+              <SectionHeader
+                icon={Users}
+                iconColor="text-fuchsia-500"
+                title="Builder Spotlight"
+                subtitle="Meet the architects behind your favorite dApps"
+              />
+              <div className="w-full rounded-[2rem] bg-white border border-gray-100 shadow-sm overflow-hidden relative">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={spotlightIndex}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -30 }}
+                    transition={{ duration: 0.45 }}
+                    className="p-6 sm:p-8 flex flex-col md:flex-row gap-8"
+                  >
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={spotlight.xProfileImageUrl || "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"}
+                          alt={spotlight.name}
+                          className="w-16 h-16 rounded-full border-2 border-fuchsia-100 object-cover"
+                        />
+                        <div>
+                          <h3 className="text-xl font-black text-gray-900">{spotlight.name}</h3>
+                          <p className="text-sm font-bold text-fuchsia-600">{spotlight.role}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed max-w-2xl">
+                        {spotlight.description}
+                      </p>
+                      {spotlight.twitter && (
+                        <a href={spotlight.twitter} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition-colors">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                          Follow on X
+                        </a>
+                      )}
+                    </div>
+
+                    {spotlight.featuredTools?.length > 0 && (
+                      <div className="md:w-72 shrink-0 space-y-3">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Built by {spotlight.name}</p>
+                        {spotlight.featuredTools.map((ft, i) => (
+                          <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
+                            <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-black text-sm text-gray-900 shadow-sm shrink-0">
+                              {ft.initial}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold text-gray-900 truncate">{ft.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{ft.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Carousel dot indicators */}
+                {spotlightList.length > 1 && (
+                  <div className="flex items-center justify-center gap-2 pb-5">
+                    {spotlightList.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => { setSpotlightIndex(idx); setSpotlight(spotlightList[idx]); }}
+                        className={`h-1.5 rounded-full transition-all ${spotlightIndex === idx ? 'w-6 bg-fuchsia-500' : 'w-1.5 bg-gray-200'}`}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
+            </section>
+          )}
 
-          {/* Newsletter */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-2xl bg-gray-50 border border-gray-100">
-            <div>
-              <h3 className="text-lg font-black text-gray-900">Stay Updated.</h3>
-              <p className="text-gray-400 text-sm mt-0.5">Join our community of builders.</p>
-            </div>
-            <form
-              className="flex gap-2 w-full md:w-auto"
-              onSubmit={(e) => { e.preventDefault(); alert("Newsletter coming soon!"); }}
-            >
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 md:w-60 bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-purple-500 transition-colors text-sm text-gray-900 placeholder:text-gray-400"
+          {/* ② New Arrivals */}
+          <CategorySection
+            sectionId="section-new"
+            icon={Sparkles}
+            iconColor="text-emerald-500"
+            title="New Arrivals"
+            subtitle="Recently listed on web3central"
+            to="/apps"
+            tools={newArrivals}
+            onOpen={openTool}
+          />
+
+          {/* ③ Top in Trading */}
+          <CategorySection
+            sectionId="section-trading"
+            icon={ArrowLeftRight}
+            iconColor="text-violet-600"
+            title="Top in Trading"
+            subtitle="DEX and perpetual protocols"
+            to="/apps/trading"
+            tools={tradingApps}
+            onOpen={openTool}
+          />
+
+          {/* ④ Top in DeFi */}
+          <CategorySection
+            sectionId="section-defi"
+            icon={Landmark}
+            iconColor="text-emerald-600"
+            title="Top in DeFi"
+            subtitle="Lending, yield, and stablecoins"
+            to="/apps/defi"
+            tools={defiApps}
+            onOpen={openTool}
+          />
+
+          {/* ⑤ Top in Bridges */}
+          <CategorySection
+            sectionId="section-bridges"
+            icon={Share2}
+            iconColor="text-blue-600"
+            title="Top in Bridges"
+            subtitle="Cross-chain asset transfers"
+            to="/apps/bridges"
+            tools={bridgesApps}
+            onOpen={openTool}
+          />
+
+          {/* ⑥ Top in Wallets */}
+          <CategorySection
+            sectionId="section-wallets"
+            icon={Wallet}
+            iconColor="text-slate-600"
+            title="Top in Wallets"
+            subtitle="Wallet tools and infrastructure"
+            to="/apps/wallets"
+            tools={walletsApps}
+            onOpen={openTool}
+          />
+
+          {/* ⑦ Top in Security */}
+          <CategorySection
+            sectionId="section-security"
+            icon={ShieldCheck}
+            iconColor="text-red-500"
+            title="Top in Security"
+            subtitle="Wallet protection and scam prevention"
+            to="/apps/security"
+            tools={securityApps}
+            onOpen={openTool}
+          />
+
+          {/* ⑧ Latest News */}
+          {newsFeed.length > 0 && (
+            <section className="border-t border-gray-100 pt-6">
+              <SectionHeader
+                icon={BarChart3}
+                iconColor="text-purple-500"
+                title="Latest in Web3"
+                subtitle="Market updates and protocol news"
               />
-              <button className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all text-sm whitespace-nowrap">
-                Join
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {newsFeed.slice(0, 3).map((article, i) => (
+                  <NewsCard key={article._id || i} article={article} index={i} />
+                ))}
+              </div>
+            </section>
+        )}
+
+      </main>
+      </div>
     </div>
   );
 }

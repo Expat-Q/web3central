@@ -14,18 +14,19 @@ const CHAINS = [
 ];
 
 const CATEGORIES = [
-  { id: "dex", name: "Decentralized Exchange (DEX)" },
-  { id: "interoperability", name: "Bridges & Interoperability" },
-  { id: "onchainAutonomy", name: "Onchain Automation" },
-  { id: "bountyHub", name: "Bounty / Grants" },
-  { id: "communityTools", name: "Community Tools" },
-  { id: "researchFiles", name: "Research & Analytics" },
+  { id: "trading", name: "Trading / DEX / Perps" },
   { id: "defi", name: "DeFi (Lending / Yield)" },
-  { id: "nft", name: "NFT" },
-  { id: "gaming", name: "Gaming / GameFi" },
+  { id: "bridges", name: "Bridges & Cross-chain" },
   { id: "wallets", name: "Wallets" },
   { id: "security", name: "Security" },
-  { id: "other", name: "Other" },
+  { id: "analytics", name: "Analytics" },
+  { id: "nft", name: "NFT" },
+  { id: "gaming", name: "Gaming / GameFi" },
+  { id: "community", name: "Community & DAO" },
+  { id: "rwa", name: "Real World Assets (RWA)" },
+  { id: "cex", name: "Centralized Exchanges (CEX)" },
+  { id: "privacy", name: "Privacy" },
+  { id: "predictions", name: "Prediction Markets" },
 ];
 
 const CRITERIA = [
@@ -79,7 +80,7 @@ export default function ListDapp() {
 
   if (authLoading || !user || user.email === 'guest@web3central.internal') {
     return (
-      <div className="min-h-screen bg-white pt-28 px-6 max-w-2xl mx-auto space-y-4">
+      <div className="min-h-screen bg-white pt-20 px-6 max-w-2xl mx-auto space-y-4">
         <CardSkeleton /><CardSkeleton />
       </div>
     );

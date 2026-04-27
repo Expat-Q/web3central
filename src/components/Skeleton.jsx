@@ -12,7 +12,7 @@ export function SkeletonBlock({ className = '' }) {
 /* ── Full-page loader (replaces the centered spinner) ── */
 export function PageSkeleton() {
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 pt-28 pb-16 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8 pt-20 pb-16 max-w-7xl mx-auto">
       {/* Header row */}
       <div className="flex items-center justify-between mb-8">
         <SkeletonBlock className="h-8 w-48" />
@@ -67,7 +67,7 @@ export function FeedSkeleton({ rows = 4 }) {
 /* ── Lesson detail skeleton ── */
 export function LessonSkeleton() {
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-24 space-y-6">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-24 space-y-6">
       <SkeletonBlock className="h-4 w-24 mb-6" />
       <div className="flex items-start gap-3">
         <SkeletonBlock className="w-12 h-12 rounded-full shrink-0" />
@@ -91,7 +91,7 @@ export function LessonSkeleton() {
 /* ── Profile skeleton ── */
 export function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-white px-4 pt-28 pb-16 max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-white px-4 pt-20 pb-16 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-5">
         <SkeletonBlock className="w-20 h-20 rounded-full shrink-0" />
         <div className="flex-1 space-y-2">

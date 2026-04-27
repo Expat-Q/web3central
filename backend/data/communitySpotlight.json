@@ -1,25 +1,48 @@
-{
-  "title": "Featured Community Project",
-  "description": "Highlighting innovative projects from our community",
-  "projects": [],
-  "builderSpotlight": {
-    "name": "Zun20",
-    "role": "Security Researcher & Tool Builder",
-    "description": "Creator of multiple security tools including Anti Drain Tool and Poly Whales Tracker. Known for building practical tools that protect users and provide valuable insights.",
-    "twitter": "https://twitter.com/zun2025",
-    "github": "https://github.com/zun2025",
-    "rating": 4.9,
-    "featuredTools": [
-      {
-        "initial": "AD",
-        "name": "Anti Drain Tool",
-        "description": "Security tool protecting users from malicious drain transactions"
-      },
-      {
-        "initial": "PW",
-        "name": "Poly Whales Tracker",
-        "description": "Tracks bets placed on Polymarket by top performing traders"
-      }
-    ]
+[
+  {
+    "builderSpotlight": {
+      "name": "Zun2025",
+      "role": "Security Researcher & Tool Builder",
+      "description": "Creator of multiple security tools including Anti Drain Tool and Poly Whales Tracker. Known for building practical tools that protect users and provide valuable on-chain insights.",
+      "twitter": "https://twitter.com/zun2025",
+      "github": "https://github.com/zun2025",
+      "xProfileImageUrl": "https://unavatar.io/twitter/zun2025",
+      "rating": 4.9,
+      "featuredTools": [
+        {
+          "initial": "AD",
+          "name": "Anti Drain Tool",
+          "description": "Security tool protecting users from malicious drain transactions"
+        },
+        {
+          "initial": "PW",
+          "name": "Poly Whales Tracker",
+          "description": "Tracks bets placed on Polymarket by top performing traders"
+        }
+      ]
+    }
+  },
+  {
+    "builderSpotlight": {
+      "name": "ExpatQ3",
+      "role": "DeFi Developer & Community Builder",
+      "description": "A passionate DeFi developer and community architect who has been instrumental in onboarding new builders into the Web3 ecosystem. Active contributor to multiple open-source protocols.",
+      "twitter": "https://twitter.com/ExpatQ3",
+      "github": "https://github.com/ExpatQ3",
+      "xProfileImageUrl": "https://unavatar.io/twitter/ExpatQ3",
+      "rating": 4.8,
+      "featuredTools": [
+        {
+          "initial": "EQ",
+          "name": "Equilibria Vault",
+          "description": "Cross-chain yield generation and savings platform powered by LI.FI"
+        },
+        {
+          "initial": "W3",
+          "name": "Web3Central",
+          "description": "The definitive directory for discovering and comparing Web3 tools"
+        }
+      ]
+    }
   }
-}
+]

@@ -1,70 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { fetchLatestNews, fetchCuratedCourses, fetchCommunityLessons, createCommunityLesson, upvoteCommunityLesson, rateCommunityLesson } from '../services/apiService';
-import {
-    BookOpen, Layers, Shield, Coins, ChevronRight, Clock,
-    Award, CheckCircle2, Sparkles, Lock, ExternalLink,
-    Play, Globe, Bookmark, Search, Users, Plus, Star, Heart, Edit3,
-    ThumbsUp, ThumbsDown, Zap, Eye, PenLine, Share2, Trash2
-} from 'lucide-react';
+import { fetchCuratedCourses } from '../services/apiService';
+import { Search, Play, ExternalLink, Bookmark, Share2, Sparkles } from 'lucide-react';
 import { useCourseBookmarks } from '../hooks/useCourseBookmarks';
-import { FeedSkeleton, CardSkeleton } from '../components/Skeleton';
-import NewsCard from '../components/NewsCard';
-
+import { CardSkeleton } from '../components/Skeleton';
 
 const PLATFORM_COLORS = {
-    'Anthropic': 'bg-orange-100 text-orange-700 border-orange-200',
-    'YouTube': 'bg-red-100 text-red-700 border-red-200',
-    'Coursera': 'bg-blue-100 text-blue-700 border-blue-200',
-    'Udemy': 'bg-purple-100 text-purple-700 border-purple-200',
-    'GitHub': 'bg-gray-800 text-white border-gray-700',
-    'Other': 'bg-slate-100 text-slate-700 border-slate-200',
+    'YouTube': 'text-red-600 bg-red-50',
+    'Coursera': 'text-blue-600 bg-blue-50',
+    'Udemy': 'text-purple-600 bg-purple-50',
+    'Anthropic': 'text-amber-600 bg-amber-50',
+    'GitHub': 'text-gray-700 bg-gray-100',
+    'Other': 'text-indigo-600 bg-indigo-50'
 };
 
 export default function Academy() {
-    const [news, setNews] = useState([]);
     const [courses, setCourses] = useState([]);
-    const [communityLessons, setCommunityLessons] = useState([]);
-    const [newsLoading, setNewsLoading] = useState(true);
     const [coursesLoading, setCoursesLoading] = useState(true);
-    const [communityLoading, setCommunityLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('news');
     const [searchQuery, setSearchQuery] = useState('');
     const [priceFilter, setPriceFilter] = useState('All'); // 'All', 'Free', 'Paid'
     const [levelFilter, setLevelFilter] = useState('All'); 
     const [platformFilter, setPlatformFilter] = useState('All');
-    
-    // Community Feed specific state
-    const [communityMenuOpen, setCommunityMenuOpen] = useState(null); // holds lesson._id of open menu
-    const [editingLesson, setEditingLesson] = useState(null); // { _id, title, description, contentMarkdown }
-    const [showCommunityModal, setShowCommunityModal] = useState(false);
-    const [communityPostSuccess, setCommunityPostSuccess] = useState(false);
-    const [submittingPost, setSubmittingPost] = useState(false);
-    const [newPostData, setNewPostData] = useState({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
-    const [communityPostError, setCommunityPostError] = useState('');
 
-
-    const { user, loading: authLoading } = useAuth();
-    const { toggleBookmark, isBookmarked } = useCourseBookmarks();
-    const navigate = useNavigate();
+    const { user } = useAuth();
+    const { isBookmarked, toggleBookmark } = useCourseBookmarks();
 
     useEffect(() => {
-        if (!user) return;
-        const fetchNewsData = async () => {
-            try {
-                setNewsLoading(true);
-                const data = await fetchLatestNews().catch(() => []);
-                setNews(data || []);
-            } catch (err) {
-                console.error('Error fetching news:', err);
-            } finally {
-                setNewsLoading(false);
-            }
-        };
-
         const fetchCoursesData = async () => {
             try {
                 setCoursesLoading(true);
@@ -77,201 +39,24 @@ export default function Academy() {
             }
         };
 
-        const fetchCommunityData = async () => {
-            try {
-                setCommunityLoading(true);
-                const communityData = await fetchCommunityLessons().catch(() => []);
-                setCommunityLessons(communityData);
-            } catch (err) {
-                console.error('Error fetching academy data:', err);
-            } finally {
-                setCommunityLoading(false);
-            }
-        };
-
-        fetchNewsData();
         fetchCoursesData();
-        fetchCommunityData();
-    }, [user]);
-
-    // ── LOGIN GATE ──
-    if (!authLoading && !user) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center px-6 pt-32 pb-20">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-md w-full text-center"
-                >
-                    <div className="w-20 h-20 bg-purple-50 border border-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                        <Lock size={36} className="text-purple-500" />
-                    </div>
-                    <h1 className="text-3xl font-black text-gray-900 mb-3">Academy Access</h1>
-                    <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                        Sign in to access Web3 courses, news, and curated learning resources all in one place.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button
-                            onClick={() => navigate('/login')}
-                            className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-purple-700 transition-all text-sm shadow-lg"
-                        >
-                            Sign In to Continue
-                        </button>
-                        <button
-                            onClick={() => navigate('/signup')}
-                            className="px-8 py-4 bg-purple-50 text-purple-700 font-bold rounded-2xl border border-purple-100 hover:bg-purple-100 transition-all text-sm"
-                        >
-                            Create Account
-                        </button>
-                    </div>
-                    <p className="text-gray-400 text-xs mt-6">Free to join. No credit card required.</p>
-                </motion.div>
-            </div>
-        );
-    }
+    }, []);
 
     const filteredCourses = courses.filter(course => {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch = course.title.toLowerCase().includes(query) ||
-            (course.description && course.description.toLowerCase().includes(query)) ||
-            (course.tags && course.tags.some(tag => tag.toLowerCase().includes(query)));
-
-        let matchesPrice = true;
-        if (priceFilter === 'Free') matchesPrice = course.isFree;
-        if (priceFilter === 'Paid') matchesPrice = !course.isFree;
-
-        const matchesLevel = levelFilter === 'All' || course.level === levelFilter;
-        const matchesPlatform = platformFilter === 'All' || course.platform === platformFilter;
+        const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            course.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            course.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        const isFree = course.isFree;
+        const matchesPrice = priceFilter === 'All' ? true : (priceFilter === 'Free' ? isFree : !isFree);
+        const matchesLevel = levelFilter === 'All' ? true : course.level === levelFilter;
+        const matchesPlatform = platformFilter === 'All' ? true : course.platform === platformFilter;
 
         return matchesSearch && matchesPrice && matchesLevel && matchesPlatform;
     });
 
     const uniquePlatforms = ['All', ...new Set(courses.map(c => c.platform).filter(Boolean))];
     const uniqueLevels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
-
-    const handleUpvote = async (lessonId) => {
-        if (!user) return navigate('/login');
-        try {
-            await upvoteCommunityLesson(lessonId);
-            setCommunityLessons(prev => prev.map(l => {
-                if (l._id !== lessonId) return l;
-                const alreadyUpvoted = l.upvotes?.includes(user.id);
-                return {
-                    ...l,
-                    upvotes: alreadyUpvoted
-                        ? l.upvotes.filter(id => id !== user.id)
-                        : [...(l.upvotes || []), user.id]
-                };
-            }));
-        } catch (err) {
-            console.error('Failed to upvote:', err);
-        }
-    };
-
-    const handleRate = async (lessonId, rating) => {
-        if (!user) return navigate('/login');
-        try {
-            const res = await rateCommunityLesson(lessonId, rating);
-            if (res.success) {
-                setCommunityLessons(prev => prev.map(l =>
-                    l._id === lessonId ? { ...l, ratings: res.ratings } : l
-                ));
-            }
-        } catch (err) {
-            console.error('Failed to rate:', err);
-        }
-    };
-
-    const handleDeleteLesson = async (lessonId) => {
-        if (!user) return;
-        if (!window.confirm('Delete this lesson? This cannot be undone.')) return;
-        try {
-            const token = localStorage.getItem('token');
-            const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
-            await fetch(`${API}/academy/community/${lessonId}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setCommunityLessons(prev => prev.filter(l => l._id !== lessonId));
-            setCommunityMenuOpen(null);
-        } catch (err) {
-            console.error('Delete failed:', err);
-        }
-    };
-
-    const handleUpdateLesson = async (e) => {
-        e.preventDefault();
-        setSubmittingPost(true);
-        setCommunityPostError('');
-        try {
-            const token = localStorage.getItem('token');
-            const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
-            const res = await fetch(`${API}/academy/community/${editingLesson._id}`, {
-                method: 'PATCH',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}` 
-                },
-                body: JSON.stringify({
-                    title: editingLesson.title,
-                    description: editingLesson.description,
-                    contentMarkdown: editingLesson.contentMarkdown
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                setCommunityLessons(prev => prev.map(l => l._id === editingLesson._id ? data.data : l));
-                setEditingLesson(null);
-            } else {
-                throw new Error(data.error || 'Failed to update lesson');
-            }
-        } catch (err) {
-            console.error("Failed to update lesson:", err);
-            setCommunityPostError(err?.message || 'Failed to update lesson. Please try again.');
-        } finally {
-            setSubmittingPost(false);
-        }
-    };
-
-    const handleCreatePost = async (e) => {
-        e.preventDefault();
-        setSubmittingPost(true);
-        setCommunityPostError('');
-        try {
-            const res = await createCommunityLesson({
-                ...newPostData,
-                level: 'Intermediate' 
-            });
-            if (res.success) {
-                // Instant Reflection: Manually update the state with the new lesson
-                // We supplement the author data since it hasn't been re-fetched yet
-                const newLesson = {
-                    ...res.data,
-                    author: {
-                        _id: user.id || user._id,
-                        name: user.name,
-                        username: user.username,
-                        avatarUrl: user.avatarUrl
-                    },
-                    upvotes: [],
-                    createdAt: new Date().toISOString()
-                };
-                
-                setCommunityLessons(prev => [newLesson, ...prev]);
-                setShowCommunityModal(false);
-                setNewPostData({ title: '', description: '', contentMarkdown: '', module: 'Web3 Foundations' });
-                
-                // Show Success Toast
-                setCommunityPostSuccess(true);
-                setTimeout(() => setCommunityPostSuccess(false), 3000);
-            }
-        } catch (err) {
-            console.error("Failed to create post:", err);
-            setCommunityPostError(err?.message || 'Failed to publish lesson. Please try again.');
-        } finally {
-            setSubmittingPost(false);
-        }
-    };
 
     return (
         <div className="bg-white min-h-screen text-gray-900 pt-32 pb-32 px-6 relative overflow-x-hidden">
@@ -280,23 +65,6 @@ export default function Academy() {
                 <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-60" />
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[120px] translate-y-1/2 translate-x-1/2 opacity-60" />
             </div>
-
-            {/* Success Toast */}
-            <AnimatePresence>
-                {communityPostSuccess && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-8 py-4 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl flex items-center gap-3"
-                    >
-                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
-                            <CheckCircle2 size={20} />
-                        </div>
-                        <p className="text-white font-black tracking-tight">Your post has been published!</p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
@@ -314,546 +82,206 @@ export default function Academy() {
                             Your Web3 <span className="text-purple-600">Learning Path</span>
                         </h1>
                         <p className="text-gray-500 text-lg md:text-xl max-w-3xl font-normal leading-relaxed">
-                            From basic bridging to institutional-grade analysis. Curated courses and interactive news all in one place.
+                            From basic bridging to institutional-grade analysis. Curated Web3 courses all in one place.
                         </p>
                     </motion.div>
                 </div>
 
-                {/* Tab Switcher */}
-                <div className="flex flex-col sm:flex-row gap-2 mb-10 pb-1">
-                    <button
-                        onClick={() => setActiveTab('news')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all border ${activeTab === 'news'
-                            ? 'bg-gray-900 text-white shadow-md border-gray-900'
-                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 border-gray-200 shadow-sm'
-                            }`}
-                    >
-                        <span className="flex items-center justify-center gap-2"><BookOpen size={15} /> Crypto News</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('courses')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'courses'
-                            ? 'bg-purple-600 text-white shadow-md border-purple-600'
-                            : 'text-gray-500 hover:text-purple-700 hover:bg-purple-50 border-gray-200 shadow-sm'
-                            }`}
-                    >
-                        <Globe size={15} /> Curated Courses
-                        {courses.length > 0 && (
-                            <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full font-bold">{courses.length}</span>
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('community')}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'community'
-                            ? 'bg-blue-600 text-white shadow-md border-blue-600'
-                            : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border-gray-200 shadow-sm'
-                            }`}
-                    >
-                        <Users size={15} /> Community Feed
-                    </button>
-                </div>
-
-                {/* ── CRYPTO NEWS TAB ── */}
-                {activeTab === 'news' && (
-                    <>
-                        {newsLoading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <CardSkeleton key={`news-skeleton-${i}`} />
-                                ))}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {/* Search and Filters */}
+                    <div className="flex flex-col gap-4 mb-8 relative z-20">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-grow relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search courses by title, description, or tags..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] focus:border-purple-300 focus:ring-4 focus:ring-purple-50 transition-all font-medium text-sm outline-none"
+                                />
                             </div>
-                        ) : news.length === 0 ? (
-                            <div className="text-center py-24 text-gray-400">
-                                <BookOpen size={48} className="mx-auto mb-4 opacity-30" />
-                                <p className="font-bold text-lg">No news published yet.</p>
-                                <p className="text-sm mt-1">Check back soon for the latest updates.</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {news.map((article, i) => (
-                                    <NewsCard key={article._id || i} article={article} index={i} />
-                                ))}
-                            </div>
-                        )}
-                    </>
-                )}
-
-                {/* ── CURATED COURSES TAB ── */}
-                {activeTab === 'courses' && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        {/* Search and Filters */}
-                        <div className="flex flex-col gap-4 mb-8 relative z-20">
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="flex-grow relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        placeholder="Search courses by title, description, or tags..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.02)] focus:border-purple-300 focus:ring-4 focus:ring-purple-50 transition-all font-medium text-sm outline-none"
-                                    />
-                                </div>
-                                <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-                                    {['All', 'Free', 'Paid'].map(filter => (
-                                        <button
-                                            key={filter}
-                                            onClick={() => setPriceFilter(filter)}
-                                            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
-                                                ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                                                : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
-                                                }`}
-                                        >
-                                            {filter}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="flex flex-col sm:flex-row gap-3 items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 w-full md:w-auto">
-                                <span className="hidden sm:inline-block text-xs font-bold text-gray-400 uppercase tracking-widest px-2">Filters</span>
-                                <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
-                                    <select 
-                                        value={levelFilter}
-                                        onChange={(e) => setLevelFilter(e.target.value)}
-                                        className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
+                            <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                                {['All', 'Free', 'Paid'].map(filter => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setPriceFilter(filter)}
+                                        className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all border whitespace-nowrap ${priceFilter === filter
+                                            ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
+                                            : 'bg-white border-gray-100 text-gray-600 hover:border-purple-200 hover:text-purple-700 shadow-sm'
+                                            }`}
                                     >
-                                        {uniqueLevels.map(level => (
-                                            <option key={level} value={level}>{level === 'All' ? 'All Levels' : level}</option>
-                                        ))}
-                                    </select>
-                                    
-                                    <select 
-                                        value={platformFilter}
-                                        onChange={(e) => setPlatformFilter(e.target.value)}
-                                        className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
-                                    >
-                                        {uniquePlatforms.map(platform => (
-                                            <option key={platform} value={platform}>{platform === 'All' ? 'All Platforms' : platform}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                        {filter}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-
-                        {coursesLoading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <CardSkeleton key={`course-skeleton-${i}`} />
-                                ))}
-                            </div>
-                        ) : courses.length === 0 ? (
-                            <div className="text-center py-24 text-gray-400">
-                                <Play size={48} className="mx-auto mb-4 opacity-30" />
-                                <p className="font-bold text-lg">No courses curated yet.</p>
-                                <p className="text-sm mt-1 max-w-sm mx-auto">The team is sourcing the best Web3 courses. Check back soon!</p>
-                            </div>
-                        ) : filteredCourses.length === 0 ? (
-                            <div className="text-center py-24 text-gray-500">
-                                <Search size={48} className="mx-auto mb-4 opacity-30" />
-                                <p className="font-bold text-lg text-gray-900">No courses found.</p>
-                                <p className="text-sm mt-1">Try adjusting your search or filters.</p>
-                                <button
-                                    onClick={() => { setSearchQuery(''); setPriceFilter('All'); setLevelFilter('All'); setPlatformFilter('All'); }}
-                                    className="mt-4 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl font-bold text-sm hover:bg-purple-100 transition-colors"
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100/50 w-full md:w-auto">
+                            <span className="hidden sm:inline-block text-xs font-bold text-gray-400 uppercase tracking-widest px-2">Filters</span>
+                            <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
+                                <select 
+                                    value={levelFilter}
+                                    onChange={(e) => setLevelFilter(e.target.value)}
+                                    className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
                                 >
-                                    Clear Filters
-                                </button>
+                                    {uniqueLevels.map(level => (
+                                        <option key={level} value={level}>{level === 'All' ? 'All Levels' : level}</option>
+                                    ))}
+                                </select>
+                                
+                                <select 
+                                    value={platformFilter}
+                                    onChange={(e) => setPlatformFilter(e.target.value)}
+                                    className="bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 outline-none shadow-sm cursor-pointer w-full"
+                                >
+                                    {uniquePlatforms.map(platform => (
+                                        <option key={platform} value={platform}>{platform === 'All' ? 'All Platforms' : platform}</option>
+                                    ))}
+                                </select>
                             </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filteredCourses.map((course, i) => {
-                                    const platformStyle = PLATFORM_COLORS[course.platform] || PLATFORM_COLORS['Other'];
-                                    return (
-                                        <motion.div
-                                            key={course._id}
-                                            initial={{ opacity: 0, y: 30 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ delay: (i % 3) * 0.1, duration: 0.5 }}
-                                            className="relative"
-                                        >
-                                            {/* Bookmark Button — outside overflow-hidden so it's always visible */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    toggleBookmark(course);
-                                                }}
-                                                className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
-                                                title={isBookmarked(course._id) ? 'Remove Bookmark' : 'Bookmark Course'}
-                                            >
-                                                <Bookmark
-                                                    size={16}
-                                                    fill={isBookmarked(course._id) ? 'currentColor' : 'none'}
-                                                    className={isBookmarked(course._id) ? 'text-purple-600' : ''}
-                                                />
-                                            </button>
+                        </div>
+                    </div>
 
-                                            {/* Share Button */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    const shareUrl = `${window.location.origin}/academy?search=${encodeURIComponent(course.title)}`;
-                                                    if (navigator.share) {
-                                                        navigator.share({ title: course.title, text: course.description, url: shareUrl }).catch(() => {});
-                                                    } else {
-                                                        navigator.clipboard.writeText(shareUrl);
-                                                        alert('Link copied to clipboard!');
-                                                    }
-                                                }}
-                                                className="absolute top-3 right-14 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
-                                                title="Share Course"
-                                            >
-                                                <Share2 size={16} />
-                                            </button>
-                                            <a
-                                                href={course.url}
-                                                target="_blank"
-                                                rel="noreferrer noopener"
-                                                className="group block bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.08)] hover:border-purple-100 transition-all duration-500 h-full"
-                                            >
-                                                {/* Thumbnail */}
-                                                <div className="w-full h-44 overflow-hidden relative">
-                                                    {course.thumbnail ? (
-                                                        <img
-                                                            src={course.thumbnail}
-                                                            alt={course.title}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                                e.target.nextSibling.style.display = 'flex';
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                    {/* Fallback banner — shown when thumbnail is absent or broken */}
-                                                    <div
-                                                        className="w-full h-full items-center justify-center flex-col gap-2"
-                                                        style={{ display: course.thumbnail ? 'none' : 'flex', background: 'linear-gradient(135deg,#ede9fe 0%,#c7d2fe 100%)' }}
-                                                    >
-                                                        <span className="text-3xl">
-                                                            {course.platform === 'YouTube' ? '▶' :
-                                                                course.platform === 'Coursera' ? '🎓' :
-                                                                    course.platform === 'Udemy' ? '📚' :
-                                                                        course.platform === 'Anthropic' ? '🤖' :
-                                                                            course.platform === 'GitHub' ? '⌨️' : '🌐'}
-                                                        </span>
-                                                        <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">{course.platform}</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Content */}
-                                                <div className="p-6 flex flex-col gap-3">
-                                                    <span className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">{course.level}</span>
-                                                    <h3 className="text-lg font-black text-gray-900 leading-tight group-hover:text-purple-700 transition-colors">{course.title}</h3>
-                                                    {course.description && (
-                                                        <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{course.description}</p>
-                                                    )}
-                                                    {course.tags?.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1.5 mt-1">
-                                                            {course.tags.slice(0, 3).map(tag => (
-                                                                <span key={tag} className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full font-medium">#{tag}</span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    <div className="mt-3 flex items-center justify-between pt-3 border-t border-gray-50">
-                                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{course.platform}</span>
-                                                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 group-hover:gap-2.5 transition-all">
-                                                            Go to Course <ExternalLink size={12} />
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </motion.div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </motion.div>
-                )}
-
-                {/* ── COMMUNITY FEED TAB ── */}
-                {activeTab === 'community' && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Community</h2>
+                    {coursesLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <CardSkeleton key={`course-skeleton-${i}`} />
+                            ))}
+                        </div>
+                    ) : courses.length === 0 ? (
+                        <div className="text-center py-24 text-gray-400">
+                            <Play size={48} className="mx-auto mb-4 opacity-30" />
+                            <p className="font-bold text-lg">No courses curated yet.</p>
+                            <p className="text-sm mt-1 max-w-sm mx-auto">The team is sourcing the best Web3 courses. Check back soon!</p>
+                        </div>
+                    ) : filteredCourses.length === 0 ? (
+                        <div className="text-center py-24 text-gray-500">
+                            <Search size={48} className="mx-auto mb-4 opacity-30" />
+                            <p className="font-bold text-lg text-gray-900">No courses found.</p>
+                            <p className="text-sm mt-1">Try adjusting your search or filters.</p>
                             <button
-                                onClick={() => user ? setShowCommunityModal(true) : navigate('/login')}
-                                className="flex px-5 py-2 bg-gray-900 text-white font-bold rounded-full text-[14px] items-center gap-2 hover:bg-gray-700 transition-colors"
+                                onClick={() => { setSearchQuery(''); setPriceFilter('All'); setLevelFilter('All'); setPlatformFilter('All'); }}
+                                className="mt-4 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl font-bold text-sm hover:bg-purple-100 transition-colors"
                             >
-                                <PenLine size={14} /> Post
+                                Clear Filters
                             </button>
                         </div>
-
-                        {communityLoading ? (
-                            <div className="max-w-[600px] mx-auto border border-gray-200 rounded-2xl overflow-hidden bg-white">
-                                <FeedSkeleton rows={5} />
-                            </div>
-                        ) : communityLessons.length === 0 ? (
-                            <div className="text-center py-20 text-gray-400 max-w-[600px] mx-auto border border-gray-200 rounded-2xl bg-white">
-                                <Users size={40} className="mx-auto mb-3 opacity-20" />
-                                <p className="font-bold text-base text-gray-900">Nothing here yet.</p>
-                                <p className="text-sm mt-1">Be the first to share your Web3 knowledge!</p>
-                            </div>
-                        ) : (
-                            <div className="max-w-[700px] mx-auto flex flex-col gap-6">
-                                {communityLessons.map((lesson, i) => {
-                                    const initials = lesson.author?.username
-                                        ? lesson.author.username.charAt(0).toUpperCase()
-                                        : (lesson.author?.name ? lesson.author.name.charAt(0).toUpperCase() : '?');
-                                    const isLiked = lesson.upvotes?.includes(user?.id || user?._id);
-                                    const diff = Date.now() - new Date(lesson.createdAt).getTime();
-                                    const timeAgo = diff < 0 ? 'just now' : diff < 3600000
-                                        ? `${Math.floor(diff / 60000)}m`
-                                        : diff < 86400000
-                                            ? `${Math.floor(diff / 3600000)}h`
-                                            : `${Math.floor(diff / 86400000)}d`;
-
-                                    const isLong = lesson.contentMarkdown?.length > 450;
-
-                                    return (
-                                        <motion.div
-                                            key={lesson._id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.05 }}
-                                            className="group bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-300"
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredCourses.map((course, i) => {
+                                const platformStyle = PLATFORM_COLORS[course.platform] || PLATFORM_COLORS['Other'];
+                                return (
+                                    <motion.div
+                                        key={course._id}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: (i % 3) * 0.1, duration: 0.5 }}
+                                        className="relative"
+                                    >
+                                        {/* Bookmark Button — outside overflow-hidden so it's always visible */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                toggleBookmark(course);
+                                            }}
+                                            className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
+                                            title={isBookmarked(course._id) ? 'Remove Bookmark' : 'Bookmark Course'}
                                         >
-                                            <div className="p-6 md:p-8">
-                                                <div className="flex justify-between items-start mb-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center font-black text-lg text-purple-600 shadow-sm border border-white">
-                                                            {lesson.author?.avatarUrl ? (
-                                                                <img src={lesson.author.avatarUrl} alt="avatar" className="w-full h-full object-cover rounded-2xl" />
-                                                            ) : (
-                                                                <span>{initials}</span>
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            <div className="font-black text-gray-900 tracking-tight leading-none mb-1">
-                                                                {lesson.author?.username || lesson.author?.name || 'Anonymous Builder'}
-                                                            </div>
-                                                            <div className="text-gray-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                                                                {timeAgo}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    {/* Context Menu for Author */}
-                                                    {user && (user.id === lesson.author?._id || user._id === lesson.author?._id) && (
-                                                        <div className="relative">
-                                                            <button 
-                                                                onClick={(e) => { e.stopPropagation(); setCommunityMenuOpen(communityMenuOpen === lesson._id ? null : lesson._id); }}
-                                                                className="w-10 h-10 rounded-xl hover:bg-gray-50 flex items-center justify-center text-gray-400 transition-colors"
-                                                            >
-                                                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-                                                            </button>
-                                                            {communityMenuOpen === lesson._id && (
-                                                                <>
-                                                                    <div className="fixed inset-0 z-40" onClick={() => setCommunityMenuOpen(null)} />
-                                                                    <div className="absolute right-0 top-12 z-50 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 min-w-[160px] overflow-hidden">
-                                                                        <button 
-                                                                            onClick={() => { setEditingLesson({ ...lesson }); setCommunityMenuOpen(null); }}
-                                                                            className="w-full text-left px-5 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                                                                        >
-                                                                            <Edit3 size={16} /> Edit Post
-                                                                        </button>
-                                                                        <button 
-                                                                            onClick={() => { handleDeleteLesson(lesson._id); setCommunityMenuOpen(null); }}
-                                                                            className="w-full text-left px-5 py-3 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                                                                        >
-                                                                            <Trash2 size={16} /> Delete Post
-                                                                        </button>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
+                                            <Bookmark
+                                                size={16}
+                                                fill={isBookmarked(course._id) ? 'currentColor' : 'none'}
+                                                className={isBookmarked(course._id) ? 'text-purple-600' : ''}
+                                            />
+                                        </button>
 
-                                                <h3 
-                                                    className="text-xl md:text-2xl font-black text-gray-900 mb-4 tracking-tight leading-tight cursor-pointer hover:text-purple-600 transition-colors"
-                                                    onClick={() => navigate(`/academy/${lesson.slug}`)}
-                                                >
-                                                    {lesson.title}
-                                                </h3>
-
-                                                {/* Content Rendering */}
-                                                <div className="prose prose-slate prose-sm max-w-none text-gray-600 leading-relaxed font-medium mb-6">
-                                                    <ReactMarkdown>
-                                                        {isLong 
-                                                            ? `${lesson.contentMarkdown.substring(0, 450)}...` 
-                                                            : lesson.contentMarkdown
-                                                        }
-                                                    </ReactMarkdown>
-                                                </div>
-
-                                                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-                                                    <div className="flex items-center gap-4">
-                                                        <button 
-                                                            onClick={() => handleUpvote(lesson._id)}
-                                                            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${isLiked ? 'bg-pink-50 text-pink-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-pink-600'}`}
-                                                        >
-                                                            <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={isLiked ? 1 : 2} />
-                                                            {lesson.upvotes?.length || 0}
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => navigate(`/academy/${lesson.slug}`)}
-                                                            className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm text-gray-400 hover:bg-gray-50 hover:text-indigo-600 transition-all"
-                                                        >
-                                                            <Eye size={18} /> {isLong ? 'Read More' : 'Details'}
-                                                        </button>
-                                                    </div>
-
-                                                    <button 
-                                                        onClick={() => {
-                                                            const shareUrl = `${window.location.origin}/academy/${lesson.slug}`;
-                                                            if (navigator.share) {
-                                                                navigator.share({ title: lesson.title, url: shareUrl }).catch(() => {});
-                                                            } else {
-                                                                navigator.clipboard.writeText(shareUrl);
-                                                                alert('Link copied to clipboard!');
-                                                            }
+                                        {/* Share Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const shareUrl = `${window.location.origin}/academy?search=${encodeURIComponent(course.title)}`;
+                                                if (navigator.share) {
+                                                    navigator.share({ title: course.title, text: course.description, url: shareUrl }).catch(() => {});
+                                                } else {
+                                                    navigator.clipboard.writeText(shareUrl);
+                                                    alert('Link copied to clipboard!');
+                                                }
+                                            }}
+                                            className="absolute top-3 right-14 z-30 w-9 h-9 rounded-full bg-white/95 backdrop-blur shadow-md border border-white/50 flex items-center justify-center text-gray-500 hover:text-purple-600 hover:scale-110 active:scale-95 transition-all"
+                                            title="Share Course"
+                                        >
+                                            <Share2 size={16} />
+                                        </button>
+                                        <a
+                                            href={course.url}
+                                            target="_blank"
+                                            rel="noreferrer noopener"
+                                            className="group block bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(109,40,217,0.08)] hover:border-purple-100 transition-all duration-500 h-full"
+                                        >
+                                            {/* Thumbnail */}
+                                            <div className="w-full h-44 overflow-hidden relative">
+                                                {course.thumbnail ? (
+                                                    <img
+                                                        src={course.thumbnail}
+                                                        alt={course.title}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                            e.target.nextSibling.style.display = 'flex';
                                                         }}
-                                                        className="w-10 h-10 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-blue-600 flex items-center justify-center transition-all"
-                                                        title="Share"
-                                                    >
-                                                        <Share2 size={18} />
-                                                    </button>
+                                                    />
+                                                ) : null}
+                                                {/* Fallback banner — shown when thumbnail is absent or broken */}
+                                                <div
+                                                    className="w-full h-full items-center justify-center flex-col gap-2"
+                                                    style={{ display: course.thumbnail ? 'none' : 'flex', background: 'linear-gradient(135deg,#ede9fe 0%,#c7d2fe 100%)' }}
+                                                >
+                                                    <span className="text-3xl">
+                                                        {course.platform === 'YouTube' ? '▶' :
+                                                            course.platform === 'Coursera' ? '🎓' :
+                                                                course.platform === 'Udemy' ? '📚' :
+                                                                    course.platform === 'Anthropic' ? '🤖' :
+                                                                        course.platform === 'GitHub' ? '⌨️' : '🌐'}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-indigo-400 tracking-widest uppercase">{course.platform}</span>
                                                 </div>
                                             </div>
-                                        </motion.div>
-                                    );
-                                })}
-                            </div>
-                        )}
 
-                        {/* Mobile FAB removed for clean unified layout */}
-                    </motion.div>
-                )}
+                                            {/* Content */}
+                                            <div className="p-6 flex flex-col gap-3">
+                                                <span className="text-[10px] font-bold text-purple-500 uppercase tracking-widest">{course.level}</span>
+                                                <h3 className="text-lg font-black text-gray-900 leading-tight group-hover:text-purple-700 transition-colors">{course.title}</h3>
+                                                {course.description && (
+                                                    <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{course.description}</p>
+                                                )}
+                                                {course.tags?.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mt-1">
+                                                        {course.tags.slice(0, 3).map((tag, idx) => (
+                                                            <span key={`${course._id}-${tag}-${idx}`} className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full font-medium">#{tag}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                <div className="mt-3 flex items-center justify-between pt-3 border-t border-gray-50">
+                                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{course.platform}</span>
+                                                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 group-hover:gap-2.5 transition-all">
+                                                        Go to Course <ExternalLink size={12} />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </motion.div>
             </div>
-
-            {/* Publish Lesson Modal */}
-            {showCommunityModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowCommunityModal(false)} />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-3xl w-full max-w-2xl relative z-10 p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
-                    >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Plus size={24} className="text-purple-500" /> Publish a Lesson
-                        </h2>
-                        <form onSubmit={handleCreatePost} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Title</label>
-                                <input 
-                                    required
-                                    type="text" 
-                                    value={newPostData.title}
-                                    onChange={e => setNewPostData(prev => ({...prev, title: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
-                                    placeholder="e.g. A Deep Dive into Zero-Knowledge Proofs"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1 mt-2">Lesson Content (Markdown Supported)</label>
-                                <textarea 
-                                    required
-                                    value={newPostData.contentMarkdown}
-                                    onChange={e => setNewPostData(prev => ({...prev, contentMarkdown: e.target.value}))}
-                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium resize-none font-mono text-sm leading-relaxed" 
-                                    placeholder="Write your lesson content here... Use markdown for headers, lists, code, etc."
-                                />
-                            </div>
-                            <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
-                                {communityPostError && (
-                                    <p className="mr-auto text-sm font-medium text-red-600">{communityPostError}</p>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCommunityModal(false)}
-                                    className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={submittingPost}
-                                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
-                                >
-                                    {submittingPost ? 'Publishing...' : 'Publish Lesson'}
-                                </button>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
-            )}
-
-            {/* Edit Lesson Modal */}
-            {editingLesson && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setEditingLesson(null)} />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-3xl w-full max-w-2xl relative z-10 p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
-                    >
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <PenLine size={24} className="text-purple-500" /> Edit Lesson
-                        </h2>
-                        <form onSubmit={handleUpdateLesson} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1">Title</label>
-                                <input 
-                                    required
-                                    type="text" 
-                                    value={editingLesson.title}
-                                    onChange={e => setEditingLesson(prev => ({...prev, title: e.target.value}))}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 ml-1 mt-2">Lesson Content (Markdown Supported)</label>
-                                <textarea 
-                                    required
-                                    value={editingLesson.contentMarkdown}
-                                    onChange={e => setEditingLesson(prev => ({...prev, contentMarkdown: e.target.value}))}
-                                    className="w-full h-64 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 font-medium resize-none font-mono text-sm leading-relaxed" 
-                                />
-                            </div>
-                            <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-100">
-                                {communityPostError && (
-                                    <p className="mr-auto text-sm font-medium text-red-600">{communityPostError}</p>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => setEditingLesson(null)}
-                                    className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={submittingPost}
-                                    className="px-8 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
-                                >
-                                    {submittingPost ? 'Updating...' : 'Update Lesson'}
-                                </button>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
-            )}
         </div>
     );
 }

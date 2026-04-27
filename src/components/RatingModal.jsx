@@ -95,7 +95,7 @@ export default function RatingModal({ tool, onClose, onRatingSubmitted }) {
                     <button
                         type="submit"
                         disabled={submitting || !user}
-                        className="w-full btn-primary py-4 font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full btn-primary py-4 font-bold text-white disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {submitting ? (
                             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />

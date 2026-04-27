@@ -76,4 +76,39 @@ router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
     }
 });
 
+// @desc    Developer replies to a review
+// @route   POST /api/ratings/:ratingId/reply
+// @access  Private
+router.post('/:ratingId/reply', protect, async (req, res) => {
+    try {
+        const { reply } = req.body;
+        if (!reply || !reply.trim()) {
+            return res.status(400).json({ success: false, error: 'Reply text is required.' });
+        }
+
+        const rating = await Rating.findById(req.params.ratingId);
+        if (!rating) return res.status(404).json({ success: false, error: 'Review not found.' });
+
+        // Verify the requesting user owns the tool (submitted or claimed it)
+        const tool = await Tool.findOne({ id: rating.tool });
+        if (!tool) return res.status(404).json({ success: false, error: 'App not found.' });
+
+        const isOwner =
+            (tool.submitter && tool.submitter.toString() === req.user.id) ||
+            (tool.developerClaimedBy && tool.developerClaimedBy.toString() === req.user.id);
+
+        if (!isOwner) {
+            return res.status(403).json({ success: false, error: 'Only the app developer can reply to reviews.' });
+        }
+
+        rating.developerReply = reply.trim();
+        rating.developerRepliedAt = new Date();
+        await rating.save();
+
+        res.json({ success: true, data: rating });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;

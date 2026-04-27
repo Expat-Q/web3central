@@ -77,21 +77,19 @@ const ProtocolCard = ({ tool, onOpenDetails }) => {
 
 /* ── Category Section Definitions ── */
 const SECTIONS = [
-  { key: "trading",     label: "Trading",          dbKeys: ["dex", "perps", "trading"],     comingSoon: false },
-  { key: "bridges",     label: "Bridges",           dbKeys: ["interoperability", "bridges"], comingSoon: false },
-  { key: "defi",        label: "DeFi",              dbKeys: ["defi"],                        comingSoon: false },
-  { key: "staking",     label: "Staking",           dbKeys: ["staking"],                     comingSoon: false },
-  { key: "rwa",         label: "RWA",               dbKeys: ["rwa"],                         comingSoon: false },
-  { key: "security",    label: "Security",          dbKeys: ["security"],                    comingSoon: false },
-  { key: "infofi",      label: "InfoFi",            dbKeys: ["infofi"],                      comingSoon: false },
-  { key: "analytics",   label: "Analytics",         dbKeys: ["analytics"],                   comingSoon: false },
-  { key: "wallets",     label: "Wallets",           dbKeys: ["wallets"],                     comingSoon: false },
-  { key: "l2",          label: "Layer 2",           dbKeys: ["l2"],                          comingSoon: false },
-  { key: "nft",         label: "NFT",               dbKeys: ["nft"],                         comingSoon: false },
-  { key: "gaming",      label: "Gaming",            dbKeys: ["gaming"],                      comingSoon: false },
-  { key: "privacy",     label: "Privacy",           dbKeys: ["privacy"],                     comingSoon: true  },
-  { key: "predictions", label: "Predictions",       dbKeys: ["predictions"],                 comingSoon: false },
-  { key: "community",   label: "Community",         dbKeys: ["communityTools", "community"], comingSoon: false },
+  { key: "trading",     label: "Trading",          dbKeys: ["dex", "perps", "trading"],               comingSoon: false },
+  { key: "defi",        label: "DeFi",             dbKeys: ["defi"],                                  comingSoon: false },
+  { key: "bridges",     label: "Bridges",          dbKeys: ["interoperability", "bridges", "bridge"], comingSoon: false },
+  { key: "wallets",     label: "Wallets",          dbKeys: ["wallets", "wallet"],                     comingSoon: false },
+  { key: "security",    label: "Security",         dbKeys: ["security"],                              comingSoon: false },
+  { key: "analytics",   label: "Analytics",        dbKeys: ["analytics"],                             comingSoon: false },
+  { key: "nft",         label: "NFT",              dbKeys: ["nft"],                                   comingSoon: false },
+  { key: "gaming",      label: "Gaming",           dbKeys: ["gaming"],                                comingSoon: false },
+  { key: "community",   label: "Community",        dbKeys: ["communityTools", "community", "bountyHub"], comingSoon: false },
+  { key: "rwa",         label: "RWA",              dbKeys: ["rwa"],                                   comingSoon: false },
+  { key: "cex",         label: "CEX",              dbKeys: ["cex"],                                   comingSoon: true  },
+  { key: "privacy",     label: "Privacy",          dbKeys: ["privacy"],                               comingSoon: true  },
+  { key: "predictions", label: "Predictions",      dbKeys: ["predictions"],                           comingSoon: false },
 ];
 
 /* ── Coming Soon Mini Card ── */
@@ -185,7 +183,7 @@ export default function Apps() {
   };
 
   return (
-    <div className="bg-white min-h-screen pt-20 pb-16">
+    <div className="bg-white min-h-screen pt-16 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Page Header */}
