@@ -7,7 +7,7 @@ import logo from "../assets/logo.jpg";
  * Slim Navbar — logo + auth only.
  * All navigation lives in the CategorySidebar.
  */
-export default function Navbar() {
+export default function Navbar({ setSidebarOpen }) {
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,17 +17,20 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between lg:justify-end h-16">
 
-          {/* Logo — hidden on desktop (shown in sidebar instead) */}
-          <Link to="/" className="flex items-center gap-3 shrink-0 lg:hidden">
-            <img
-              src={logo}
-              alt="web3central"
-              className="w-9 h-9 object-cover rounded-lg border border-purple-100 shadow-sm"
-            />
-            <span className="text-lg font-black tracking-tight text-gray-900">
-              web3<span className="text-purple-600">central</span>
-            </span>
-          </Link>
+          {/* Logo on mobile */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <Link to="/" className="flex items-center gap-3 shrink-0">
+              <img
+                src={logo}
+                alt="web3central"
+                className="w-9 h-9 object-cover rounded-lg border border-purple-100 shadow-sm"
+              />
+              {/* Text hidden on mobile (hidden block), only shown if not hidden */}
+              <span className="hidden sm:inline-block text-lg font-black tracking-tight text-gray-900">
+                web3<span className="text-purple-600">central</span>
+              </span>
+            </Link>
+          </div>
 
           {/* Auth — desktop */}
           <div className="hidden md:flex items-center gap-3">
@@ -69,27 +72,40 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Auth — mobile */}
-          <div className="md:hidden flex items-center gap-2">
+          {/* Auth + Hamburger — mobile */}
+          <div className="md:hidden flex items-center gap-1 sm:gap-2">
             {isLoggedIn ? (
               <button
                 onClick={logout}
-                className="px-3 py-1.5 text-xs font-bold text-gray-600 border border-gray-200 rounded-lg"
+                className="px-2 py-1.5 sm:px-3 text-xs font-bold text-gray-600 border border-gray-200 rounded-lg"
               >
                 Logout
               </button>
             ) : (
               <>
-                <Link to="/login" className="px-3 py-1.5 text-xs font-semibold text-gray-600">
+                <Link to="/login" className="px-2 py-1.5 sm:px-3 text-xs font-semibold text-gray-600">
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-3 py-1.5 text-xs font-bold text-white bg-purple-600 rounded-lg"
+                  className="px-2 py-1.5 sm:px-3 text-xs font-bold text-white bg-purple-600 rounded-lg"
                 >
                   Sign Up
                 </Link>
               </>
+            )}
+            
+            {/* Hamburger Menu Icon */}
+            {setSidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors ml-1"
+                aria-label="Open sidebar"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+              </button>
             )}
           </div>
         </div>

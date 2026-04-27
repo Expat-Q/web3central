@@ -87,8 +87,8 @@ const SECTIONS = [
   { key: "gaming",      label: "Gaming",           dbKeys: ["gaming"],                                comingSoon: false },
   { key: "community",   label: "Community",        dbKeys: ["communityTools", "community", "bountyHub"], comingSoon: false },
   { key: "rwa",         label: "RWA",              dbKeys: ["rwa"],                                   comingSoon: false },
-  { key: "cex",         label: "CEX",              dbKeys: ["cex"],                                   comingSoon: true  },
-  { key: "privacy",     label: "Privacy",          dbKeys: ["privacy"],                               comingSoon: true  },
+  { key: "cex",         label: "CEX",              dbKeys: ["cex"],                                   comingSoon: false },
+  { key: "privacy",     label: "Privacy",          dbKeys: ["privacy"],                               comingSoon: false },
   { key: "predictions", label: "Predictions",      dbKeys: ["predictions"],                           comingSoon: false },
 ];
 

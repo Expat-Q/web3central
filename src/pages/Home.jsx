@@ -10,6 +10,7 @@ import {
 import ToolLogo from "../components/ToolLogo";
 import NewsCard from "../components/NewsCard";
 import CategorySidebar from "../components/CategorySidebar";
+// Sidebar is now rendered globally in App.jsx — import kept for potential direct use
 import { PageSkeleton } from "../components/Skeleton";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
@@ -221,18 +222,7 @@ export default function Home() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="bg-[#FAFAFA] min-h-screen text-gray-900 flex">
-
-      {/* ── Desktop Sidebar (full height from top-0) ── */}
-      <CategorySidebar
-        activeSection={activeSection}
-        onSelect={setActiveSection}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-
-      {/* ── Scrollable content column ── */}
-      <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 w-full overflow-x-hidden">
       {/* Spacer for fixed navbar */}
       <div className="h-16" />
 
@@ -260,18 +250,8 @@ export default function Home() {
       {/* ── Main content ── */}
       <main className="px-4 sm:px-5 lg:px-7 py-5 space-y-8">
 
-        {/* Search bar + mobile hamburger */}
+        {/* Search bar */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2.5 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors shrink-0"
-              aria-label="Open sidebar"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-              </svg>
-            </button>
-
             <div ref={searchRef} className="relative flex-1">
               <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-purple-400 transition-all shadow-sm">
                 <Search size={16} className="text-gray-300 shrink-0" />
@@ -370,20 +350,20 @@ export default function Home() {
                     </p>
                   </div>
                   
-                  <div className="flex flex-row md:flex-col items-center justify-center gap-3 shrink-0 md:ml-auto">
+                  <div className="flex flex-row md:flex-col items-center justify-center gap-2 md:gap-3 shrink-0 md:ml-auto mt-4 md:mt-0">
                     {trending[currentFeaturedIndex].url && (
                       <a 
                         href={trending[currentFeaturedIndex].url} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="flex justify-center items-center gap-2 px-6 py-3 w-full md:w-40 bg-white text-gray-900 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-lg"
+                        className="flex justify-center items-center gap-1.5 md:gap-2 px-4 py-2 md:px-6 md:py-3 w-full md:w-40 bg-white text-gray-900 rounded-xl font-bold text-sm md:text-base hover:bg-gray-50 transition-colors shadow-lg"
                       >
-                        <ExternalLink size={16} /> Open App
+                        <ExternalLink size={14} className="md:w-4 md:h-4" /> Open App
                       </a>
                     )}
                     <button 
                       onClick={() => openTool(trending[currentFeaturedIndex])}
-                      className="flex justify-center items-center gap-2 px-6 py-3 w-full md:w-40 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl font-bold transition-colors backdrop-blur-sm"
+                      className="flex justify-center items-center gap-1.5 md:gap-2 px-4 py-2 md:px-6 md:py-3 w-full md:w-40 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl font-bold text-sm md:text-base transition-colors backdrop-blur-sm"
                     >
                       Details
                     </button>
@@ -584,7 +564,6 @@ export default function Home() {
         )}
 
       </main>
-      </div>
     </div>
   );
 }

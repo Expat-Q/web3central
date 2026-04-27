@@ -139,7 +139,7 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
         </div>
 
         {/* Scrollable body */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-4 ${isCollapsed ? "px-2" : ""}`}>
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain py-3 space-y-4 ${isCollapsed ? "px-2" : ""}`}>
 
           {/* Quick links */}
           <div className={isCollapsed ? "space-y-0.5" : "px-3 space-y-0.5"}>
