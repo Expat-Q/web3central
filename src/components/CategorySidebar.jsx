@@ -5,7 +5,7 @@ import {
   ArrowLeftRight, Landmark, Share2, Wallet, ShieldCheck,
   BarChart3, Image, Gamepad2, Users, Building, Coins, Lock,
   Activity, X, ChevronRight, ChevronLeft, LayoutGrid, Code2,
-  Scale, HelpCircle, User as UserIcon
+  Scale, HelpCircle, User as UserIcon, Target
 } from "lucide-react";
 import logo from "../assets/logo.jpg";
 
@@ -31,6 +31,7 @@ const CATEGORIES = [
   { id: "cex",         label: "CEX",         icon: Coins,          path: "/apps/cex",         color: "text-yellow-600"  },
   { id: "privacy",     label: "Privacy",     icon: Lock,           path: "/apps/privacy",     color: "text-gray-600"    },
   { id: "predictions", label: "Predictions", icon: Activity,       path: "/apps/predictions", color: "text-orange-600"  },
+  { id: "bounty-hub",  label: "Bounty Hub",  icon: Target,         path: "/apps/bounty-hub",  color: "text-indigo-600"  },
 ];
 
 const NAV_LINKS = [
