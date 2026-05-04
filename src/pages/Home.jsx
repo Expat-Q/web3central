@@ -5,12 +5,14 @@ import { fetchToolsData, fetchLatestNews, fetchCommunitySpotlight } from "../ser
 import {
   Star, ExternalLink, ChevronRight, Search, X,
   TrendingUp, Sparkles, ArrowLeftRight, Landmark,
-  Share2, Wallet, ShieldCheck, BarChart3, Users
+  Share2, Wallet, ShieldCheck, BarChart3, Users,
+  Trophy, Gamepad2, Lock, Building, Coins, Activity,
+  Image, Target
 } from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
 import NewsCard from "../components/NewsCard";
 import CategorySidebar from "../components/CategorySidebar";
-// Sidebar is now rendered globally in App.jsx — import kept for potential direct use
+// Sidebar is now rendered globally in App.jsx  import kept for potential direct use
 import { PageSkeleton } from "../components/Skeleton";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
@@ -27,13 +29,13 @@ const CATEGORY_TO_ROUTE = {
 const norm = (cat = "") => cat.toLowerCase().replace(/[^a-z0-9]/g, "");
 const getCategoryRoute = (cat = "") => CATEGORY_TO_ROUTE[norm(cat)] || norm(cat) || "trading";
 
-/* ── Trending score: clicks + ratings + weeklyTrend ── */
+/*  Trending score: clicks + ratings + weeklyTrend  */
 const trendScore = (t) =>
   (t.weeklyTrendScore || 0) * 1.5 +
   (t.clickCount || 0) * 0.5 +
   (t.averageRating || t.rating || 0) * 10;
 
-/* ── Section Header ── */
+/*  Section Header  */
 const SectionHeader = ({ icon: Icon, iconColor = "text-purple-600", title, subtitle, to }) => (
   <div className="flex items-end justify-between mb-4">
     <div>
@@ -51,7 +53,7 @@ const SectionHeader = ({ icon: Icon, iconColor = "text-purple-600", title, subti
   </div>
 );
 
-/* ── App Card (Play Store style) ── */
+/*  App Card (Play Store style)  */
 const AppCard = ({ tool, onOpen }) => {
   const rating = tool.averageRating || tool.rating || 0;
   return (
@@ -76,14 +78,14 @@ const AppCard = ({ tool, onOpen }) => {
   );
 };
 
-/* ── Horizontal Scroll Row ── */
+/*  Horizontal Scroll Row  */
 const HScrollRow = ({ children }) => (
   <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
     {children}
   </div>
 );
 
-/* ── Category Row Section ── */
+/*  Category Row Section  */
 const CategorySection = ({ icon, iconColor, title, subtitle, to, tools, onOpen, sectionId }) => {
   if (!tools.length) return null;
   return (
@@ -100,14 +102,77 @@ const CategorySection = ({ icon, iconColor, title, subtitle, to, tools, onOpen, 
   );
 };
 
-/* ══════════════════════════════════════════════════
+  /*  Top Charts Section  */
+const TopChartsSection = ({ tools, onOpen }) => {
+  if (!tools || tools.length === 0) return null;
+  return (
+    <section>
+      <SectionHeader
+        icon={Trophy}
+        iconColor="text-yellow-500"
+        title="Top Charts"
+        subtitle="The highest performing protocols across all categories"
+        to="/apps"
+      />
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {tools.map((tool, idx) => {
+          const rating = tool.averageRating || tool.rating || 0;
+          return (
+            <button
+              key={tool._id || tool.id}
+              onClick={() => onOpen(tool)}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-50 last:border-0 group"
+            >
+              {/* Rank number */}
+              <span className={`text-sm font-black w-6 text-center shrink-0 ${
+                idx === 0 ? 'text-yellow-500' :
+                idx === 1 ? 'text-gray-400' :
+                idx === 2 ? 'text-amber-700' : 'text-gray-300'
+              }`}>
+                {idx + 1}
+              </span>
+
+              {/* Logo */}
+              <div className="w-10 h-10 rounded-xl border border-gray-100 overflow-hidden bg-white shrink-0 shadow-sm">
+                <ToolLogo tool={tool} className="w-full h-full object-contain p-1" />
+              </div>
+
+              {/* Name + category */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">{tool.name}</p>
+                <p className="text-xs text-gray-400 capitalize truncate">{tool.category}</p>
+              </div>
+
+              {/* Rating or arrow */}
+              <div className="shrink-0 flex items-center gap-1">
+                {rating > 0 ? (
+                  <>
+                    <Star size={11} className="text-yellow-400 fill-yellow-400" />
+                    <span className="text-xs font-bold text-gray-600">{rating.toFixed(1)}</span>
+                  </>
+                ) : (
+                  <ExternalLink size={12} className="text-gray-300 group-hover:text-purple-400 transition-colors" />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+/* ----------------------------------------
    HOME PAGE
-═══════════════════════════════════════════════════ */
+   ---------------------------------------- */
 export default function Home() {
+
+
   const [allTools, setAllTools] = useState([]);
   const [newsFeed, setNewsFeed] = useState([]);
   const [spotlight, setSpotlight] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [topCharts, setTopCharts] = useState({});
 
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -123,17 +188,28 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  /* ── Data fetch ── */
+  /*  Data fetch  */
   useEffect(() => {
-    Promise.all([fetchToolsData(), fetchLatestNews(), fetchCommunitySpotlight()])
-      .then(([toolsData, newsData, spotlightData]) => {
+    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
+
+    Promise.all([
+      fetchToolsData(),
+      fetchLatestNews(),
+      fetchCommunitySpotlight(),
+      fetch(`${API_BASE}/tools/top-charts`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+    ])
+      .then(([toolsData, newsData, spotlightData, topChartsRes]) => {
         const tools = Object.values(toolsData || {})
           .filter(Array.isArray).flat()
           .filter(t => t.status === "active" || !t.status);
         setAllTools(tools);
         setNewsFeed(newsData || []);
+
+        // Top charts  backend returns { success, data: { category: [tools] } }
+        if (topChartsRes?.data) setTopCharts(topChartsRes.data);
+        else if (typeof topChartsRes === 'object') setTopCharts(topChartsRes);
         
-        // Handle spotlight data — supports both array and legacy single object
+        // Handle spotlight data  supports both array and legacy single object
         const raw = spotlightData;
         let spotlights = [];
         if (Array.isArray(raw)) {
@@ -150,7 +226,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* ── Spotlight Carousel Interval ── */
+  /*  Spotlight Carousel Interval  */
   useEffect(() => {
     if (spotlightList.length <= 1) return;
     const interval = setInterval(() => {
@@ -163,7 +239,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [spotlightList]);
 
-  /* ── Featured Carousel Interval ── */
+  /*  Featured Carousel Interval  */
   useEffect(() => {
     const trendingList = allTools
       .sort((a, b) => trendScore(b) - trendScore(a))
@@ -177,7 +253,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [allTools]);
 
-  /* ── Debounced search ── */
+  /*  Debounced search  */
   useEffect(() => {
     if (!query.trim()) { setSearchResults([]); setSearchOpen(false); return; }
     const t = setTimeout(async () => {
@@ -199,7 +275,7 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  /* ── Open tool → navigate to category page + open MetricsPanel ── */
+  /*  Open tool  navigate to category page + open MetricsPanel  */
   const openTool = (tool) => {
     const route = getCategoryRoute(tool.category);
     navigate(`/apps/${route}`, {
@@ -207,7 +283,7 @@ export default function Home() {
     });
   };
 
-  /* ── Derived data ── */
+  /*  Derived data  */
   const byCats = (cats) =>
     allTools.filter(t => cats.includes(norm(t.category))).sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
 
@@ -226,7 +302,7 @@ export default function Home() {
       {/* Spacer for fixed navbar */}
       <div className="h-16" />
 
-      {/* ── New arrivals ticker ── */}
+      {/*  New arrivals ticker  */}
       {newArrivals.length > 0 && (
         <div className="w-full bg-purple-50 border-b border-purple-100 overflow-hidden flex py-1.5">
           <div className="whitespace-nowrap flex items-center gap-4 animate-marquee">
@@ -247,7 +323,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── Main content ── */}
+      {/*  Main content  */}
       <main className="px-4 sm:px-5 lg:px-7 py-5 space-y-8">
 
         {/* Search bar */}
@@ -279,7 +355,7 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Search dropdown — clicking opens MetricsPanel */}
+              {/* Search dropdown  clicking opens MetricsPanel */}
               {searchOpen && searchResults.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: -6 }}
@@ -318,7 +394,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ⓪ Featured Hero Banner Carousel */}
+          {/*  Featured Hero Banner Carousel */}
           {trending.length > 0 && (
             <div className="w-full rounded-[2rem] bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-900 p-8 md:p-10 text-white relative overflow-hidden shadow-2xl h-auto md:h-[280px] flex items-center">
               {/* Background glow effects */}
@@ -384,7 +460,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* ① Trending Now — all categories, ranked by clicks + ratings */}
+          {/*  Trending Now  all categories, ranked by clicks + ratings */}
           <CategorySection
             id="section-trending"
             sectionId="section-trending"
@@ -396,8 +472,8 @@ export default function Home() {
             tools={trending}
             onOpen={openTool}
           />
-          
-          {/* ── Builder Spotlight Carousel ── */}
+
+          {/*  Builder Spotlight Carousel  */}
           {spotlightList.length > 0 && (
             <section className="my-8">
               <SectionHeader
@@ -474,7 +550,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* ② New Arrivals */}
+          {/*  New Arrivals */}
           <CategorySection
             sectionId="section-new"
             icon={Sparkles}
@@ -486,7 +562,7 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ③ Top in Trading */}
+          {/*  Top in Trading */}
           <CategorySection
             sectionId="section-trading"
             icon={ArrowLeftRight}
@@ -498,7 +574,7 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ④ Top in DeFi */}
+          {/*  Top in DeFi */}
           <CategorySection
             sectionId="section-defi"
             icon={Landmark}
@@ -510,7 +586,7 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ⑤ Top in Bridges */}
+          {/*  Top in Bridges */}
           <CategorySection
             sectionId="section-bridges"
             icon={Share2}
@@ -522,7 +598,7 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ⑥ Top in Wallets */}
+          {/*  Top in Wallets */}
           <CategorySection
             sectionId="section-wallets"
             icon={Wallet}
@@ -534,7 +610,7 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ⑦ Top in Security */}
+          {/*  Top in Security */}
           <CategorySection
             sectionId="section-security"
             icon={ShieldCheck}
@@ -546,7 +622,32 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/* ⑧ Latest News */}
+          {/*  Top Charts: combined top protocols from all categories  */}
+          <section className="py-8">
+            <SectionHeader icon={Trophy} iconColor="text-amber-500" title="Top Charts" subtitle="Ranked by clicks, ratings & weekly trend" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {[...allTools].sort((a,b) => trendScore(b) - trendScore(a)).slice(0, 10).map((tool, idx) => (
+                <button key={tool.id} onClick={() => openTool(tool)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left group">
+                  <span className="font-mono text-xs text-gray-400 w-6 shrink-0">#{idx + 1}</span>
+                  <div className="w-9 h-9 rounded-xl border border-gray-100 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                    <ToolLogo tool={tool} className="w-full h-full object-contain p-1" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">{tool.name}</p>
+                    <p className="text-xs text-gray-400 capitalize truncate">{tool.category}</p>
+                  </div>
+                  {(tool.averageRating || tool.rating) > 0 && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Star size={11} className="text-yellow-400 fill-yellow-400" />
+                      <span className="text-xs font-bold text-gray-500">{(tool.averageRating || tool.rating).toFixed(1)}</span>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/*  Latest News */}
           {newsFeed.length > 0 && (
             <section className="border-t border-gray-100 pt-6">
               <SectionHeader

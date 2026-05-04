@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Aave",
+    "description": "Aave Protocol is a non-custodial liquidity protocol. Users can participate as suppliers, borrowers, or liquidators, earning interest on supplied assets and borrowing in an overcollateralized manner.",
+    "url": "https://app.aave.com/",
+    "category": "defi, lending/borrowing"
+  },
+  {
+    "name": "Across Protocol",
+    "description": "Across Protocol is a leading cross-chain token bridge that is secured by UMA's optimistic oracle. It is optimized for capital efficiency with a single liquidity pool, a competitive relayer landscape, ...",
+    "url": "https://across.to/",
+    "category": "infra, bridge"
+  },
+  {
+    "name": "Add3",
+    "description": "EVM smart contract creation and management for web3 projects - Use Add3 to deploy customizable & compliant web3 smart contract products, dapp & analytics in minutes. Code or no-code options available!",
+    "url": "https://add3.io",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "Aerodrome Finance",
+    "description": "The central trading and liquidity marketplace on Base.",
+    "url": "http://aerodrome.finance",
+    "category": "defi, dex"
+  },
+  {
+    "name": "AgentiPy",
+    "description": "AgentiPy is an AI agent framework designed for the Base ecosystem.",
+    "url": "https://agentipy.fun/",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "AI Agent Arena",
+    "description": "AI Agent Arena is a gaming platform featuring intelligent and autonomous agents.",
+    "url": "https://play.agent-arena.xyz/",
+    "category": "consumer, gaming"
+  },
+  {
+    "name": "AITV",
+    "description": "AITV is a 24/7 livestream of intelligent and autonomous agents across topics that adjust to what you care about most! News, finance, music, gaming, and more.",
+    "url": "https://aitv.gg",
+    "category": "ai"
+  },
+  {
+    "name": "Alchemy",
+    "description": "Alchemy is the leading web3 developer platform. Alchemy's Account Abstraction APIs and SDK make it easy to offer seamless transactions and simple, secure accounts. Build anything on Base with Alchemy!",
+    "url": "https://www.alchemy.com/",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "Aleph.im",
+    "description": "Open source and agnostic Decentralized Physical Infrastructure Network providing Confidential VMs, Indexing, Web hosting, Storage, Databases, Compute, AI and VRF.",
+    "url": "https://aleph.im",
+    "category": "infra, depin"
+  },
+  {
+    "name": "AlfaFrens",
+    "description": "AlfaFrens is a SocialFi app on Farcaster for gated alfa chat subscriptions powered by Superfluid. Subscribe to creators with $DEGEN, earn $ALFA and stake it on creators for a share of their revenue.",
+    "url": "https://alfafrens.com",
+    "category": "consumer, social"
+  },
+  {
+    "name": "Algebra",
+    "description": "Algebra is a modular DEX protocol allowing projects to build their own decentralized exchanges with concentrated liquidity.",
+    "url": "https://algebra.finance/",
+    "category": "defi, dex"
+  },
+  {
+    "name": "Alien Base",
+    "description": "Alien Base is building a Base trading hub for efficiently trading tokens and memecoins onchain. Offering aggregated liquidity, limit orders, yield farming and more, Alien technology helps you use Base...",
+    "url": "https://alienbase.xyz/",
+    "category": "defi, dex"
+  },
+  {
+    "name": "All That Node",
+    "description": "All That Node is the most comprehensive multi-chain development suite, designed to support multiple networks from a single platform.",
+    "url": "https://www.allthatnode.com/",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "Allbridge Core",
+    "description": "Allbridge Core is a cross-chain swap protocol designed for stablecoins, providing seamless transfers between different networks.",
+    "url": "https://core.allbridge.io/",
+    "category": "infra, bridge"
+  },
+  {
+    "name": "Amberdata",
+    "description": "Amberdata provides comprehensive digital asset data, including on-chain, market, and network metrics for institutional clients.",
+    "url": "https://amberdata.io",
+    "category": "infra, data"
+  },
+  {
+    "name": "Animoca Brands",
+    "description": "Animoca Brands and its various subsidiaries develop and publish a broad portfolio of blockchain games, traditional games, and other products",
+    "url": "https://www.animocabrands.com/",
+    "category": "consumer, gaming"
+  },
+  {
+    "name": "Ankr",
+    "description": "Build on Web3 with a fast, reliable and distributed network of blockchain nodes",
+    "url": "https://www.ankr.com/",
+    "category": "infra, node provider"
+  },
+  {
+    "name": "Anotherblock",
+    "description": "anotherblock is empowering the emotional and financial connection between creators and consumers. Collectors own future streaming royalties of high-end tracks and earn royalties when they stream.",
+    "url": "https://anotherblock.io/",
+    "category": "consumer, music"
+  },
+  {
+    "name": "AnyCampus",
+    "description": "AnyCampus is a Web3 “learn-to-earn” platform that enables you to earn tokens while you learn.",
+    "url": "https://anycampus.io",
+    "category": "consumer, social"
+  },
+  {
+    "name": "Anzen",
+    "description": "Anzen is the creator of USDz, a stablecoin backed by a diversified RWA portfolio, allowing holders to mitigate volatility and earn rewards through all market cycles",
+    "url": "https://anzen.finance",
+    "category": "defi, stablecoin"
+  },
+  {
+    "name": "Arcana Network",
+    "description": "Arcana is a web3 developer platform that provides tools for user authentication, data privacy, and access control.",
+    "url": "https://arcana.network/",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "Arkham",
+    "description": "Arkham is a crypto intelligence platform that provides data and analytics on blockchain transactions and entities.",
+    "url": "https://www.arkhamintelligence.com/",
+    "category": "infra, data"
+  },
+  {
+    "name": "Avantis",
+    "description": "Avantis is a decentralized synthetics protocol that allows users to trade various assets with leverage on-chain.",
+    "url": "https://www.avantisfi.com/",
+    "category": "defi, derivatives"
+  },
+  {
+    "name": "Axelar",
+    "description": "Axelar delivers secure cross-chain communication for Web3, enabling developers to build interchain dApps.",
+    "url": "https://axelar.network/",
+    "category": "infra, bridge"
+  },
+  {
+    "name": "Base Name Service (BNS)",
+    "description": "BNS is a decentralized naming service for the Base ecosystem, providing human-readable names for wallet addresses.",
+    "url": "https://www.basecamp.global/",
+    "category": "consumer, identity"
+  },
+  {
+    "name": "Basenames",
+    "description": "Basenames are a decentralized naming service integrated directly into the Base ecosystem for identity and social interactions.",
+    "url": "https://www.base.org/names",
+    "category": "consumer, identity"
+  },
+  {
+    "name": "Beefy",
+    "description": "Beefy is a Decentralized, Multi-Chain Yield Optimizer that allows its users to earn compound interest on their crypto holdings.",
+    "url": "https://beefy.com/",
+    "category": "defi, yield"
+  },
+  {
+    "name": "Bitget Wallet",
+    "description": "Bitget Wallet is a leading multi-chain wallet providing a secure and seamless experience for managing digital assets.",
+    "url": "https://web3.bitget.com/",
+    "category": "consumer, wallet"
+  },
+  {
+    "name": "BlackRock",
+    "description": "BlackRock is a global investment manager providing institutional-grade access to digital assets and blockchain technology.",
+    "url": "https://www.blackrock.com/",
+    "category": "institutional"
+  },
+  {
+    "name": "Blockscout",
+    "description": "Blockscout is a multi-chain explorer providing transparent and detailed data on blockchain transactions and contracts.",
+    "url": "https://blockscout.com/",
+    "category": "infra, explorer"
+  },
+  {
+    "name": "Bluechip",
+    "description": "Bluechip is a stablecoin rating agency providing independent assessments of stablecoin safety and stability.",
+    "url": "https://bluechip.org/",
+    "category": "defi, stablecoin"
+  },
+  {
+    "name": "Bndr",
+    "description": "Bndr is a social platform built on Base for discovering and interacting with web3 communities.",
+    "url": "https://bndr.fi/",
+    "category": "consumer, social"
+  },
+  {
+    "name": "Boardroom",
+    "description": "Boardroom is a governance platform that simplifies the management and participation in DAO governance.",
+    "url": "https://www.boardroom.info/",
+    "category": "infra, governance"
+  },
+  {
+    "name": "Brave",
+    "description": "Brave is a privacy-focused browser with integrated web3 features and a built-in crypto wallet.",
+    "url": "https://brave.com/",
+    "category": "consumer, browser"
+  },
+  {
+    "name": "Bridge.xyz",
+    "description": "Bridge.xyz is a cross-chain bridging platform enabling seamless asset transfers between various networks.",
+    "url": "https://bridge.xyz/",
+    "category": "infra, bridge"
+  },
+  {
+    "name": "Build On Base",
+    "description": "Resources and tools for developers to build and scale applications on the Base network.",
+    "url": "https://www.base.org/build",
+    "category": "infra, developer tool"
+  },
+  {
+    "name": "Cami",
+    "description": "Cami is a SocialFi platform designed to bridge the gap between social media and decentralized finance.",
+    "url": "https://cami.finance/",
+    "category": "consumer, social"
+  },
+  {
+    "name": "Chainlink",
+    "description": "Chainlink is the industry-standard decentralized oracle network, providing reliable and secure data to smart contracts.",
+    "url": "https://chain.link/",
+    "category": "infra, oracle"
+  },
+  {
+    "name": "Circle",
+    "description": "Circle is a global financial technology firm that enables businesses of all sizes to harness the power of digital currencies.",
+    "url": "https://www.circle.com/",
+    "category": "infra, stablecoin"
+  },
+  {
+    "name": "Coinbase Wallet",
+    "description": "Coinbase Wallet is a self-custody wallet that gives users full control over their digital assets and dApp interactions.",
+    "url": "https://www.coinbase.com/wallet",
+    "category": "consumer, wallet"
+  },
+  {
+    "name": "Compound",
+    "description": "Compound is an algorithmic, autonomous interest rate protocol built for developers, to unlock a universe of open financial applications.",
+    "url": "https://compound.finance/",
+    "category": "defi, lending/borrowing"
+  },
+  {
+    "name": "Curve",
+    "description": "Curve is a decentralized exchange pool on Ethereum and Base designed for extremely efficient stablecoin trading.",
+    "url": "https://curve.fi/",
+    "category": "defi, dex"
+  },
+  {
+    "name": "CyberConnect",
+    "description": "CyberConnect is a decentralized social graph protocol that empowers users to own their social identity and data.",
+    "url": "https://cyber.co/",
+    "category": "consumer, social"
+  },
+  {
+    "name": "DeBank",
+    "description": "DeBank is a multi-chain portfolio tracker that provides a comprehensive view of your decentralized financial holdings.",
+    "url": "https://debank.com/",
+    "category": "infra, data"
+  },
+  {
+    "name": "DefiLlama",
+    "description": "DefiLlama is the largest TVL aggregator for DeFi, providing accurate and up-to-date metrics on decentralized finance protocols.",
+    "url": "https://defillama.com/",
+    "category": "infra, data"
+  },
+  {
+    "name": "DexScreener",
+    "description": "DexScreener is a real-time price charts and trading history platform for decentralized exchanges.",
+    "url": "https://dexscreener.com/",
+    "category": "infra, data"
+  },
+  {
+    "name": "Disco",
+    "description": "Disco is a decentralized identity platform that enables users to manage their data and reputation across the web3 ecosystem.",
+    "url": "https://disco.xyz/",
+    "category": "consumer, identity"
+  },
+  {
+    "name": "Dune",
+    "description": "Dune is a community-powered blockchain analytics platform that allows anyone to create and share crypto data dashboards.",
+    "url": "https://dune.com/",
+    "category": "infra, data"
+  },
+  {
+    "name": "ENS",
+    "description": "ENS is a decentralized naming service on Ethereum and Base, providing human-readable names for wallet addresses and other resources.",
+    "url": "https://ens.domains/",
+    "category": "consumer, identity"
+  },
+  {
+    "name": "Etherscan",
+    "description": "Etherscan is the leading block explorer and search platform for Ethereum and Base, providing transparency for blockchain data.",
+    "url": "https://etherscan.io/",
+    "category": "infra, explorer"
+  }
+]

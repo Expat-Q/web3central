@@ -1,0 +1,1827 @@
+[
+  {
+    "id": "nexo",
+    "name": "Nexo",
+    "url": "https://nexo.com/",
+    "description": "Nexo belongs to the Centralized Exchange category.",
+    "category": "cex",
+    "tags": [
+      "Centralized Exchange",
+      "Wallet",
+      "Ethereum",
+      "Binance",
+      "Polygon",
+      "Avalanche",
+      "Arbitrum",
+      "Optimism",
+      "Fantom"
+    ],
+    "builder": {
+      "name": "Nexo Team",
+      "handle": "@Nexo",
+      "twitter": "https://twitter.com/Nexo"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 425348235.55002046,
+      "mcap": 883754528.199118
+    },
+    "llamaSlug": "nexo",
+    "logoUrl": "https://icons.llama.fi/nexo.png"
+  },
+  {
+    "id": "tbtc",
+    "name": "tBTC",
+    "url": "https://threshold.network/",
+    "description": "tBTC belongs to the Liquid Staking Token (LSTs) category.",
+    "category": "defi",
+    "tags": [
+      "Liquid Staking Token (LSTs)",
+      "RPG",
+      "Bitcoin",
+      "Ethereum"
+    ],
+    "builder": {
+      "name": "tBTC Team",
+      "handle": "@TheTNetwork",
+      "twitter": "https://twitter.com/TheTNetwork"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 415326572.71111894,
+      "mcap": 0
+    },
+    "llamaSlug": "tbtc",
+    "logoUrl": "https://icons.llama.fi/tbtc.png"
+  },
+  {
+    "id": "defi-saver",
+    "name": "DeFi Saver",
+    "url": "https://defisaver.com/",
+    "description": "DeFi Saver belongs to the Lending/Borrowing and Yield Optimization categories.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Yield Optimization",
+      "Ethereum",
+      "Arbitrum",
+      "Optimism",
+      "Base"
+    ],
+    "builder": {
+      "name": "DeFi Saver Team",
+      "handle": "@DefiSaver",
+      "twitter": "https://twitter.com/DefiSaver"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 286571738.65080696,
+      "mcap": 0
+    },
+    "llamaSlug": "defi-saver",
+    "logoUrl": "https://icons.llama.fi/defi-saver.jpg"
+  },
+  {
+    "id": "gaib",
+    "name": "GAIB",
+    "url": "https://aid.gaib.ai/spice?ref=4A3909EB",
+    "description": "GAIB is the first economic layer for AI and compute, transforming GPU-backed assets into yield-generating opportunities. Through AID, GAIB’s AI synthetic dollar, investors can seamlessly access the AI economy while earning real yield from AI-powered compute. Staking AID (sAID) allows token holders to earn rewards while maintaining liquidity, offering access to AI-driven financial markets. GAIB also powers AI infrastructure by providing capital solutions for cloud providers and data centers, optimizing their access to compute resources. With integrations across DeFi protocols, including lending, borrowing, and structured products, GAIB bridges AI and blockchain finance—unlocking new opportunities at the intersection of technology and investment. For more information, visit gaib.ai.",
+    "category": "defi",
+    "tags": [
+      "AI",
+      "Ethereum",
+      "Sei",
+      "Arbitrum",
+      "Binance",
+      "Base",
+      "Story"
+    ],
+    "builder": {
+      "name": "GAIB Team",
+      "handle": "@gaib_ai",
+      "twitter": "https://twitter.com/gaib_ai"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 201841100.52208832,
+      "mcap": 0
+    },
+    "llamaSlug": "gaib",
+    "logoUrl": "https://icons.llama.fi/gaib.jpg"
+  },
+  {
+    "id": "stake-dao",
+    "name": "Stake DAO",
+    "url": "https://stakedao.org/",
+    "description": "Stake DAO belongs to the Liquid Staking Token (LSTs) category.",
+    "category": "defi",
+    "tags": [
+      "Liquid Staking Token (LSTs)",
+      "Ethereum",
+      "Base",
+      "Arbitrum",
+      "Fraxtal",
+      "Polygon",
+      "Avalanche",
+      "Sonic",
+      "Optimism",
+      "Linea",
+      "xDai"
+    ],
+    "builder": {
+      "name": "Stake DAO Team",
+      "handle": "@StakeDAOHQ",
+      "twitter": "https://twitter.com/StakeDAOHQ"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 172294997.40028208,
+      "mcap": 8038852.599716765
+    },
+    "llamaSlug": "stake-dao",
+    "logoUrl": "https://icons.llama.fi/stake-dao.jpg"
+  },
+  {
+    "id": "dolomite",
+    "name": "Dolomite",
+    "url": "https://dolomite.io",
+    "description": "Dolomite is a decentralized money market and DEX on Arbitrum. It allows users to lend, borrow, spot trade, margin trade, and hedge a wider range of yield-generating assets than is available on other protocols, while also allowing users to continue to stake, vest, and earn rewards on those assets even while using them as collateral.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Ethereum",
+      "Berachain",
+      "Arbitrum",
+      "Mantle",
+      "Botanix",
+      "Polygon zkEVM",
+      "X Layer"
+    ],
+    "builder": {
+      "name": "Dolomite Team",
+      "handle": "@Dolomite_io",
+      "twitter": "https://twitter.com/Dolomite_io"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 146583368.4913863,
+      "mcap": 14659883.067142203
+    },
+    "llamaSlug": "dolomite",
+    "logoUrl": "https://icons.llama.fi/dolomite.jpg"
+  },
+  {
+    "id": "termmax",
+    "name": "TermMax",
+    "url": "https://ts.finance/termmax/",
+    "description": "TermMax is a DeFi AMM protocol that allows users to lend, borrow and one-click leverage at fixed-rates and fixed-maturities. Earn passive yield via Vaults without the hassle to manage positions. Curators and Order Makers are empowered by the Range Order Tool to set their yield curve, slippage and manage efficiently with ease.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "BSquared",
+      "Ethereum",
+      "Base",
+      "Binance",
+      "Berachain",
+      "X Layer",
+      "Arbitrum",
+      "Hyperliquid L1"
+    ],
+    "builder": {
+      "name": "TermMax Team",
+      "handle": "@TermMaxFi",
+      "twitter": "https://twitter.com/TermMaxFi"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 64132562.49721229,
+      "mcap": 0
+    },
+    "llamaSlug": "termmax",
+    "logoUrl": "https://icons.llama.fi/termmax.jpg"
+  },
+  {
+    "id": "near-intents",
+    "name": "NEAR Intents",
+    "url": "https://app.near-intents.org/",
+    "description": "The universal trading protocol for onchain markets and tokenized assets.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Near",
+      "Ethereum",
+      "Bitcoin",
+      "Tron",
+      "Arbitrum",
+      "Solana",
+      "Binance",
+      "Polygon",
+      "TON",
+      "Base",
+      "Ripple",
+      "xDai",
+      "Monad",
+      "Litecoin",
+      "Doge",
+      "Optimism",
+      "Avalanche",
+      "Berachain",
+      "Sui",
+      "Dash",
+      "Cardano",
+      "Aptos",
+      "X Layer",
+      "Stellar",
+      "Aurora"
+    ],
+    "builder": {
+      "name": "NEAR Intents Team",
+      "handle": "@NEARProtocol",
+      "twitter": "https://twitter.com/NEARProtocol"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 62837770.31287211,
+      "mcap": 0
+    },
+    "llamaSlug": "near-intents",
+    "logoUrl": "https://icons.llama.fi/near-intents.jpg"
+  },
+  {
+    "id": "ostium",
+    "name": "Ostium",
+    "url": "https://www.ostium.io/",
+    "description": "Trade any strategy on any asset: from indices and currencies to metals, energy, and crypto.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Ostium Team",
+      "handle": "@OstiumLabs",
+      "twitter": "https://twitter.com/OstiumLabs"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 51549003.13848271,
+      "mcap": 0
+    },
+    "llamaSlug": "ostium",
+    "logoUrl": "https://icons.llama.fi/ostium.png"
+  },
+  {
+    "id": "origin-ether",
+    "name": "Origin Ether",
+    "url": "https://www.originprotocol.com/oeth",
+    "description": "Liquid Staking Token featuring ultra-low slippage and enhanced yield.",
+    "category": "defi",
+    "tags": [
+      "Liquid Staking Token (LSTs)",
+      "Ethereum",
+      "Base",
+      "Plume Mainnet"
+    ],
+    "builder": {
+      "name": "Origin Ether Team",
+      "handle": "@OriginProtocol",
+      "twitter": "https://twitter.com/OriginProtocol"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 50776193.942309946,
+      "mcap": 0
+    },
+    "llamaSlug": "origin-ether",
+    "logoUrl": "https://icons.llama.fi/origin-ether.png"
+  },
+  {
+    "id": "autofinance",
+    "name": "AUTOfinance",
+    "url": "https://www.auto.finance",
+    "description": "Autopools simplify DeFi primitives such as DEXs, lending, and Pendle markets, by autonomously routing liquidity across USD-denominated positions.",
+    "category": "defi",
+    "tags": [
+      "Yield Optimization",
+      "Ethereum",
+      "Base",
+      "Arbitrum",
+      "Plasma",
+      "Sonic"
+    ],
+    "builder": {
+      "name": "AUTOfinance Team",
+      "handle": "@autopools",
+      "twitter": "https://twitter.com/autopools"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 48836212.95695599,
+      "mcap": 0
+    },
+    "llamaSlug": "autofinance",
+    "logoUrl": "https://icons.llama.fi/autofinance.jpg"
+  },
+  {
+    "id": "zoo-finance",
+    "name": "Zoo Finance",
+    "url": "https://zoofi.io",
+    "description": "LNT is a liquid market to trade vesting tokens from locked assets such as nodes, SAFT and SAFE.",
+    "category": "defi",
+    "tags": [
+      "Liquid Staking Token (LSTs)",
+      "Binance",
+      "Story",
+      "Sei",
+      "Arbitrum",
+      "Base",
+      "Berachain"
+    ],
+    "builder": {
+      "name": "Zoo Finance Team",
+      "handle": "@ZooFinanceIO",
+      "twitter": "https://twitter.com/ZooFinanceIO"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 38811733.567910865,
+      "mcap": 0
+    },
+    "llamaSlug": "zoo-finance",
+    "logoUrl": "https://icons.llama.fi/zoo-finance.jpg"
+  },
+  {
+    "id": "ankr",
+    "name": "Ankr",
+    "url": "https://ankr.com",
+    "description": "Build on Web3 with a fast, reliable and distributed network of blockchain nodes",
+    "category": "analytics",
+    "tags": [
+      "infra",
+      "node provider",
+      "Ethereum",
+      "Flow",
+      "Binance",
+      "Avalanche",
+      "Polkadot",
+      "Fantom",
+      "xDai",
+      "Kusama"
+    ],
+    "builder": {
+      "name": "Ankr Team",
+      "handle": "@ankr",
+      "twitter": "https://twitter.com/ankr"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 24641758.69583109,
+      "mcap": 47157183.06210446
+    },
+    "llamaSlug": "ankr",
+    "logoUrl": "https://icons.llama.fi/ankr.jpg"
+  },
+  {
+    "id": "ankr",
+    "name": "Ankr",
+    "url": "https://www.ankr.com/",
+    "description": "Build web3 apps with a full suite of developer tools. Power them with fast, global, decentralized connections to dozens of chains.",
+    "category": "analytics",
+    "tags": [
+      "Node Provider",
+      "Developer Tool",
+      "Ethereum",
+      "Flow",
+      "Binance",
+      "Avalanche",
+      "Polkadot",
+      "Fantom",
+      "xDai",
+      "Kusama"
+    ],
+    "builder": {
+      "name": "Ankr Team",
+      "handle": "@ankr",
+      "twitter": "https://twitter.com/ankr"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 24641758.69583109,
+      "mcap": 47157183.06210446
+    },
+    "llamaSlug": "ankr",
+    "logoUrl": "https://icons.llama.fi/ankr.jpg"
+  },
+  {
+    "id": "pnetwork",
+    "name": "pNetwork",
+    "url": "https://p.network",
+    "description": "pNetwork belongs to the Bridge category.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Binance",
+      "Ethereum",
+      "Ultra",
+      "Algorand",
+      "Arbitrum",
+      "Polygon",
+      "EOS",
+      "Telos",
+      "xDai"
+    ],
+    "builder": {
+      "name": "pNetwork Team",
+      "handle": "@pNetworkDeFi",
+      "twitter": "https://twitter.com/pNetworkDeFi"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 13099805.903342,
+      "mcap": 52984.6834916002
+    },
+    "llamaSlug": "pnetwork",
+    "logoUrl": "https://icons.llama.fi/pnetwork.jpg"
+  },
+  {
+    "id": "bitbond-token-tool",
+    "name": "Bitbond Token Tool",
+    "url": "https://tokentool.bitbond.com",
+    "description": "Bitbond Token Tool is a web3 app that enables users to effortlessly create, manage and multisend ERC20 / ERC1400 tokens and NFTs across leading EVM chains. Users can rely on Token Tool’s configurable ...",
+    "category": "analytics",
+    "tags": [
+      "infra",
+      "developer tool",
+      "Base",
+      "Binance",
+      "Ethereum",
+      "Optimism",
+      "Avalanche",
+      "Arbitrum",
+      "Polygon"
+    ],
+    "builder": {
+      "name": "Bitbond Token Tool Team",
+      "handle": "@Bitbond",
+      "twitter": "https://twitter.com/Bitbond"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 12111810.096010627,
+      "mcap": 0
+    },
+    "llamaSlug": "bitbond-lockers",
+    "logoUrl": "https://icons.llama.fi/bitbond-lockers.jpg"
+  },
+  {
+    "id": "acryptos",
+    "name": "ACryptoS",
+    "url": "https://www.acryptos.com/",
+    "description": "ACryptoS is a multi-chain liquidity manager, with vaults for V3 CL DEXs and Lending Protocols. Using advanced strategies, their Automated Conc. Liquidity Manager (ACLM) offers attractive yet sustainable yields, while Single-Token vaults help grow users' tokens with no IL risks.",
+    "category": "defi",
+    "tags": [
+      "Yield Optimization",
+      "Binance",
+      "Arbitrum",
+      "Avalanche",
+      "Base",
+      "Moonbeam",
+      "Moonriver",
+      "Astar",
+      "Linea",
+      "Ethereum",
+      "Optimism",
+      "Cronos",
+      "xDai",
+      "Polygon",
+      "Fantom",
+      "Kava",
+      "Canto",
+      "Harmony"
+    ],
+    "builder": {
+      "name": "ACryptoS Team",
+      "handle": "@acryptosdao",
+      "twitter": "https://twitter.com/acryptosdao"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 10559924.922253815,
+      "mcap": 0
+    },
+    "llamaSlug": "acryptos",
+    "logoUrl": "https://icons.llama.fi/acryptos.jpg"
+  },
+  {
+    "id": "maya-protocol",
+    "name": "Maya Protocol",
+    "url": "https://www.mayaprotocol.com",
+    "description": "Maya Protocol is a decentralised and permissionless cross-chain liquidity protocol, allowing users to swap between native assets, such as native Bitcoin, Ethereum, Arbitrum & more.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Mayachain",
+      "Bitcoin",
+      "Zcash",
+      "Ethereum",
+      "Thorchain",
+      "Arbitrum",
+      "Dash",
+      "Kujira",
+      "Radix"
+    ],
+    "builder": {
+      "name": "Maya Protocol Team",
+      "handle": "@Maya_Protocol",
+      "twitter": "https://twitter.com/Maya_Protocol"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 10359190.526429938,
+      "mcap": 10723386.16704948
+    },
+    "llamaSlug": "maya-protocol",
+    "logoUrl": "https://icons.llama.fi/maya-protocol.jpg"
+  },
+  {
+    "id": "symbiosis",
+    "name": "Symbiosis",
+    "url": "https://symbiosis.finance",
+    "description": "Symbiosis belongs to the Bridge category.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Ethereum",
+      "Tron",
+      "Binance",
+      "Bitcoin",
+      "TON",
+      "Polygon",
+      "Arbitrum",
+      "Base",
+      "Merlin",
+      "Cronos",
+      "Boba",
+      "zkSync Era",
+      "Gravity",
+      "Hyperliquid L1",
+      "RSK",
+      "Katana",
+      "xDai",
+      "BSquared",
+      "Avalanche",
+      "Mantle",
+      "Cronos zkEVM",
+      "Linea",
+      "Manta",
+      "Scroll",
+      "Tempo",
+      "Optimism",
+      "Sei",
+      "Arbitrum Nova",
+      "Metis",
+      "Abstract",
+      "Berachain",
+      "Taiko",
+      "Blast",
+      "Plasma",
+      "Sonic",
+      "Soneium",
+      "Unichain",
+      "Fraxtal",
+      "zkLink",
+      "Op_Bnb",
+      "Mode",
+      "Monad",
+      "Polygon zkEVM",
+      "ZetaChain",
+      "ApeChain",
+      "Morph",
+      "Kava",
+      "Goat",
+      "CORE",
+      "Aurora",
+      "Boba_Avax",
+      "Citrea",
+      "Bahamut",
+      "Telos"
+    ],
+    "builder": {
+      "name": "Symbiosis Team",
+      "handle": "@symbiosis_fi",
+      "twitter": "https://twitter.com/symbiosis_fi"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 8988753.188533561,
+      "mcap": 2683459.126611919
+    },
+    "llamaSlug": "symbiosis",
+    "logoUrl": "https://icons.llama.fi/symbiosis.png"
+  },
+  {
+    "id": "giza",
+    "name": "Giza",
+    "url": "https://www.gizatech.xyz/",
+    "description": "Your capital, always optimized. Capture top DeFi yields 24/7 with autonomous agents — all while you touch grass.",
+    "category": "defi",
+    "tags": [
+      "AI",
+      "Arbitrum",
+      "Base",
+      "Plasma",
+      "Hyperliquid L1"
+    ],
+    "builder": {
+      "name": "Giza Team",
+      "handle": "@gizatechxyz",
+      "twitter": "https://twitter.com/gizatechxyz"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 6007589.840954851,
+      "mcap": 2587242.2041802104
+    },
+    "llamaSlug": "giza",
+    "logoUrl": "https://icons.llama.fi/giza.jpg"
+  },
+  {
+    "id": "privacy-pools",
+    "name": "Privacy Pools",
+    "url": "https://privacypools.com/",
+    "description": "Privacy Pools belongs to the Defi Tool category.",
+    "category": "defi",
+    "tags": [
+      "Defi Tool",
+      "Ethereum",
+      "Arbitrum",
+      "Optimism"
+    ],
+    "builder": {
+      "name": "Privacy Pools Team",
+      "handle": "@0xbowio",
+      "twitter": "https://twitter.com/0xbowio"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 5572759.440110409,
+      "mcap": 0
+    },
+    "llamaSlug": "privacy-pools",
+    "logoUrl": "https://icons.llama.fi/privacy-pools.jpg"
+  },
+  {
+    "id": "superfluid",
+    "name": "Superfluid",
+    "url": "https://superfluid.org/",
+    "description": "Superfluid belongs to the Payments and Developer Tool categories.",
+    "category": "defi",
+    "tags": [
+      "Payments",
+      "Developer Tool",
+      "DEX",
+      "Optimism",
+      "Base",
+      "Ethereum",
+      "Polygon",
+      "Celo",
+      "Arbitrum",
+      "xDai",
+      "Avalanche",
+      "Scroll",
+      "Binance"
+    ],
+    "builder": {
+      "name": "Superfluid Team",
+      "handle": "@Superfluid_HQ",
+      "twitter": "https://twitter.com/Superfluid_HQ"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 5053741.7077637445,
+      "mcap": 3224158.286243439
+    },
+    "llamaSlug": "superfluid",
+    "logoUrl": "https://icons.llama.fi/superfluid.png"
+  },
+  {
+    "id": "superfluid",
+    "name": "Superfluid",
+    "url": "https://superfluid.org/",
+    "description": "Superfluid belongs to the Payments and Developer Tool categories.",
+    "category": "defi",
+    "tags": [
+      "Payments",
+      "Developer Tool",
+      "Optimism",
+      "Base",
+      "Ethereum",
+      "Polygon",
+      "Celo",
+      "Arbitrum",
+      "xDai",
+      "Avalanche",
+      "Scroll",
+      "Binance"
+    ],
+    "builder": {
+      "name": "Superfluid Team",
+      "handle": "@Superfluid_HQ",
+      "twitter": "https://twitter.com/Superfluid_HQ"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 5053741.7077637445,
+      "mcap": 3224158.286243439
+    },
+    "llamaSlug": "superfluid",
+    "logoUrl": "https://icons.llama.fi/superfluid.png"
+  },
+  {
+    "id": "mangrove",
+    "name": "Mangrove",
+    "url": "https://www.mangrove.exchange",
+    "description": "Mangrove is an order book. Our main product is Kandel, a discrete AMM strategy.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Blast",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Mangrove Team",
+      "handle": "@MangroveDAO",
+      "twitter": "https://twitter.com/MangroveDAO"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 4273895.099286825,
+      "mcap": 0
+    },
+    "llamaSlug": "mangrove",
+    "logoUrl": "https://icons.llama.fi/mangrove.jpg"
+  },
+  {
+    "id": "wombat-exchange",
+    "name": "Wombat Exchange",
+    "url": "https://www.wombat.exchange/",
+    "description": "Wombat is a multi-chain stableswap. Its innovative single-sided pool design allows users to minimize slippage and maximize yield, that means more savings and earnings!",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Binance",
+      "Arbitrum",
+      "Avalanche",
+      "Optimism",
+      "Base",
+      "Ethereum",
+      "Scroll",
+      "Monad",
+      "Hyperliquid L1",
+      "Polygon"
+    ],
+    "builder": {
+      "name": "Wombat Exchange Team",
+      "handle": "@WombatExchange",
+      "twitter": "https://twitter.com/WombatExchange"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 4019368.8776151487,
+      "mcap": 162180.30489771918
+    },
+    "llamaSlug": "wombat-exchange",
+    "logoUrl": "https://icons.llama.fi/wombat-exchange.png"
+  },
+  {
+    "id": "ample",
+    "name": "Ample",
+    "url": "https://ample.money/",
+    "description": "Ample is a prize-linked savings protocol that lets users deposit stablecoins and keep their principal while pooled earnings fund verifiable onchain payouts. Inspired by the UK's Premium Bonds model, Ample makes prize-linked savings globally accessible on crypto rails, with no partner banks, no middleware, and no intermediary failure.",
+    "category": "defi",
+    "tags": [
+      "Defi Tool",
+      "Base",
+      "Arbitrum",
+      "Katana",
+      "Monad"
+    ],
+    "builder": {
+      "name": "Ample Team",
+      "handle": "@AmpleHQ",
+      "twitter": "https://twitter.com/AmpleHQ"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 3931714.254403292,
+      "mcap": 0
+    },
+    "llamaSlug": "ample",
+    "logoUrl": "https://icons.llama.fi/ample.jpg"
+  },
+  {
+    "id": "elfi-protocol",
+    "name": "ELFi protocol",
+    "url": "https://www.elfi.xyz",
+    "description": "Derivative DEX with Ultra Portfolio Mode: multi-assets margin",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Arbitrum",
+      "Base"
+    ],
+    "builder": {
+      "name": "ELFi protocol Team",
+      "handle": "@ELFiProtocol",
+      "twitter": "https://twitter.com/ELFiProtocol"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 3391872.750549105,
+      "mcap": 0
+    },
+    "llamaSlug": "elfi-protocol",
+    "logoUrl": "https://icons.llama.fi/elfi-protocol.jpg"
+  },
+  {
+    "id": "hashport",
+    "name": "Hashport",
+    "url": "https://www.hashport.network",
+    "description": "Hashport belongs to the Bridge category.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Ethereum",
+      "Hedera",
+      "Avalanche",
+      "Binance",
+      "Polygon",
+      "Base",
+      "Arbitrum",
+      "Optimism",
+      "Cronos",
+      "Aurora",
+      "Moonbeam",
+      "Fantom"
+    ],
+    "builder": {
+      "name": "Hashport Team",
+      "handle": "@HashportNetwork",
+      "twitter": "https://twitter.com/HashportNetwork"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 2231367.6029757257,
+      "mcap": 0
+    },
+    "llamaSlug": "hashport",
+    "logoUrl": "https://icons.llama.fi/hashport.jpg"
+  },
+  {
+    "id": "teller",
+    "name": "Teller",
+    "url": "https://teller.org",
+    "description": "Teller belongs to the Lending/Borrowing category.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Base",
+      "Ethereum",
+      "Arbitrum",
+      "Polygon",
+      "Hyperliquid L1",
+      "Katana"
+    ],
+    "builder": {
+      "name": "Teller Team",
+      "handle": "@useteller",
+      "twitter": "https://twitter.com/useteller"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 1812522.0175281402,
+      "mcap": 0
+    },
+    "llamaSlug": "teller",
+    "logoUrl": "https://icons.llama.fi/teller.jpg"
+  },
+  {
+    "id": "bprotocol",
+    "name": "B.Protocol",
+    "url": "https://app.bprotocol.org/",
+    "description": "A community of risk-aware DeFi players building open protocols for risk mitigation and assessment.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Ethereum",
+      "Arbitrum",
+      "Polygon",
+      "Fantom"
+    ],
+    "builder": {
+      "name": "B.Protocol Team",
+      "handle": "@bprotocoleth",
+      "twitter": "https://twitter.com/bprotocoleth"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 1794471.0253485804,
+      "mcap": 3001357.385757605
+    },
+    "llamaSlug": "b.protocol",
+    "logoUrl": "https://icons.llama.fi/b.protocol.jpg"
+  },
+  {
+    "id": "butter-network",
+    "name": "Butter Network",
+    "url": "https://www.butterswap.io/swap",
+    "description": "Butter Network is an Omnichain Interoperability Hub integrated with ZK technology that enables users with global DAPP accessibility and data availability, building an infrastructure that makes transactions transverse across chain to chain freely and securely.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Ethereum",
+      "Binance",
+      "Base",
+      "Tron",
+      "Arbitrum",
+      "Polygon",
+      "Map",
+      "Optimism",
+      "Linea",
+      "Mantle",
+      "Scroll",
+      "Klaytn",
+      "X Layer",
+      "Blast",
+      "Merlin"
+    ],
+    "builder": {
+      "name": "Butter Network Team",
+      "handle": "@ButterNetworkio",
+      "twitter": "https://twitter.com/ButterNetworkio"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 1773792.055308057,
+      "mcap": 0
+    },
+    "llamaSlug": "butter-network",
+    "logoUrl": "https://icons.llama.fi/butter-network.png"
+  },
+  {
+    "id": "shift-protocol",
+    "name": "Shift Protocol",
+    "url": "https://shiftprotocol.xyz/?ref=c534997d-771b-4e83-b1fb-918421c64383",
+    "description": "Shift is building the structured yield layer for on-chain finance. We turn complex, market-neutral (and pseudo-neutral) strategies, leveraging perp DEXs, into simple, liquid, composable tokens.",
+    "category": "defi",
+    "tags": [
+      "Defi Tool",
+      "Arbitrum",
+      "Base"
+    ],
+    "builder": {
+      "name": "Shift Protocol Team",
+      "handle": "@shiftprotocol_",
+      "twitter": "https://twitter.com/shiftprotocol_"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 1674351.3975721493,
+      "mcap": 0
+    },
+    "llamaSlug": "shift-protocol",
+    "logoUrl": "https://icons.llama.fi/shift-protocol.jpg"
+  },
+  {
+    "id": "satsuma",
+    "name": "Satsuma",
+    "url": "https://www.satsuma.exchange/",
+    "description": "Satsuma is a fast, reliable blockchain indexing provider with support for subgraphs. We power top builders like Decentraland, Treasure, GMX, and Aragon with up to 5x faster sync times, 99.9%+ reliability, and devtools (metrics, direct SQL access, and alerts).",
+    "category": "analytics",
+    "tags": [
+      "Developer Tool",
+      "Citrea"
+    ],
+    "builder": {
+      "name": "Satsuma Team",
+      "handle": "@SatsumaDEX",
+      "twitter": "https://twitter.com/SatsumaDEX"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 1544088.5648764311,
+      "mcap": 0
+    },
+    "llamaSlug": "satsuma",
+    "logoUrl": "https://icons.llama.fi/satsuma.jpg"
+  },
+  {
+    "id": "evedex",
+    "name": "EVEDEX",
+    "url": "https://invite.evedex.com/fua0uojd",
+    "description": "The first hybrid perp DEX and a full-scale financial ecosystem built on its own L3, EVENTUM, powered by Arbitrum Orbit. Explore self-custody trading with a native mobile app and a gamified point system that brings CEX-grade trading level to everyone.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Eventum"
+    ],
+    "builder": {
+      "name": "EVEDEX Team",
+      "handle": "@EVEDEX",
+      "twitter": "https://twitter.com/EVEDEX"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 944766.6224837144,
+      "mcap": 0
+    },
+    "llamaSlug": "evedex",
+    "logoUrl": "https://icons.llama.fi/evedex.jpg"
+  },
+  {
+    "id": "rhinofi",
+    "name": "rhino.fi",
+    "url": "https://rhino.fi",
+    "description": "rhino.fi - The lightning-fast secure bridge for seamless cross-chain transactions",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "DEX",
+      "Arbitrum",
+      "Polygon",
+      "Ethereum"
+    ],
+    "builder": {
+      "name": "rhino.fi Team",
+      "handle": "@rhinofi",
+      "twitter": "https://twitter.com/rhinofi"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 607418.9112518182,
+      "mcap": 0
+    },
+    "llamaSlug": "rhino.fi",
+    "logoUrl": "https://icons.llama.fi/rhino.fi.png"
+  },
+  {
+    "id": "rhinofi",
+    "name": "rhino.fi",
+    "url": "https://rhino.fi",
+    "description": "rhino.fi - The lightning-fast secure bridge for seamless cross-chain transactions",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "DEX",
+      "Arbitrum",
+      "Polygon",
+      "Ethereum"
+    ],
+    "builder": {
+      "name": "rhino.fi Team",
+      "handle": "@rhinofi",
+      "twitter": "https://twitter.com/rhinofi"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 607418.9112518182,
+      "mcap": 0
+    },
+    "llamaSlug": "rhino.fi",
+    "logoUrl": "https://icons.llama.fi/rhino.fi.png"
+  },
+  {
+    "id": "hashflow",
+    "name": "hashflow",
+    "url": "https://www.hashflow.com",
+    "description": "Introducing xOS: A universal ZK Settlement Layer to make exchanges Provable.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Ethereum",
+      "Arbitrum",
+      "Polygon",
+      "Binance",
+      "Avalanche",
+      "Optimism"
+    ],
+    "builder": {
+      "name": "hashflow Team",
+      "handle": "@hashflow",
+      "twitter": "https://twitter.com/hashflow"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 594416.6389134185,
+      "mcap": 11535908.378468517
+    },
+    "llamaSlug": "hashflow",
+    "logoUrl": "https://icons.llama.fi/hashflow.png"
+  },
+  {
+    "id": "almanak",
+    "name": "Almanak",
+    "url": "https://almanak.co",
+    "description": "Almanak is an agent-centric platform that allows users to build, train and manage financial strategies using AI Agents.",
+    "category": "defi",
+    "tags": [
+      "Coming Soon",
+      "AI",
+      "Ethereum",
+      "Base"
+    ],
+    "builder": {
+      "name": "Almanak Team",
+      "handle": "@almanak",
+      "twitter": "https://twitter.com/almanak"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 553454.8138971872,
+      "mcap": 520962.33175451244
+    },
+    "llamaSlug": "almanak",
+    "logoUrl": "https://icons.llama.fi/almanak.jpg"
+  },
+  {
+    "id": "sentiment",
+    "name": "Sentiment",
+    "url": "https://app.sentiment.xyz?refCode=dcd82abec7",
+    "description": "Sentiment belongs to the Lending/Borrowing category.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Hyperliquid L1",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Sentiment Team",
+      "handle": "@sentimentxyz",
+      "twitter": "https://twitter.com/sentimentxyz"
+    },
+    "status": "active",
+    "verified": true,
+    "metrics": {
+      "tvl": 517964.16135128477,
+      "mcap": 0
+    },
+    "llamaSlug": "sentiment",
+    "logoUrl": "https://icons.llama.fi/sentiment.jpg"
+  },
+  {
+    "id": "boringdao",
+    "name": "BoringDAO",
+    "url": "https://www.boringdao.com/",
+    "description": "BoringDAO is a DAO-driven cross-chain service provider for every crypto asset. A decentralized and permissionless solution to provide everyone with a safe, seamless and cost efficient experience for pegged tokens wrapping and assets transfers.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Litecoin",
+      "Polygon",
+      "Doge",
+      "Ethereum",
+      "Avalanche",
+      "Binance",
+      "OKExChain",
+      "Kucoin",
+      "Bitcoin",
+      "IoTeX",
+      "Aurora",
+      "Heco",
+      "Oasis",
+      "Fantom",
+      "Metis",
+      "Harmony",
+      "Optimism",
+      "Boba",
+      "Arbitrum",
+      "xDai"
+    ],
+    "builder": {
+      "name": "BoringDAO Team",
+      "handle": "@TheBoringDAO",
+      "twitter": "https://twitter.com/TheBoringDAO"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 358303.12737894553,
+      "mcap": 97637.69554204306
+    },
+    "llamaSlug": "boringdao",
+    "logoUrl": "https://icons.llama.fi/boringdao.jpg"
+  },
+  {
+    "id": "renegade",
+    "name": "Renegade",
+    "url": "https://trade.renegade.fi",
+    "description": "Renegade is the first on-chain dark pool. Trade any token in size with zero slippage, spread, or price impact.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Arbitrum",
+      "Base"
+    ],
+    "builder": {
+      "name": "Renegade Team",
+      "handle": "@renegade_fi",
+      "twitter": "https://twitter.com/renegade_fi"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 332642.99173858186,
+      "mcap": 0
+    },
+    "llamaSlug": "renegade",
+    "logoUrl": "https://icons.llama.fi/renegade.jpg"
+  },
+  {
+    "id": "mufex",
+    "name": "MUFEX",
+    "url": "",
+    "description": "Smart Money, Social Interaction, Exciting Entertainment - A Whole New Decentralized Trading Experience!",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Binance",
+      "Polygon",
+      "Arbitrum",
+      "Mantle"
+    ],
+    "builder": {
+      "name": "MUFEX Team",
+      "handle": "@Mufex_Official",
+      "twitter": "https://twitter.com/Mufex_Official"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 276563.33883550245,
+      "mcap": 0
+    },
+    "llamaSlug": "mufex",
+    "logoUrl": "https://icons.llama.fi/mufex.jpg"
+  },
+  {
+    "id": "wardenswap",
+    "name": "WardenSwap",
+    "url": "https://www.wardenswap.com",
+    "description": "WardenSwap belongs to the DEX category.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Binance"
+    ],
+    "builder": {
+      "name": "WardenSwap Team",
+      "handle": "@WardenSwap",
+      "twitter": "https://twitter.com/WardenSwap"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 266508.82860123814,
+      "mcap": 2532256.9485141495
+    },
+    "llamaSlug": "wardenswap",
+    "logoUrl": "https://icons.llama.fi/wardenswap.jpg"
+  },
+  {
+    "id": "hourglass",
+    "name": "Hourglass",
+    "url": "https://hourglass.com/",
+    "description": "Hourglass is a bridge built around our new DeFi primitive: an EVM compatible orderbook. Thanks to our on-chain orderbooks and pool-less liquidity solution, Hourglass offers best-in-class security, capital efficiency, and fees. Hourglass charges just .01% in fees - in many cases, 90% cheaper than other solutions.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Ethereum",
+      "Mantle"
+    ],
+    "builder": {
+      "name": "Hourglass Team",
+      "handle": "@hourglasshq",
+      "twitter": "https://twitter.com/hourglasshq"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 226946.68940854233,
+      "mcap": 0
+    },
+    "llamaSlug": "hourglass",
+    "logoUrl": "https://icons.llama.fi/hourglass.png"
+  },
+  {
+    "id": "tokenpocket",
+    "name": "TokenPocket",
+    "url": "https://dapp.tokenpocket.pro/StakeVault/#/",
+    "description": "TokenPocket belongs to the Wallet category.",
+    "category": "wallets",
+    "tags": [
+      "Wallet",
+      "Ethereum"
+    ],
+    "builder": {
+      "name": "TokenPocket Team",
+      "handle": "@TokenPocket_TP",
+      "twitter": "https://twitter.com/TokenPocket_TP"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 226491.60359348735,
+      "mcap": 24117014.025068942
+    },
+    "llamaSlug": "tokenpocket",
+    "logoUrl": "https://icons.llama.fi/tokenpocket.jpg"
+  },
+  {
+    "id": "cyclo",
+    "name": "Cyclo",
+    "url": "https://cyclo.finance",
+    "description": "Cyclo Finance Leverage without liquidation mechanisms. A completely new DeFi primitive for leveraged borrowing. Cyclo gives users access to the power of leverage while keeping their collateral completely safe from liquidations. Perfect for unlocking capital on blue chip crypto, RWAS, and yield bearing tokens, while still accruing interest!",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Flare"
+    ],
+    "builder": {
+      "name": "Cyclo Team",
+      "handle": "@cyclofinance",
+      "twitter": "https://twitter.com/cyclofinance"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 206061.11191632872,
+      "mcap": 0
+    },
+    "llamaSlug": "cyclo",
+    "logoUrl": "https://icons.llama.fi/cyclo.jpg"
+  },
+  {
+    "id": "umbra",
+    "name": "Umbra",
+    "url": "",
+    "description": "Umbra is a stealth address protocol for Ethereum. It allows privacy preserving payments where only the sender and recipient know who the recipient is. Umbra is useful for sending or receiving donations, e-commerce payments, paying salaries or invoices, and more, all in a privacy preserving manner.",
+    "category": "defi",
+    "tags": [
+      "Payments",
+      "Security Tool",
+      "Eclipse"
+    ],
+    "builder": {
+      "name": "Umbra Team",
+      "handle": "@UmbraFi",
+      "twitter": "https://twitter.com/UmbraFi"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 203855.09620755308,
+      "mcap": 0
+    },
+    "llamaSlug": "umbra",
+    "logoUrl": "https://icons.llama.fi/umbra.jpg"
+  },
+  {
+    "id": "rubicon",
+    "name": "Rubicon",
+    "url": "https://app.rubicon.finance/swap",
+    "description": "Rubicon belongs to the DEX category.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Optimism",
+      "Base",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Rubicon Team",
+      "handle": "@rubicondefi",
+      "twitter": "https://twitter.com/rubicondefi"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 171542.66414361828,
+      "mcap": 83036.05088928755
+    },
+    "llamaSlug": "rubicon",
+    "logoUrl": "https://icons.llama.fi/rubicon.jpg"
+  },
+  {
+    "id": "openocean",
+    "name": "OpenOcean",
+    "url": "https://openocean.finance",
+    "description": "OpenOcean is the leading dex aggregator & cross-chain swap aggregator providing the best swap returns with intelligent routes on major DEXs across 19+ blockchains.",
+    "category": "trading",
+    "tags": [
+      "DEX Aggregator",
+      "Binance",
+      "Arbitrum",
+      "Avalanche",
+      "Ethereum",
+      "Polygon",
+      "RSK",
+      "Kava",
+      "Manta"
+    ],
+    "builder": {
+      "name": "OpenOcean Team",
+      "handle": "@OpenOceanGlobal",
+      "twitter": "https://twitter.com/OpenOceanGlobal"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 137346.7581357461,
+      "mcap": 283388.7830285527
+    },
+    "llamaSlug": "openocean",
+    "logoUrl": "https://icons.llama.fi/openocean.jpg"
+  },
+  {
+    "id": "crosscurve",
+    "name": "CrossCurve",
+    "url": "https://crosscurve.fi",
+    "description": "CrossCurve is a cross-chain trading and yield protocol built on Curve, creating a unified cross-chain liquidity market by aggregating existing Curve pools.",
+    "category": "bridges",
+    "tags": [
+      "Bridge",
+      "Taiko",
+      "Blast",
+      "xDai",
+      "Polygon",
+      "Base",
+      "Binance",
+      "Ethereum",
+      "Arbitrum",
+      "Optimism",
+      "Sonic",
+      "Avalanche",
+      "Manta",
+      "Metis",
+      "Mode",
+      "Fraxtal",
+      "Linea",
+      "Celo",
+      "Kava",
+      "Fantom",
+      "Mantle"
+    ],
+    "builder": {
+      "name": "CrossCurve Team",
+      "handle": "@crosscurvefi",
+      "twitter": "https://twitter.com/crosscurvefi"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 135246.5477273676,
+      "mcap": 419330.07439496386
+    },
+    "llamaSlug": "crosscurve",
+    "logoUrl": "https://icons.llama.fi/crosscurve.png"
+  },
+  {
+    "id": "openleverage",
+    "name": "OpenLeverage",
+    "url": "https://openleverage.finance",
+    "description": "OpenLeverage belongs to the Lending/Borrowing category.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Binance",
+      "Ethereum",
+      "Kucoin",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "OpenLeverage Team",
+      "handle": "@OpenLeverage",
+      "twitter": "https://twitter.com/OpenLeverage"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 94606.95668940093,
+      "mcap": 0
+    },
+    "llamaSlug": "openleverage",
+    "logoUrl": "https://icons.llama.fi/openleverage.jpg"
+  },
+  {
+    "id": "bakerfi",
+    "name": "BakerFi",
+    "url": "https://bakerfi.ai",
+    "description": "Skip the DeFi complexity with BakerFi's intelligent AI agents that work 24/7 to maximize your crypto portfolio returns while maintaining security and minimizing risks.",
+    "category": "defi",
+    "tags": [
+      "AI",
+      "Base",
+      "Ethereum",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "BakerFi Team",
+      "handle": "@bakerfi_",
+      "twitter": "https://twitter.com/bakerfi_"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 84362.80386088163,
+      "mcap": 0
+    },
+    "llamaSlug": "bakerfi",
+    "logoUrl": "https://icons.llama.fi/bakerfi.jpg"
+  },
+  {
+    "id": "chaingpt",
+    "name": "ChainGPT",
+    "url": "https://pad.chaingpt.org/staking-pools",
+    "description": "ChainGPT is a Web3 AI suite that helps builders, traders, and teams ship faster with tools like an AI chatbot, smart-contract generator/auditor, crypto analytics, and APIs/SDKs inside the AI Hub. The ecosystem also includes ChainGPT Pad (launchpad), Buzz (campaigns/airdrops), and ChainGPT Labs (incubation) powering project launches and growth.",
+    "category": "defi",
+    "tags": [
+      "Defi Tool",
+      "Binance",
+      "Ethereum",
+      "Arbitrum",
+      "Polygon",
+      "Base",
+      "X Layer",
+      "CORE",
+      "zkSync Era",
+      "Linea",
+      "Avalanche"
+    ],
+    "builder": {
+      "name": "ChainGPT Team",
+      "handle": "@Chain_GPT",
+      "twitter": "https://twitter.com/Chain_GPT"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 38292.842471970216,
+      "mcap": 24704338.252750386
+    },
+    "llamaSlug": "chaingpt",
+    "logoUrl": "https://icons.llama.fi/chaingpt.jpg"
+  },
+  {
+    "id": "gasp",
+    "name": "Gasp",
+    "url": "https://www.gasp.xyz",
+    "description": "Gasp is a cross-chain DEX and protocol designed for exchanging crypto assets between blockchains, such as Ethereum L2s and rollups, Solana, Bitcoin, RWA protocols, web3 gaming ecosystems, and much more. Gasp provides a cross-chain communication platform that scales infinitely with large amounts of capital, and provides high-speed trading for both enterprise and individual retail users.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Bridge",
+      "Ethereum",
+      "Base",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Gasp Team",
+      "handle": "@Gasp_xyz",
+      "twitter": "https://twitter.com/Gasp_xyz"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 29909.961764981388,
+      "mcap": 0
+    },
+    "llamaSlug": "gasp",
+    "logoUrl": "https://icons.llama.fi/gasp.png"
+  },
+  {
+    "id": "gasp",
+    "name": "Gasp",
+    "url": "https://www.gasp.xyz",
+    "description": "Gasp is a cross-chain DEX and protocol designed for exchanging crypto assets between blockchains, such as Ethereum L2s and rollups, Solana, Bitcoin, RWA protocols, web3 gaming ecosystems, and much more. Gasp provides a cross-chain communication platform that scales infinitely with large amounts of capital, and provides high-speed trading for both enterprise and individual retail users.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Bridge",
+      "Ethereum",
+      "Base",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Gasp Team",
+      "handle": "@Gasp_xyz",
+      "twitter": "https://twitter.com/Gasp_xyz"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 29909.961764981388,
+      "mcap": 0
+    },
+    "llamaSlug": "gasp",
+    "logoUrl": "https://icons.llama.fi/gasp.png"
+  },
+  {
+    "id": "pwn",
+    "name": "PWN",
+    "url": "https://pwn.xyz",
+    "description": "PWN is a non-custodial, peer-to-peer permissionless lending protocol. In the true spirit of DeFi composability, PWN users can borrow against (or lend using) any asset in their wallet (ERC-20, NFT, and even a bundle of both), while enjoying absolute flexibility on the loan terms (LTV, duration, APY, etc.). The oracle-less nature of the protocol protects all PWN loans from price-based liquidations. The only way to lose collateral is to default on a loan. Operating on 7 EVM-compatible networks, PWN opens up new liquidity avenues, composability options, and leverage opportunities, while giving its users both optimized capital efficiency and predictability on both sides of the loan.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Polygon",
+      "Ethereum",
+      "Arbitrum",
+      "Unichain",
+      "Optimism",
+      "Base",
+      "xDai",
+      "Cronos",
+      "Linea",
+      "Binance",
+      "Mantle",
+      "World Chain"
+    ],
+    "builder": {
+      "name": "PWN Team",
+      "handle": "@pwndao",
+      "twitter": "https://twitter.com/pwndao"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 28693.601397888953,
+      "mcap": 0
+    },
+    "llamaSlug": "pwn",
+    "logoUrl": "https://icons.llama.fi/pwn.jpg"
+  },
+  {
+    "id": "primex-finance",
+    "name": "Primex Finance",
+    "url": "https://primex.finance",
+    "description": "Primex Finance is a non-custodial prime brokerage protocol that connects lenders with traders, enabling traders to utilize lender liquidity for leveraged spot trading on existing DEXs like Uniswap, Balancer, Curve, and more. On Primex, traders can also benefit from CEX-like trader tooling and interfaces. The protocol is powered by the fully decentralized trade execution mechanism (community-hosted Keepers), enabling the execution of different types of limit orders in a decentralized manner. In the next versions, Primex has plans to expand its feature set to include other leveraged operations across various DeFi protocols, such as lending, providing liquidity on AMM-based DEXs, etc.",
+    "category": "trading",
+    "tags": [
+      "DEX Aggregator",
+      "Ethereum",
+      "Polygon",
+      "Arbitrum",
+      "Base"
+    ],
+    "builder": {
+      "name": "Primex Finance Team",
+      "handle": "@primex_official",
+      "twitter": "https://twitter.com/primex_official"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 24591.145182607375,
+      "mcap": 17589.52481274119
+    },
+    "llamaSlug": "primex-finance",
+    "logoUrl": "https://icons.llama.fi/primex-finance.jpg"
+  },
+  {
+    "id": "aquarius-loan",
+    "name": "Aquarius Loan",
+    "url": "",
+    "description": "Aquarius Loan is a decentralized blockchain protocol that allows users to lend or borrow selected cryptocurrencies. It establishes money markets by pooling assets together and algorithmically setting interest rates based on supply and demand of assets.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Arbitrum",
+      "CORE"
+    ],
+    "builder": {
+      "name": "Aquarius Loan Team",
+      "handle": "@AquariusLoan",
+      "twitter": "https://twitter.com/AquariusLoan"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 24421.625906274043,
+      "mcap": 0
+    },
+    "llamaSlug": "aquarius-loan",
+    "logoUrl": "https://icons.llama.fi/aquarius-loan.png"
+  },
+  {
+    "id": "truefi",
+    "name": "TrueFi",
+    "url": "https://app.truefi.io/",
+    "description": "TrueFi is modular infrastructure for on-chain credit. TrueFi connects lenders, borrowers, and portfolio managers via smart contracts to facilitate credit-based lending.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Ethereum",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "TrueFi Team",
+      "handle": "@TrueFiDAO",
+      "twitter": "https://twitter.com/TrueFiDAO"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 21655.28568623858,
+      "mcap": 2485235.9932373157
+    },
+    "llamaSlug": "truefi",
+    "logoUrl": "https://icons.llama.fi/truefi.jpg"
+  },
+  {
+    "id": "hermes-v2",
+    "name": "Hermes V2",
+    "url": "https://www.maiadao.io",
+    "description": "Hermes Protocol V2 is an Omnichain yield and liquidity marketplace that is community-owned and future-proof. The protocol has been designed to improve upon key mechanics like ve(3,3) mechanics from V1 and to address some of the limitations of existing DeFi protocols.",
+    "category": "trading",
+    "tags": [
+      "DEX",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Hermes V2 Team",
+      "handle": "@HermesOmnichain",
+      "twitter": "https://twitter.com/HermesOmnichain"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 17540.076229759285,
+      "mcap": 62952.41797396071
+    },
+    "llamaSlug": "hermes-v2",
+    "logoUrl": "https://icons.llama.fi/hermes-v2.jpg"
+  },
+  {
+    "id": "seneca",
+    "name": "Seneca",
+    "url": "",
+    "description": "Seneca is an omnichain CDP protocol for yield-bearing assets. Borrow collateralized stablecoin senUSD using supported collateral. SEN token utility includes governance, trading tax redistribution, and protocol fee redistribution through staking. Seneca users can access institutional-grade borrowing against established and developing DeFi assets, maximising capital efficiency. Seneca is Arbitrum native.",
+    "category": "defi",
+    "tags": [
+      "Lending / Borrowing",
+      "Ethereum",
+      "Arbitrum"
+    ],
+    "builder": {
+      "name": "Seneca Team",
+      "handle": "@SenecaUSD",
+      "twitter": "https://twitter.com/SenecaUSD"
+    },
+    "status": "pending",
+    "verified": false,
+    "metrics": {
+      "tvl": 16060.377528963763,
+      "mcap": 0
+    },
+    "llamaSlug": "seneca",
+    "logoUrl": "https://icons.llama.fi/seneca.jpg"
+  }
+]

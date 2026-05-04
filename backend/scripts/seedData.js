@@ -13,29 +13,21 @@ const importData = async () => {
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('MongoDB Connected...');
 
-        // Clear existing data
-        await Tool.deleteMany({});
+        // Clear spotlight only (usually replaced completely)
         await Spotlight.deleteMany({});
-        console.log('Data cleared...');
+        console.log('Spotlight cleared...');
 
         // --- Load Tools Data ---
-        // Note: appsData.js now uses module.exports
         const appsDataModule = require('../../src/data/appsData.js');
-        const appsData = appsDataModule; // It exports the object directly
+        const appsData = appsDataModule; 
 
-        // Flatten the category-based structure into an array of tools
-        // but we want to preserve category info if it's not in the object itself.
-        // However, in our file structure, each tool object has a 'category' field.
         let tools = [];
 
-        // AppsData is keyed by category, but also contains metadata like "tooltipExplanations"
-        // We need to iterate over the keys that are arrays (categories)
         Object.keys(appsData).forEach(key => {
             if (Array.isArray(appsData[key])) {
-                // This is a category array
                 const categoryTools = appsData[key].map(tool => ({
                     ...tool,
-                    category: key // Ensure category is set
+                    category: key 
                 }));
                 tools = [...tools, ...categoryTools];
             }
@@ -43,11 +35,31 @@ const importData = async () => {
 
         // Deduplicate tools by ID
         const uniqueTools = Array.from(new Map(tools.map(item => [item.id, item])).values());
-        tools = uniqueTools;
+        
+        // --- Filtering Logic ---
+        // Only include dapps that are 'active' and have a basic level of quality/usage info
+        const filteredTools = uniqueTools.filter(t => {
+            // High quality filter: Must have a name, description, and builder info
+            const hasBasicInfo = t.name && t.description && t.builder?.name;
+            // Usage filter: In appsData, we check if they are marked as active or verified
+            const isHighQuality = t.status === 'active' || t.verified === true;
+            return hasBasicInfo && isHighQuality;
+        });
 
-        if (tools.length > 0) {
-            await Tool.insertMany(tools);
-            console.log(`Imported ${tools.length} tools...`);
+        console.log(`Found ${filteredTools.length} high-quality tools to upsert...`);
+
+        if (filteredTools.length > 0) {
+            let upsertedCount = 0;
+            for (const tool of filteredTools) {
+                // Use findOneAndUpdate with upsert: true to avoid wiping existing data (like clickCount)
+                await Tool.findOneAndUpdate(
+                    { id: tool.id },
+                    { $set: tool },
+                    { upsert: true, new: true, setDefaultsOnInsert: true }
+                );
+                upsertedCount++;
+            }
+            console.log(`Successfully upserted ${upsertedCount} tools.`);
         } else {
             console.log('No tools found to import.');
         }
@@ -59,7 +71,7 @@ const importData = async () => {
         await Spotlight.create(spotlightData);
         console.log('Imported Community Spotlight data...');
 
-        console.log('Data Import Success!');
+        console.log('Data Synchronization Success!');
         process.exit();
     } catch (err) {
         console.error('Error with data import:', JSON.stringify(err, null, 2));

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircle, ArrowRight, Twitter, Wallet, Copy, ExternalLink, AlertCircle } from "lucide-react";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
-// Placeholder vault address — will be updated once web3central wallet is confirmed
-const W3C_VAULT = process.env.REACT_APP_W3C_VAULT_ADDRESS || "0xTBD_WEB3CENTRAL_VAULT";
+// Confirming the web3central vault address for on-chain fee collection
+const W3C_VAULT = process.env.REACT_APP_W3C_VAULT_ADDRESS || "0x3C80818c4ebA036D54775Bd0D8994d3dfc0b7A25";
 const LISTING_FEE_ETH = "0.001";
 
 const SECURITY_LEVELS = ["unaudited", "community", "audited", "verified"];
@@ -72,12 +72,7 @@ export default function PublishApp({ onPublished }) {
       const hexData = "0x" + [...verificationCode].map(c => c.charCodeAt(0).toString(16).padStart(2, "0")).join("");
       const valueHex = "0x" + (BigInt(Math.round(parseFloat(LISTING_FEE_ETH) * 1e18))).toString(16);
 
-      if (W3C_VAULT === "0xTBD_WEB3CENTRAL_VAULT") {
-        // Vault not yet configured — skip tx, use manual hash input
-        setError("Vault address not yet configured. Please paste your tx hash manually below.");
-        setSendingTx(false);
-        return;
-      }
+
 
       const txHashResult = await window.ethereum.request({
         method: "eth_sendTransaction",
@@ -115,7 +110,7 @@ export default function PublishApp({ onPublished }) {
         txHash,
         walletAddress,
       };
-      const res = await fetch(`${API}/tools`, {
+      const res = await fetch(`${API}/tools/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
