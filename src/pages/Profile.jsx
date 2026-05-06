@@ -402,6 +402,8 @@ export default function Profile() {
                                                     url={tool.url}
                                                     verified={false}
                                                     hideDomain={true}
+                                                    toolId={tool.id || tool._id}
+                                                    currentCount={tool.clickCount}
                                                     className="flex-grow h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 hover:shadow-md transition-all text-[11px] font-bold uppercase tracking-wider relative group/link"
                                                 >
                                                     <div className="flex flex-row items-center justify-center gap-2 w-full absolute inset-0">

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import ExitWarningModal from "./ExitWarningModal";
+import { useMetrics } from "../context/MetricsContext";
 
-export default function SafeLink({ url, children, className, verified = false, hideDomain = false }) {
+export default function SafeLink({ url, children, className, verified = false, hideDomain = false, toolId, currentCount }) {
   const [open, setOpen] = useState(false);
+  const { incrementClick } = useMetrics();
 
   // Extract domain name from URL
   const getDomain = (url) => {
@@ -20,6 +22,9 @@ export default function SafeLink({ url, children, className, verified = false, h
   };
 
   const confirmExit = () => {
+    if (toolId) {
+      incrementClick(toolId, currentCount || 0);
+    }
     window.open(url, "_blank", "noopener noreferrer");
     setOpen(false);
   };

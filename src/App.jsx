@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import CategorySidebar from "./components/CategorySidebar";
 import { AuthProvider } from "./context/AuthContext";
+import { MetricsProvider } from "./context/MetricsContext";
 import ClaudeBot from "./components/ClaudeBot";
 // import { Analytics } from "@vercel/analytics/react";
 
@@ -179,12 +180,14 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <AppLayout />
-      </Router>
-    </AuthProvider>
+    <MetricsProvider>
+      <AuthProvider>
+        <Router>
+          <ScrollToTop />
+          <AppLayout />
+        </Router>
+      </AuthProvider>
+    </MetricsProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsByCategory } from "../services/apiService";
+import SafeLink from "../components/SafeLink";
 
 const container = {
   hidden: { opacity: 0 },
@@ -122,14 +123,16 @@ export default function VibeCoding() {
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{tool.status}</span>
                   </div>
 
-                  <a
-                    href={tool.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <SafeLink
+                    url={tool.url}
+                    verified={false}
+                    hideDomain={true}
+                    toolId={tool.id}
+                    currentCount={tool.clickCount}
                     className="px-8 py-3 bg-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-pink-600/20 hover:scale-105 transition-all"
                   >
                     Enter App
-                  </a>
+                  </SafeLink>
                 </div>
               </motion.div>
             ))

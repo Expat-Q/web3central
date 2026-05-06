@@ -14,6 +14,7 @@ import NewsCard from "../components/NewsCard";
 import CategorySidebar from "../components/CategorySidebar";
 // Sidebar is now rendered globally in App.jsx  import kept for potential direct use
 import { PageSkeleton } from "../components/Skeleton";
+import SafeLink from "../components/SafeLink";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
 
@@ -428,14 +429,16 @@ export default function Home() {
                   
                   <div className="flex flex-row md:flex-col items-center justify-center gap-2 md:gap-3 shrink-0 md:ml-auto mt-4 md:mt-0">
                     {trending[currentFeaturedIndex].url && (
-                      <a 
-                        href={trending[currentFeaturedIndex].url} 
-                        target="_blank" 
-                        rel="noreferrer"
+                      <SafeLink
+                        url={trending[currentFeaturedIndex].url}
+                        verified={false}
+                        hideDomain={true}
+                        toolId={trending[currentFeaturedIndex].id || trending[currentFeaturedIndex]._id}
+                        currentCount={trending[currentFeaturedIndex].clickCount}
                         className="flex justify-center items-center gap-1.5 md:gap-2 px-4 py-2 md:px-6 md:py-3 w-full md:w-40 bg-white text-gray-900 rounded-xl font-bold text-sm md:text-base hover:bg-gray-50 transition-colors shadow-lg"
                       >
                         <ExternalLink size={14} className="md:w-4 md:h-4" /> Open App
-                      </a>
+                      </SafeLink>
                     )}
                     <button 
                       onClick={() => openTool(trending[currentFeaturedIndex])}

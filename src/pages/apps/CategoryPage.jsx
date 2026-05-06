@@ -225,6 +225,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           reviews: match.reviews,
           rating: match.averageRating || match.rating,
           ratingCount: match.ratingCount,
+          clickCount: match.clickCount,
         });
         // Clear state so refresh doesn't re-open
         window.history.replaceState({}, '');
@@ -343,6 +344,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             reviews: app.reviews,
             rating: app.averageRating || app.rating,
             ratingCount: app.ratingCount,
+            clickCount: app.clickCount,
             popularWith: app.popularWith,
           })}
           className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
@@ -421,6 +423,8 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
                   url={app.url}
                   verified={false}
                   hideDomain={true}
+                  toolId={app.id || app._id}
+                  currentCount={app.clickCount}
                   className="flex items-center justify-center bg-[#6d39ff] text-white px-4 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#5b2fff] transition-all whitespace-nowrap border border-[#6d39ff]/10 shadow-sm hover:shadow-md"
                 >
                   Open
@@ -767,6 +771,8 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
                         url={featured.url}
                         verified={false}
                         hideDomain={true}
+                        toolId={featured.id || featured._id}
+                        currentCount={featured.clickCount}
                         className="w-full md:w-auto flex items-center justify-center px-4 md:px-6 py-2.5 bg-white text-gray-900 text-sm font-black rounded-full hover:bg-gray-100 transition-colors"
                       >
                         Open

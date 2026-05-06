@@ -9,6 +9,8 @@ import {
 import ToolLogo from './ToolLogo';
 import RatingModal from './RatingModal';
 import { useAuth } from '../context/AuthContext';
+import { useMetrics } from '../context/MetricsContext';
+import SafeLink from './SafeLink';
 
 const metricsCache = new Map();
 
@@ -127,6 +129,11 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [descExpanded, setDescExpanded] = React.useState(false);
   const [showRatingModal, setShowRatingModal] = React.useState(false);
   const { user } = useAuth();
+  const { clickCounts } = useMetrics();
+
+  const currentClickCount = React.useMemo(() => {
+    return clickCounts[protocol?.id] !== undefined ? clickCounts[protocol.id] : (protocol?.clickCount || 0);
+  }, [clickCounts, protocol]);
 
   const shouldFetchLiveMetrics = React.useMemo(() => {
     const category = normalizeCategory(protocol?.category);
@@ -334,7 +341,7 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                 />
                 <StatPill
                   label="Launches"
-                  value={protocol?.clickCount > 0 ? formatCount(protocol.clickCount) : '—'}
+                  value={currentClickCount > 0 ? formatCount(currentClickCount) : '—'}
                   icon={<MousePointerClick size={10} className="text-purple-500" />}
                 />
                 <StatPill
@@ -347,17 +354,16 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
 
             {/* ══ LAUNCH APP CTA (Play Store "Install" button) ══ */}
             <div className="px-5 mb-5">
-              <a
-                href={protocol?.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  fetch(`${API}/tools/${protocol?.id}/click`, { method: 'POST' }).catch(() => {});
-                }}
+              <SafeLink
+                url={protocol?.url}
+                verified={false}
+                hideDomain={true}
+                toolId={protocol?.id}
+                currentCount={currentClickCount}
                 className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-300/40 text-sm"
               >
                 Launch App <ArrowUpRight size={16} />
-              </a>
+              </SafeLink>
               {protocol?.url && (
                 <p className="text-center text-[11px] text-gray-400 mt-1.5">
                   {protocol.url.replace(/^https?:\/\//, '').split('/')[0]}
