@@ -146,6 +146,10 @@ export const deleteNewsArticle = async (id) => {
   return apiClient.delete(`/news/${id}`, { auth: true });
 };
 
+export const updateNewsArticle = async (id, newsData) => {
+  return apiClient.put(`/news/${id}`, newsData, { auth: true });
+};
+
 export const fetchCuratedCourses = async () => {
   const data = await cachedGet({
     cacheKey: 'academy-courses',
@@ -161,6 +165,10 @@ export const createCuratedCourse = async (courseData) => {
 
 export const deleteCuratedCourse = async (courseId) => {
   return apiClient.delete(`/academy/courses/${courseId}`, { auth: true });
+};
+
+export const updateCuratedCourse = async (id, courseData) => {
+  return apiClient.put(`/academy/courses/${id}`, courseData, { auth: true });
 };
 
 export const generateAiQuiz = async (content) => {
@@ -219,4 +227,64 @@ export const upvoteCommunityLesson = async (lessonId) => {
 
 export const rateCommunityLesson = async (lessonId, rating) => {
   return apiClient.post(`/academy/community/${lessonId}/rate`, { rating }, { auth: true });
+};
+
+// --- Quest API ---
+export const fetchQuests = async (isAdmin = false) => {
+  const endpoint = isAdmin ? '/quests/admin' : '/quests';
+  return apiClient.get(endpoint, { auth: isAdmin });
+};
+
+export const createQuest = async (questData) => {
+  return apiClient.post('/quests', questData, { auth: true });
+};
+
+export const updateQuest = async (id, questData) => {
+  return apiClient.put(`/quests/${id}`, questData, { auth: true });
+};
+
+export const deleteQuest = async (id) => {
+  return apiClient.delete(`/quests/${id}`, { auth: true });
+};
+
+export const fetchLeaderboard = async () => {
+  const data = await apiClient.get('/auth/leaderboard');
+  return data.leaderboard || [];
+};
+
+export const completeQuest = async (id) => {
+  return apiClient.post(`/quests/${id}/complete`, {}, { auth: true });
+};
+
+// --- Admin API ---
+export const fetchPendingTools = async () => {
+  return apiClient.get('/tools/pending', { auth: true });
+};
+
+export const updateToolStatus = async (id, status) => {
+  return apiClient.put(`/tools/review/${id}`, { status }, { auth: true });
+};
+
+export const fetchPendingClaims = async () => {
+  return apiClient.get('/developer/pending-claims', { auth: true });
+};
+
+export const approveClaim = async (id, profileId) => {
+  return apiClient.post(`/developer/pending-claims/${id}/approve`, { profileId }, { auth: true });
+};
+
+export const rejectClaim = async (id, profileId) => {
+  return apiClient.post(`/developer/pending-claims/${id}/reject`, { profileId }, { auth: true });
+};
+
+export const generateCryptoNews = async (query, count) => {
+  return apiClient.post('/news/generate', { query, count }, { auth: true });
+};
+
+export const createCourse = async (courseData) => {
+  return apiClient.post('/academy/courses', courseData, { auth: true });
+};
+
+export const fetchAirdrops = async () => {
+  return apiClient.get('/airdrops');
 };

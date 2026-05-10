@@ -41,6 +41,8 @@ const chatRouter = require('./routes/chat');
 const defiRouter = require('./routes/defi');
 const newsRouter = require('./routes/news');
 const developerRouter = require('./routes/developer');
+const questRouter = require('./routes/quests');
+const ttsRouter = require('./routes/tts');
 
 
 // Connect to Database
@@ -163,6 +165,9 @@ app.use('/api/chat', chatRouter);
 app.use('/api/defi', defiRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/developer', developerRouter);
+app.use('/api/quests', questRouter);
+app.use('/api/tts', ttsRouter);
+app.use('/api/airdrops', require('./routes/airdrops'));
 
 
 app.get('/', (req, res) => {

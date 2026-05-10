@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Rating = require('../models/Rating');
 const Tool = require('../models/Tool');
+const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 
@@ -46,6 +47,7 @@ router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
 
         // Check if user already rated this tool
         let rating = await Rating.findOne({ user: req.user.id, tool: toolId });
+        let isNewReview = false;
 
         if (rating) {
             // Update existing rating
@@ -54,6 +56,7 @@ router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
             await rating.save();
         } else {
             // Create new rating
+            isNewReview = true;
             rating = await Rating.create({
                 user: req.user.id,
                 tool: toolId,
@@ -70,7 +73,21 @@ router.post('/:toolId', protect, validate(ratingSchema), async (req, res) => {
         tool.reviews = allRatings.length;
         await tool.save();
 
-        res.status(200).json({ success: true, data: rating, toolAvg: tool.rating });
+        // 💎 GAMIFICATION: Award Diamonds for new reviews
+        let diamondsEarned = 0;
+        if (isNewReview) {
+            diamondsEarned = 10;
+            await User.findByIdAndUpdate(req.user.id, {
+                $inc: { diamonds: diamondsEarned, totalXP: diamondsEarned, reviewCount: 1 }
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            data: rating, 
+            toolAvg: tool.rating,
+            diamondsEarned
+        });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

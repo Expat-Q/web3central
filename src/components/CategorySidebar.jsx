@@ -5,7 +5,7 @@ import {
   ArrowLeftRight, Landmark, Share2, Wallet, ShieldCheck,
   BarChart3, Image, Gamepad2, Users, Building, Coins, Lock,
   Activity, X, ChevronRight, ChevronLeft, LayoutGrid, Code2,
-  Scale, HelpCircle, User as UserIcon, Target
+  Scale, HelpCircle, User as UserIcon, Target, Trophy, Bookmark
 } from "lucide-react";
 import logo from "../assets/logo.jpg";
 
@@ -13,32 +13,42 @@ const QUICK_LINKS = [
   { id: "for-you",   label: "For You",      icon: Home,       color: "text-purple-600" },
   { id: "trending",  label: "Trending",     icon: TrendingUp, color: "text-orange-500" },
   { id: "top-rated", label: "Top Rated",    icon: Star,       color: "text-yellow-500" },
-  { id: "new",       label: "New Arrivals", icon: Sparkles,   color: "text-emerald-500" },
-  { id: "all",       label: "All Apps",     icon: LayoutGrid, color: "text-blue-500"   },
+  { id: "all",       label: "All Apps",     icon: LayoutGrid, color: "text-blue-500", path: "/apps"   },
 ];
 
 const CATEGORIES = [
-  { id: "trading",     label: "Trading",     icon: ArrowLeftRight, path: "/apps/trading",     color: "text-violet-600"  },
-  { id: "defi",        label: "DeFi",        icon: Landmark,       path: "/apps/defi",        color: "text-emerald-600" },
-  { id: "bridges",     label: "Bridges",     icon: Share2,         path: "/apps/bridges",     color: "text-blue-600"    },
-  { id: "wallets",     label: "Wallets",     icon: Wallet,         path: "/apps/wallets",     color: "text-slate-600"   },
-  { id: "security",    label: "Security",    icon: ShieldCheck,    path: "/apps/security",    color: "text-red-600"     },
+  { id: "ai",          label: "Artificial Intelligence", icon: Sparkles, path: "/apps/ai",    color: "text-indigo-600"  },
+  { id: "airdrops",    label: "Airdrops",    icon: Star,           path: "/apps/airdrops",    color: "text-yellow-400"  },
   { id: "analytics",   label: "Analytics",   icon: BarChart3,      path: "/apps/analytics",   color: "text-cyan-600"    },
-  { id: "nft",         label: "NFT",         icon: Image,          path: "/apps/nft",         color: "text-pink-600"    },
-  { id: "gaming",      label: "Gaming",      icon: Gamepad2,       path: "/apps/gaming",      color: "text-green-600"   },
-  { id: "community",   label: "Community",   icon: Users,          path: "/apps/community",   color: "text-teal-600"    },
-  { id: "rwa",         label: "RWA",         icon: Building,       path: "/apps/rwa",         color: "text-amber-600"   },
-  { id: "cex",         label: "CEX",         icon: Coins,          path: "/apps/cex",         color: "text-yellow-600"  },
-  { id: "privacy",     label: "Privacy",     icon: Lock,           path: "/apps/privacy",     color: "text-gray-600"    },
-  { id: "predictions", label: "Predictions", icon: Activity,       path: "/apps/predictions", color: "text-orange-600"  },
   { id: "bounty-hub",  label: "Bounty Hub",  icon: Target,         path: "/apps/bounty-hub",  color: "text-indigo-600"  },
-];
+  { id: "bridges",     label: "Bridges",     icon: Share2,         path: "/apps/bridges",     color: "text-blue-600"    },
+  { id: "cex",         label: "CEX",         icon: Coins,          path: "/apps/cex",         color: "text-yellow-600"  },
+  { id: "community",   label: "Community",   icon: Users,          path: "/apps/community",   color: "text-teal-600"    },
+  { id: "dao",         label: "DAOs & Governance", icon: Building, path: "/apps/dao",         color: "text-purple-600"  },
+  { id: "defi",        label: "DeFi",        icon: Landmark,       path: "/apps/defi",        color: "text-emerald-600" },
+  { id: "depin",       label: "DePIN",       icon: Activity,       path: "/apps/depin",       color: "text-orange-500", comingSoon: true  },
+  { id: "gaming",      label: "Gaming",      icon: Gamepad2,       path: "/apps/gaming",      color: "text-green-600"   },
+  { id: "infra",       label: "Infra & Dev Tools", icon: Code2,    path: "/apps/infra",       color: "text-slate-500"   },
+  { id: "nft",         label: "NFT",         icon: Image,          path: "/apps/nft",         color: "text-pink-600"    },
+  { id: "payments",    label: "Payments",    icon: Wallet,         path: "/apps/payments",    color: "text-emerald-500", comingSoon: true },
+  { id: "predictions", label: "Predictions", icon: Activity,       path: "/apps/predictions", color: "text-orange-600", comingSoon: true  },
+  { id: "privacy",     label: "Privacy",     icon: Lock,           path: "/apps/privacy",     color: "text-gray-600", comingSoon: true    },
+  { id: "rwa",         label: "RWA",         icon: Building,       path: "/apps/rwa",         color: "text-amber-600"  },
+  { id: "security",    label: "Security",    icon: ShieldCheck,    path: "/apps/security",    color: "text-red-600"     },
+  { id: "social",      label: "Social & DeSoc", icon: Share2,      path: "/apps/social",      color: "text-blue-400"    },
+  { id: "staking",     label: "Staking & Yield", icon: Coins,      path: "/apps/staking",     color: "text-yellow-600"  },
+  { id: "trading",     label: "Trading",     icon: ArrowLeftRight, path: "/apps/trading",     color: "text-violet-600"  },
+  { id: "wallets",     label: "Wallets",     icon: Wallet,         path: "/apps/wallets",     color: "text-slate-600"   },
+].sort((a, b) => a.label.localeCompare(b.label) || a.label.length - b.label.length);
 
 const NAV_LINKS = [
   { label: "News",              icon: Newspaper,     path: "/news"             },
   { label: "Community Feed",    icon: Users,         path: "/community"        },
   { label: "Academy",           icon: GraduationCap, path: "/academy"          },
   { label: "Compare",           icon: Scale,         path: "/tool-comparison"  },
+  { label: "Quests",            icon: Star,          path: "/quests"           },
+  { label: "Leaderboard",       icon: Trophy,        path: "/leaderboard"      },
+  { label: "Bookmarks",         icon: Bookmark,      path: "/bookmarks"        },
   { label: "Profile",           icon: UserIcon,      path: "/profile"          },
   { label: "Support",           icon: HelpCircle,    path: "/support"          },
   { label: "Developer Console", icon: Code2,         path: "/developer"        },
@@ -46,7 +56,22 @@ const NAV_LINKS = [
 
 export default function CategorySidebar({ activeSection, onSelect, isOpen, onClose }) {
   const drawerRef = useRef(null);
+  const scrollRef = useRef(null);
   const navigate = useNavigate();
+
+  // Restore scroll position
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem("sidebar_scroll");
+    if (savedScroll && scrollRef.current) {
+      scrollRef.current.scrollTop = parseInt(savedScroll, 10);
+    }
+  }, []);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      sessionStorage.setItem("sidebar_scroll", String(scrollRef.current.scrollTop));
+    }
+  };
 
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem("w3c_sidebar_collapsed") === "true"; }
@@ -83,10 +108,29 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
   };
 
   const handleSelect = (id) => {
+    // Check if it's All Apps
+    const qLink = QUICK_LINKS.find(q => q.id === id);
+    if (qLink?.path) {
+      navigate(qLink.path);
+      onClose?.();
+      return;
+    }
+
     onSelect?.(id);
     onClose?.();
-    const el = document.getElementById(`section-${id}`);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    
+    // If we're on the home page, scroll to the section
+    if (window.location.pathname === '/') {
+      const targetId = id === 'top-rated' ? 'top-charts' : id;
+      const el = document.getElementById(`section-${targetId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      // If we're on another page, navigate home first
+      const targetId = id === 'top-rated' ? 'top-charts' : id;
+      navigate('/', { state: { scrollToSection: targetId } });
+    }
   };
 
   /* ── Shared inner content ── */
@@ -104,8 +148,8 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
               className="w-9 h-9 object-cover rounded-lg border border-purple-100 shadow-sm shrink-0"
             />
             {!isCollapsed && (
-              <span className="text-base font-black tracking-tight text-gray-900 whitespace-nowrap overflow-hidden">
-                web3<span className="text-purple-600">central</span>
+              <span className="text-xl font-black tracking-tighter text-gray-900 whitespace-nowrap overflow-hidden">
+                WEB3<span className="text-purple-600">CENTRAL</span>
               </span>
             )}
           </Link>
@@ -140,7 +184,11 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
         </div>
 
         {/* Scrollable body */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain py-3 space-y-4 ${isCollapsed ? "px-2" : ""}`}>
+        <div 
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className={`flex-1 overflow-y-auto overflow-x-hidden overscroll-contain py-3 space-y-4 ${isCollapsed ? "px-2" : ""}`}
+        >
 
           {/* Quick links */}
           <div className={isCollapsed ? "space-y-0.5" : "px-3 space-y-0.5"}>
@@ -190,7 +238,14 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
                     size={15}
                     className={activeSection === id ? "text-purple-600 shrink-0" : `${color} opacity-60 group-hover:opacity-100 shrink-0`}
                   />
-                  {!isCollapsed && label}
+                  {!isCollapsed && (
+                    <div className="flex items-center justify-between flex-1 min-w-0">
+                      <span className="truncate">{label}</span>
+                      {['ai', 'dao', 'depin', 'infra', 'payments', 'social', 'staking'].includes(id) ? (
+                        <span className="ml-1 text-[8px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-1 rounded uppercase tracking-tighter shrink-0">Soon</span>
+                      ) : null}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -233,7 +288,7 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
     <>
       {/* ── Desktop: sticky collapsible sidebar from top ── */}
       <aside
-        className={`hidden lg:flex flex-col shrink-0 sticky top-0 h-screen z-[51] bg-white border-r border-gray-100 transition-all duration-200 ${
+        className={`hidden lg:flex flex-col shrink-0 sticky top-0 h-screen z-[51] bg-white border-r border-gray-100 transition-all duration-200 font-outfit ${
           collapsed ? "w-14" : "w-60"
         }`}
       >

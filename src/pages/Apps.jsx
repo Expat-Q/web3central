@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
 import { Star, ChevronRight, Rocket, Share2 } from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
 import { CardSkeleton } from "../components/Skeleton";
 import MetricsPanel from "../components/MetricsPanel";
+import ChainFilter from "../components/ChainFilter";
+import { useMetrics } from "../context/MetricsContext";
 
 /* ── Protocol Card ── */
 const ProtocolCard = ({ tool, onOpenDetails }) => {
@@ -90,6 +92,13 @@ const SECTIONS = [
   { key: "cex",         label: "CEX",              dbKeys: ["cex"],                                   comingSoon: false },
   { key: "privacy",     label: "Privacy",          dbKeys: ["privacy"],                               comingSoon: false },
   { key: "predictions", label: "Predictions",      dbKeys: ["predictions"],                           comingSoon: false },
+  { key: "depin",       label: "DePIN",            dbKeys: ["depin"],                                 comingSoon: true  },
+  { key: "payments",    label: "Payments",         dbKeys: ["payments"],                              comingSoon: true  },
+  { key: "ai",          label: "Artificial Intelligence", dbKeys: ["ai"],                             comingSoon: true  },
+  { key: "dao",         label: "DAOs & Governance", dbKeys: ["dao"],                                comingSoon: true  },
+  { key: "infra",       label: "Infra & Dev Tools", dbKeys: ["infra"],                              comingSoon: true  },
+  { key: "social",      label: "Social & DeSoc",    dbKeys: ["social"],                               comingSoon: true  },
+  { key: "staking",     label: "Staking & Yield",   dbKeys: ["staking"],                              comingSoon: true  },
 ];
 
 /* ── Coming Soon Mini Card ── */
@@ -122,14 +131,44 @@ export default function Apps() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
   const [selectedMetricsProtocol, setSelectedMetricsProtocol] = useState(null);
+  const { selectedChain } = useMetrics();
   const sectionRefs = useRef({});
 
+  const location = useLocation();
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const toolsData = await fetchToolsData();
         setAppsData(toolsData);
+        
+        // Handle automatic open from navigation state
+        if (location.state?.openToolId) {
+          const allTools = Object.values(toolsData).flat();
+          const target = allTools.find(t => (t._id || t.id) === location.state.openToolId);
+          if (target) {
+            setSelectedMetricsProtocol({
+              id: target.id || target._id,
+              slug: target.llamaSlug || target.slug || target.id,
+              name: target.name,
+              description: target.description,
+              logoUrl: target.logoUrl,
+              logo: target.logo,
+              url: target.url,
+              twitter: target.twitter,
+              builder: target.builder,
+              category: target.category,
+              verified: target.verified,
+              metrics: target.metrics,
+              geckoId: target.geckoId,
+              monthlyUsers: target.monthlyUsers,
+              reviews: target.reviews,
+              rating: target.averageRating || target.rating,
+              ratingCount: target.ratingCount,
+              popularWith: target.popularWith,
+            });
+          }
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -137,7 +176,7 @@ export default function Apps() {
       }
     };
     fetchData();
-  }, []);
+  }, [location.state]);
 
   const sectionToolsMap = useMemo(() => {
     if (!appsData) return {};
@@ -158,11 +197,13 @@ export default function Apps() {
         }
       }
 
-      map[section.key] = tools.sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
+      map[section.key] = tools
+        .filter(t => selectedChain === 'All' || t.metrics?.chains?.some(c => c.toLowerCase() === selectedChain.toLowerCase()))
+        .sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
     }
 
     return map;
-  }, [appsData]);
+  }, [appsData, selectedChain]);
 
   const getToolsForSection = (section) => {
     return sectionToolsMap[section.key] || [];
@@ -183,19 +224,27 @@ export default function Apps() {
   };
 
   return (
-    <div className="bg-white min-h-screen pt-16 pb-16">
+    <div className="bg-white min-h-screen pt-0 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Page Header */}
-        <div className="mb-6 pt-4">
-          <h1 className="text-3xl font-black tracking-tight text-gray-900">Browse Apps</h1>
-          <p className="text-gray-400 text-sm mt-1">Explore the best protocols across every Web3 category</p>
+        <div className="mb-6 pt-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900">Browse Apps</h1>
+            <p className="text-gray-400 text-sm mt-1">Explore the best protocols across every Web3 category</p>
+          </div>
+          <div className="flex shrink-0">
+            <ChainFilter />
+          </div>
         </div>
 
         {/* Sticky Filter Pills */}
         <div className="sticky top-[64px] z-30 bg-white/90 backdrop-blur-md py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-b border-gray-100 mb-8">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {[{ key: "All", label: "All" }, ...SECTIONS.map(s => ({ key: s.key, label: s.label }))].map(f => (
+            {[
+              { key: "All", label: "All" },
+              ...SECTIONS.map(s => ({ key: s.key, label: s.label }))
+            ].map(f => (
               <button
                 key={f.key}
                 onClick={() => scrollToSection(f.key)}
@@ -213,7 +262,12 @@ export default function Apps() {
 
         {/* Category Sections */}
         <div className="space-y-12">
-          {SECTIONS.map(section => {
+          {SECTIONS
+            .filter(section => {
+              if (activeFilter === "All") return !section.comingSoon;
+              return section.key === activeFilter;
+            })
+            .map(section => {
             const tools = getToolsForSection(section);
             const displayTools = tools.slice(0, 6);
             const hasMore = tools.length > 6;

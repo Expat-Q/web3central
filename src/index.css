@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
 /* ── Google Material Symbols Rounded rendering fix ── */
 .material-symbols-rounded {
   font-family: 'Material Symbols Rounded', sans-serif;
@@ -42,7 +44,7 @@ body {
   @apply antialiased selection:bg-purple-200;
   background-color: var(--bg-white);
   color: var(--text-primary);
-  font-family: 'Plus Jakarta Sans', 'ui-sans-serif', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
@@ -414,4 +416,27 @@ h6 {
 
 /* ── Hide scrollbar (horizontal scroll rows) ── */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Page Transition Loading Bar */
+.page-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, #6d28d9, #8b5cf6);
+  z-index: 9999;
+  transform-origin: left;
+  animation: loading-bar 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-bar {
+  0% { transform: scaleX(0); }
+  50% { transform: scaleX(0.7); }
+  100% { transform: scaleX(1); opacity: 0; }
+}

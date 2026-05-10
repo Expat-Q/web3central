@@ -1,1019 +1,929 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  ShieldAlert, Users, LayoutDashboard, Database, Activity,
-  CheckCircle, Trash2, Plus, X, Lock, ExternalLink
-} from 'lucide-react';
-import {
-  fetchStatsOverview, fetchToolsData, deleteTool, createTool,
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { 
+  fetchPendingTools, updateToolStatus, deleteTool, 
+  fetchPendingClaims, approveClaim, rejectClaim, 
+  generateCryptoNews, createCourse,
+  createQuest, fetchQuests, updateQuest, deleteQuest,
   fetchCommunitySpotlight, updateCommunitySpotlight,
-  reviewTool, fetchCuratedCourses, createCuratedCourse, deleteCuratedCourse,
-  publishNewsArticle
+  fetchStatsOverview,
+  fetchLatestNews, updateNewsArticle, deleteNewsArticle, publishNewsArticle,
+  fetchCuratedCourses, updateCuratedCourse, deleteCuratedCourse
 } from '../services/apiService';
-
-const ADMIN_PASSWORD = '213478';
-
-const CATEGORIES = [
-  { id: "trading", name: "Trading / DEX / Perps" },
-  { id: "defi", name: "DeFi (Lending / Yield)" },
-  { id: "bridges", name: "Bridges & Cross-chain" },
-  { id: "wallets", name: "Wallets" },
-  { id: "security", name: "Security" },
-  { id: "analytics", name: "Analytics" },
-  { id: "nft", name: "NFT" },
-  { id: "gaming", name: "Gaming / GameFi" },
-  { id: "community", name: "Community & DAO" },
-  { id: "rwa", name: "Real World Assets (RWA)" },
-  { id: "cex", name: "Centralized Exchanges (CEX)" },
-  { id: "privacy", name: "Privacy" },
-  { id: "predictions", name: "Prediction Markets" },
-];
+import { 
+  Settings, CheckCircle2, XCircle, Trash2, Shield, 
+  ExternalLink, MessageSquare, Plus, Star, Search,
+  LayoutGrid, Rocket, Users, AlertCircle, FileText,
+  BookOpen, Zap, Sparkles, Edit3, X, Save, RefreshCw
+} from 'lucide-react';
 
 export default function Admin() {
-  // Password Gate State
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-
-  // Dashboard State
+  const { user, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [pendingTools, setPendingTools] = useState([]);
+  const [pendingClaims, setPendingClaims] = useState([]);
   const [stats, setStats] = useState(null);
-  const [toolsList, setToolsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [questsList, setQuestsList] = useState([]);
   const [spotlightData, setSpotlightData] = useState(null);
-  const [updatingSpotlight, setUpdatingSpotlight] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
 
-  // Add Tool State
-  const [showAddTool, setShowAddTool] = useState(false);
-  const [addingTool, setAddingTool] = useState(false);
-  const [newTool, setNewTool] = useState({
-    name: '',
-    description: '',
-    url: '',
-    category: 'dex',
-    twitter: '',
-    logo: ''
-  });
-
-  // News Engine State
-  const [newsForm, setNewsForm] = useState({
-    title: '', shortDescription: '', content: '', thumbnailUrl: '', tags: ''
-  });
-  const [publishingNews, setPublishingNews] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-
-  // Curated Courses State
-  const [curatedCourses, setCuratedCourses] = useState([]);
+  // Form States
+  const [newsConfig, setNewsConfig] = useState({ query: 'Ethereum layer 2 scaling', count: 3 });
+  const [generatingNews, setGeneratingNews] = useState(false);
+  const [newCourse, setNewCourse] = useState({ title: '', url: '', platform: 'YouTube', level: 'Beginner' });
   const [savingCourse, setSavingCourse] = useState(false);
-  const [newCourse, setNewCourse] = useState({
-    title: '', description: '', url: '', platform: 'Anthropic',
-    thumbnail: '', level: 'Beginner', isFree: true, tags: ''
-  });
+  
+  const [newQuest, setNewQuest] = useState({ title: '', description: '', reward: 50, category: 'Social', type: 'link', targetUrl: '' });
+  const [savingQuest, setSavingQuest] = useState(false);
+  const [editingQuest, setEditingQuest] = useState(null);
+  
+  const [updatingSpotlight, setUpdatingSpotlight] = useState(false);
+  const [newsArticles, setNewsArticles] = useState([]);
+  const [curatedCourses, setCuratedCourses] = useState([]);
+  const [editingNews, setEditingNews] = useState(null);
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [newManualNews, setNewManualNews] = useState({ title: '', description: '', thumbnail: '', tags: '', contentMarkdown: '' });
+  const [publishingNews, setPublishingNews] = useState(false);
 
-  // Check localStorage for previous unlock
   useEffect(() => {
-    const unlocked = sessionStorage.getItem('admin_unlocked');
-    if (unlocked === 'true') setIsUnlocked(true);
-  }, []);
-
-  // Load data once unlocked
-  useEffect(() => {
-    if (!isUnlocked) return;
-    const loadData = async () => {
-      try {
-        const [statsData, toolsData, spotlightRes, coursesData] = await Promise.all([
-          fetchStatsOverview().catch(() => ({ users: 0, activeTools: 0, pendingTools: 0 })),
-          fetchToolsData().catch(() => ({})),
-          fetchCommunitySpotlight().catch(() => ({ builderSpotlight: { name: '', role: '', description: '', twitter: '', xProfileImageUrl: '' } })),
-          fetchCuratedCourses().catch(() => [])
-        ]);
-        setStats(statsData);
-        const toolsArrays = Object.entries(toolsData)
-          .filter(([key]) => key !== 'tooltipExplanations')
-          .map(([_, val]) => val);
-        setToolsList(toolsArrays.flat());
-        setSpotlightData(spotlightRes);
-        setCuratedCourses(coursesData);
-      } catch (error) {
-        console.error("Failed to load admin stats", error);
-      } finally {
-        setLoadingData(false);
-      }
-    };
-    loadData();
-  }, [isUnlocked]);
-
-  // Password submission
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    if (passwordInput === ADMIN_PASSWORD) {
-      setIsUnlocked(true);
-      setPasswordError('');
-      sessionStorage.setItem('admin_unlocked', 'true');
-    } else {
-      setPasswordError('Incorrect access code');
-      setPasswordInput('');
+    if (user?.role === 'admin') {
+      loadData();
     }
-  };
+  }, [user]);
 
-  // Delete tool handler
-  const handleRemoveTool = async (category, id, name) => {
-    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  const loadData = async () => {
     try {
-      await deleteTool(category, id);
-      setToolsList(prev => prev.filter(t => (t.id || t._id) !== id));
-      setStats(prev => ({ ...prev, activeTools: (prev.activeTools || 1) - 1 }));
-    } catch (error) {
-      alert('Failed to delete tool');
-    }
-  };
-
-  // Review tool handler (Accept/Reject)
-  const handleReviewTool = async (category, id, name, action) => {
-    if (!window.confirm(`Are you sure you want to ${action} "${name}"?`)) return;
-    try {
-      await reviewTool(category, id, { action });
-      setToolsList(prev => prev.map(t => (t.id || t._id) === id ? { ...t, status: action === 'accept' ? 'active' : 'rejected' } : t));
-      setStats(prev => ({
-        ...prev,
-        activeTools: action === 'accept' ? (prev.activeTools || 0) + 1 : prev.activeTools,
-        pendingTools: Math.max((prev.pendingTools || 1) - 1, 0)
-      }));
-    } catch (error) {
-      alert(`Failed to ${action} tool`);
-    }
-  };
-
-  // Add tool handler
-  const handleAddTool = async (e) => {
-    e.preventDefault();
-    if (!newTool.name || !newTool.description || !newTool.url) {
-      return alert('Name, description, and URL are required');
-    }
-    setAddingTool(true);
-    try {
-      const result = await createTool(newTool.category, {
-        name: newTool.name,
-        description: newTool.description,
-        url: newTool.url,
-        twitter: newTool.twitter,
-        logo: newTool.logo,
-        status: 'active'
-      });
-      setToolsList(prev => [...prev, { ...result, category: newTool.category }]);
-      setNewTool({ name: '', description: '', url: '', category: 'dex', twitter: '', logo: '' });
-      setShowAddTool(false);
-      setStats(prev => ({ ...prev, activeTools: (prev.activeTools || 0) + 1 }));
-      alert('Tool added successfully!');
-    } catch (error) {
-      alert(`Failed to add tool. Error: ${error.message || 'Validation failed'}`);
-    }
-    setAddingTool(false);
-  };
-
-  // Curated Course handlers
-  const handleAddCourse = async (e) => {
-    e.preventDefault();
-    if (!newCourse.title || !newCourse.url) return alert('Title and URL are required');
-    setSavingCourse(true);
-    try {
-      let finalThumbnail = newCourse.thumbnail;
-
-      // Auto-extract or assign thumbnails if the thumbnail field is empty
-      if (!finalThumbnail) {
-        const urlLower = newCourse.url.toLowerCase();
-
-        // 1. YouTube
-        if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) {
-          const videoIdMatch = newCourse.url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-          if (videoIdMatch && videoIdMatch[1]) {
-            finalThumbnail = `https://img.youtube.com/vi/${videoIdMatch[1]}/maxresdefault.jpg`;
-          }
-        }
-        // 2. Github
-        else if (urlLower.includes('github.com')) {
-          finalThumbnail = 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
-        }
-        // 3. Platform Defaults based on dropdown selection
-        else {
-          switch (newCourse.platform) {
-            case 'Udemy':
-              finalThumbnail = 'https://s.udemycdn.com/meta/default-meta-image-v2.png';
-              break;
-            case 'Coursera':
-              finalThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Coursera_logo.svg/1200px-Coursera_logo.svg.png';
-              break;
-            case 'Anthropic':
-              finalThumbnail = 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/1200px-Anthropic_logo.svg.png';
-              break;
-            default:
-              // Fallback image if nothing matches
-              finalThumbnail = 'https://images.unsplash.com/photo-1639762681485-074b7f4f24fe?w=800&auto=format&fit=crop&q=60';
-          }
-        }
-      }
-
-      const payload = {
-        ...newCourse,
-        thumbnail: finalThumbnail,
-        tags: newCourse.tags ? newCourse.tags.split(',').map(t => t.trim()).filter(Boolean) : []
-      };
-      const result = await createCuratedCourse(payload);
-      setCuratedCourses(prev => [result.data, ...prev]);
-      setNewCourse({ title: '', description: '', url: '', platform: 'Anthropic', thumbnail: '', level: 'Beginner', isFree: true, tags: '' });
-      alert('Course added successfully!');
+      setLoading(true);
+      const [tools, claims, q, stats, spotlight, news, courses] = await Promise.all([
+        fetchPendingTools(),
+        fetchPendingClaims(),
+        fetchQuests(true),
+        fetchStatsOverview(),
+        fetchCommunitySpotlight(),
+        fetchLatestNews(),
+        fetchCuratedCourses()
+      ]);
+      setPendingTools(tools?.data || []);
+      setPendingClaims(claims?.claims || []);
+      setQuestsList(q?.data || []);
+      setStats(stats);
+      setSpotlightData(spotlight);
+      setNewsArticles(news || []);
+      setCuratedCourses(courses || []);
     } catch (err) {
-      alert('Failed to add course. Make sure you are logged in.');
+      console.error('Admin data load failed:', err);
+    } finally {
+      setLoading(false);
     }
-    setSavingCourse(false);
+  };
+
+  // Handlers
+  const handleReviewTool = async (id, status) => {
+    try {
+      await updateToolStatus(id, status);
+      setPendingTools(prev => prev.filter(t => t._id !== id));
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleApproveClaim = async (id, profileId) => {
+    try {
+      await approveClaim(id, profileId);
+      setPendingClaims(prev => prev.filter(c => c._id !== id));
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleRejectClaim = async (id, profileId) => {
+    if (!window.confirm('Reject this developer claim?')) return;
+    try {
+      await rejectClaim(id, profileId);
+      setPendingClaims(prev => prev.filter(c => c._id !== id));
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleCreateQuest = async (e) => {
+    e.preventDefault();
+    setSavingQuest(true);
+    try {
+      await createQuest(newQuest);
+      setNewQuest({ title: '', description: '', reward: 50, category: 'Social', type: 'link', targetUrl: '' });
+      loadData();
+    } catch (err) { alert(err.message); }
+    finally { setSavingQuest(false); }
+  };
+
+  const handleUpdateQuest = async (e) => {
+    e.preventDefault();
+    try {
+      await updateQuest(editingQuest._id, editingQuest);
+      setEditingQuest(null);
+      loadData();
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleUpdateQuestStatus = async (id, status) => {
+    try {
+      await updateQuest(id, { status });
+      loadData();
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleDeleteQuest = async (id, title) => {
+    if (!window.confirm(`Delete quest "${title}"?`)) return;
+    try {
+      await deleteQuest(id);
+      loadData();
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleUpdateNews = async (e) => {
+    e.preventDefault();
+    try {
+      await updateNewsArticle(editingNews._id, editingNews);
+      setEditingNews(null);
+      loadData();
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleDeleteNews = async (id, title) => {
+    if (!window.confirm(`Delete news article "${title}"?`)) return;
+    try {
+      await deleteNewsArticle(id);
+      loadData();
+    } catch (err) { alert(err.message); }
+  };
+
+  const handleUpdateCourse = async (e) => {
+    e.preventDefault();
+    try {
+      await updateCuratedCourse(editingCourse._id, editingCourse);
+      setEditingCourse(null);
+      loadData();
+    } catch (err) { alert(err.message); }
   };
 
   const handleDeleteCourse = async (id, title) => {
-    if (!window.confirm(`Delete "${title}"?`)) return;
+    if (!window.confirm(`Delete course "${title}"?`)) return;
     try {
       await deleteCuratedCourse(id);
-      setCuratedCourses(prev => prev.filter(c => c._id !== id));
-    } catch (err) {
-      alert('Failed to delete course.');
-    }
+      loadData();
+    } catch (err) { alert(err.message); }
   };
 
-  const handleSpotlightUpdate = async (e) => {
+  const handlePublishManualNews = async (e) => {
     e.preventDefault();
-    setUpdatingSpotlight(true);
-    try {
-      await updateCommunitySpotlight(spotlightData);
-      alert('Builder Spotlight updated successfully!');
-    } catch (err) {
-      alert('Failed to update Spotlight.');
-    }
-    setUpdatingSpotlight(false);
-  };
-
-  // News Handlers
-  const handlePublishNews = async () => {
-    if (!newsForm.title || !newsForm.content || !newsForm.shortDescription || !newsForm.thumbnailUrl) {
-      return alert("Complete all required news fields (Title, Description, Content, Thumbnail).");
-    }
-
     setPublishingNews(true);
     try {
-      const slug = newsForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const tagsArray = newsForm.tags.split(',').map(tag => tag.trim()).filter(Boolean);
-      
-      const payload = {
-        title: newsForm.title,
-        shortDescription: newsForm.shortDescription,
-        contentMarkdown: newsForm.content,
-        thumbnailUrl: newsForm.thumbnailUrl,
-        tags: tagsArray,
-        slug
+      const newsData = {
+        ...newManualNews,
+        tags: newManualNews.tags.split(',').map(t => t.trim()).filter(t => t),
+        publishedAt: new Date()
       };
-      await publishNewsArticle(payload);
-      alert("News Article Published Successfully!");
-      setNewsForm({ title: '', shortDescription: '', content: '', thumbnailUrl: '', tags: '' });
-    } catch (e) {
-      alert("Error publishing news: " + e.message);
-    }
-    setPublishingNews(false);
+      await publishNewsArticle(newsData);
+      setNewManualNews({ title: '', description: '', thumbnail: '', tags: '', contentMarkdown: '' });
+      alert('News article published!');
+      loadData();
+    } catch (err) { alert(err.message); }
+    finally { setPublishingNews(false); }
   };
 
-  // ── PASSWORD GATE ──
-  if (!isUnlocked) {
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: LayoutGrid, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { id: 'review', label: 'Manage Tools', icon: Shield, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { id: 'quests', label: 'Quests', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { id: 'content', label: 'Content Engine', icon: Rocket, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+    { id: 'spotlight', label: 'Builder Spotlight', icon: Users, color: 'text-fuchsia-500', bg: 'bg-fuchsia-50' },
+  ];
+
+  if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 pt-16">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-sm"
-        >
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-slate-900 to-indigo-900 p-8 text-center">
-              <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Lock size={28} className="text-white" />
-              </div>
-              <h2 className="text-xl font-black text-white">Admin Access</h2>
-              <p className="text-indigo-300 text-sm mt-1">Enter access code to continue</p>
-            </div>
-            <form onSubmit={handlePasswordSubmit} className="p-8 space-y-4">
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Access Code"
-                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl text-center text-lg font-mono tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-red-500 text-sm text-center font-medium">{passwordError}</p>
-              )}
-              <button
-                type="submit"
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-md"
-              >
-                Unlock Dashboard
-              </button>
-            </form>
-          </div>
-        </motion.div>
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <div className="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
       </div>
     );
   }
 
-  // ── LOADING STATE ──
-  if (loadingData) {
+  if (user?.role !== 'admin') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  // ── COMPUTED LISTS ──
-  const activeTools = toolsList.filter(t => t.status === 'active' || t.status === 'experimental');
-  const pendingTools = toolsList.filter(t => t.status === 'pending');
-
-  // ── DASHBOARD ──
-  return (
-    <div className="min-h-screen bg-slate-50 pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-6">
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-              <ShieldAlert className="text-indigo-600" size={32} />
-              Admin Command Center
-            </h1>
-            <p className="text-slate-500 mt-1">Manage tools, lessons, and monitor platform health.</p>
+      <div className="min-h-screen flex items-center justify-center p-6 bg-[#fafafa]">
+        <div className="text-center space-y-4">
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto shadow-sm border border-red-100">
+            <AlertCircle size={40} />
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-sm border border-indigo-100">
-            <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
-            System Online
-          </div>
+          <h1 className="text-3xl font-black text-slate-900">Access Denied</h1>
+          <p className="text-slate-500 font-medium">Administrator privileges are required to view this page.</p>
         </div>
+      </div>
+    );
+  }
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-          {[
-            { id: 'overview', label: 'Overview' },
-            { id: 'tools', label: 'Manage Tools', count: activeTools.length },
-            { id: 'pending', label: 'Pending Reviews', count: pendingTools.length, highlight: pendingTools.length > 0 },
-            { id: 'content', label: 'Content Engine' },
-            { id: 'spotlight', label: 'Builder Spotlight' },
-          ].map(tab => (
+  return (
+    <div className="min-h-screen bg-[#fafafa] pt-12 pb-32">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Header */}
+        <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center border border-indigo-100">
+                <Shield size={20} />
+              </div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">Admin <span className="text-indigo-600">Command Center</span></h1>
+            </div>
+            <p className="text-slate-500 font-medium">Manage tools, lessons, and monitor platform health.</p>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-xl">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">System Online</span>
+          </div>
+        </header>
+
+        <div className="mb-12 bg-white p-1 rounded-[1.5rem] border border-slate-100 shadow-sm inline-flex items-center gap-1">
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
-                activeTab === tab.id
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              className={`flex items-center gap-2 px-6 py-3 rounded-[1.2rem] text-sm font-bold transition-all ${
+                activeTab === tab.id 
+                  ? `bg-[#4F46E5] text-white shadow-lg shadow-indigo-200` 
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
               }`}
             >
+              <tab.icon size={18} />
               {tab.label}
-              {tab.count !== undefined && (
-                <span className={`px-2 py-0.5 rounded-full text-xs ${
-                  activeTab === tab.id 
-                    ? 'bg-white/20 text-white' 
-                    : tab.highlight ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700'
-                }`}>
-                  {tab.count}
+              {tab.id === 'review' && pendingTools.length > 0 && (
+                <span className={`ml-1 text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'}`}>
+                  {pendingTools.length}
                 </span>
               )}
             </button>
           ))}
         </div>
 
-        {/* ── OVERVIEW TAB ── */}
-        {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Users size={28} />
-              </div>
-              <div>
-                <p className="text-slate-500 font-medium text-sm">Registered Users</p>
-                <h3 className="text-3xl font-black text-slate-900">{stats?.users || 0}</h3>
-              </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Database size={28} />
-              </div>
-              <div>
-                <p className="text-slate-500 font-medium text-sm">Active Tools</p>
-                <h3 className="text-3xl font-black text-slate-900">{stats?.activeTools || 0}</h3>
-              </div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center gap-6">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <Activity size={28} />
-              </div>
-              <div>
-                <p className="text-slate-500 font-medium text-sm">Pending Submissions</p>
-                <h3 className="text-3xl font-black text-slate-900">{stats?.pendingTools || 0}</h3>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        {/* ── MANAGE TOOLS TAB ── */}
-        {activeTab === 'tools' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
-          {/* Existing Tools List */}
-          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-[600px]">
-            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <LayoutDashboard size={20} className="text-indigo-500" />
-                Manage Active Tools
-              </h2>
-              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                {activeTools.length} tools
-              </span>
-            </div>
-            <div className="p-0 overflow-y-auto custom-scrollbar flex-1">
-              {activeTools.length === 0 ? (
-                <div className="p-12 text-center flex flex-col items-center">
-                  <CheckCircle size={48} className="text-emerald-400 mb-4" />
-                  <h3 className="text-lg font-bold text-slate-800">No tools yet</h3>
-                  <p className="text-slate-500 text-sm mt-1">Add your first tool using the form.</p>
+        {/* Tab Content */}
+        <div className="space-y-12">
+          
+          {/* ── OVERVIEW TAB ── */}
+          {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-xl hover:border-indigo-100 transition-all duration-500">
+                <div className="w-20 h-20 bg-blue-50/50 text-blue-600 rounded-[1.5rem] flex items-center justify-center shrink-0">
+                  <Users size={32} strokeWidth={1.5} />
                 </div>
-              ) : (
-                <div className="divide-y divide-slate-100">
-                  {CATEGORIES.map(category => {
-                    const categoryTools = activeTools.filter(t => t.category === category.id);
-                    if (categoryTools.length === 0) return null;
-                    return (
-                      <div key={category.id} className="pb-4">
-                        <div className="px-6 py-3 bg-slate-100 border-y border-slate-200 sticky top-0 z-10 backdrop-blur-sm">
-                          <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{category.name}</h3>
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Registered Users</p>
+                  <h3 className="text-4xl font-black text-slate-900 tracking-tight">{stats?.users || 0}</h3>
+                </div>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-xl hover:border-emerald-100 transition-all duration-500">
+                <div className="w-20 h-20 bg-emerald-50/50 text-emerald-600 rounded-[1.5rem] flex items-center justify-center shrink-0">
+                  <LayoutGrid size={32} strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Active Tools</p>
+                  <h3 className="text-4xl font-black text-slate-900 tracking-tight">{stats?.activeTools || 0}</h3>
+                </div>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6 group hover:shadow-xl hover:border-amber-100 transition-all duration-500">
+                <div className="w-20 h-20 bg-amber-50/50 text-amber-600 rounded-[1.5rem] flex items-center justify-center shrink-0">
+                  <RefreshCw size={32} strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">Pending Reviews</p>
+                  <h3 className="text-4xl font-black text-slate-900 tracking-tight">{stats?.pendingTools || 0}</h3>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── REVIEWS TAB ── */}
+          {activeTab === 'review' && (
+            <div className="grid grid-cols-1 gap-12">
+              {/* Tool Submissions */}
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                    <LayoutGrid size={24} className="text-blue-500" />
+                    Protocol Submissions
+                    <span className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-black">{pendingTools.length}</span>
+                  </h2>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pendingTools.map(tool => (
+                    <AdminCard key={tool._id} title={tool.name} subtitle={tool.category} desc={tool.description}>
+                      <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-50">
+                        <SafeLink href={tool.url} className="text-indigo-600 font-bold text-xs flex items-center gap-1 hover:underline">
+                          View Site <ExternalLink size={12} />
+                        </SafeLink>
+                        <div className="flex gap-2">
+                          <button onClick={() => handleReviewTool(tool._id, 'approved')} className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-colors">
+                            <CheckCircle2 size={20} />
+                          </button>
+                          <button onClick={() => handleReviewTool(tool._id, 'rejected')} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                            <XCircle size={20} />
+                          </button>
                         </div>
-                        <ul className="divide-y divide-slate-50">
-                          {categoryTools.map(tool => (
-                            <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
-                                    {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                                  </div>
-                                  <div>
-                                    <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
-                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                      <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                                        {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
-                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
-                                  title="Remove Tool"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              </div>
-                              <div className="pl-14 pr-2">
-                                <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
-                                <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                                  <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
-                                  {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
-                                </div>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
                       </div>
-                    );
-                  })}
-                  {activeTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).length > 0 && (
-                    <div className="pb-4">
-                      <div className="px-6 py-3 bg-slate-100 border-y border-slate-200 sticky top-0 z-10 backdrop-blur-sm">
-                        <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Uncategorized</h3>
-                      </div>
-                      <ul className="divide-y divide-slate-50">
-                        {activeTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).map(tool => (
-                            <li key={tool.id || tool._id} className="p-4 flex flex-col hover:bg-slate-50 transition-colors">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm border border-slate-200">
-                                    {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                                  </div>
-                                  <div>
-                                    <h4 className="font-bold text-slate-900 text-sm">{tool.name}</h4>
-                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                      <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                                        {tool.category?.replace(/([A-Z])/g, ' $1').trim() || 'Missing Configuration'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => handleRemoveTool(tool.category, tool.id || tool._id, tool.name)}
-                                  className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 flex items-center justify-center"
-                                  title="Remove Tool"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              </div>
-                              <div className="pl-14 pr-2">
-                                <p className="text-sm text-slate-600 line-clamp-2">{tool.description}</p>
-                                <div className="flex items-center gap-4 mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                                  <span>Architect: <span className="text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</span></span>
-                                  {tool.url && <a href={tool.url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-800 transition-colors">Launch Link ↗</a>}
-                                </div>
-                              </div>
-                            </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Add New Tool */}
-          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-[600px]">
-            <div className="p-6 border-b border-slate-100 bg-emerald-50/50 flex justify-between items-center shrink-0">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Plus size={20} className="text-emerald-600" />
-                Add New Tool
-              </h2>
-            </div>
-            <form onSubmit={handleAddTool} className="p-6 space-y-4 overflow-y-auto flex-1">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category *</label>
-                <select
-                  value={newTool.category}
-                  onChange={e => setNewTool({ ...newTool, category: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20"
-                >
-                  {CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    </AdminCard>
                   ))}
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tool Name *</label>
-                <input
-                  type="text"
-                  value={newTool.name}
-                  onChange={e => setNewTool({ ...newTool, name: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20"
-                  placeholder="e.g. Uniswap"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Website URL *</label>
-                <input
-                  type="url"
-                  value={newTool.url}
-                  onChange={e => setNewTool({ ...newTool, url: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20"
-                  placeholder="https://uniswap.org"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description *</label>
-                <textarea
-                  value={newTool.description}
-                  onChange={e => setNewTool({ ...newTool, description: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20 h-20 resize-none"
-                  placeholder="Brief description of what this tool does..."
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Twitter / X URL</label>
-                  <input
-                    type="text"
-                    value={newTool.twitter}
-                    onChange={e => setNewTool({ ...newTool, twitter: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20"
-                    placeholder="https://x.com/uniswap"
-                  />
+                  {pendingTools.length === 0 && <EmptyState text="No pending protocol submissions." />}
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Logo URL</label>
-                  <input
-                    type="text"
-                    value={newTool.logo}
-                    onChange={e => setNewTool({ ...newTool, logo: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500/20"
-                    placeholder="https://..."
-                  />
+              </section>
+
+              {/* Developer Claims */}
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                    <Shield size={24} className="text-indigo-500" />
+                    Developer Claims
+                    <span className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-black">{pendingClaims.length}</span>
+                  </h2>
                 </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={addingTool}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50 mt-2"
-              >
-                {addingTool ? 'Adding...' : 'Add Tool to Platform'}
-              </button>
-            </form>
-          </div>
-        </div>
-        )}
-
-        {/* ── PENDING REVIEWS TAB ── */}
-        {activeTab === 'pending' && (
-          <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-8">
-          <div className="p-6 border-b border-slate-100 bg-amber-50/50 flex justify-between items-center shrink-0">
-            <h2 className="text-xl font-bold text-amber-900 flex items-center gap-2">
-              <Activity size={20} className="text-amber-600" />
-              Pending Submissions
-            </h2>
-            <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
-              {pendingTools.length} awaiting review
-            </span>
-          </div>
-          <div className="p-0 overflow-y-auto custom-scrollbar max-h-[600px]">
-            {pendingTools.length === 0 ? (
-              <div className="p-12 text-center flex flex-col items-center">
-                <CheckCircle size={48} className="text-slate-300 mb-4" />
-                <h3 className="text-lg font-bold text-slate-600">All caught up</h3>
-                <p className="text-slate-500 text-sm mt-1">No pending tool submissions to review.</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {CATEGORIES.map(category => {
-                  const categoryTools = pendingTools.filter(t => t.category === category.id);
-                  if (categoryTools.length === 0) return null;
-                  return (
-                    <div key={category.id} className="pb-4">
-                      <div className="px-6 py-3 bg-amber-50/80 border-y border-amber-100 sticky top-0 z-10 backdrop-blur-sm">
-                        <h3 className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">{category.name}</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {pendingClaims.map(claim => (
+                    <AdminCard key={claim._id} title={claim.toolName || 'Project Claim'} subtitle={`User: ${claim.developer?.name || claim.developer?.email}`} desc={`Claim Status: ${claim.status}`}>
+                      <div className="mt-6 flex gap-3">
+                        <button onClick={() => handleApproveClaim(claim._id, claim.developer?.profileId)} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors">
+                          Approve Claim
+                        </button>
+                        <button onClick={() => handleRejectClaim(claim._id, claim.developer?.profileId)} className="px-5 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                          Reject
+                        </button>
                       </div>
-                      <ul className="divide-y divide-slate-50">
-                        {categoryTools.map(tool => (
-                          <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
-                                  {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                                </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
-                                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                    <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                                      {tool.category?.replace(/([A-Z])/g, ' $1').trim()}
-                                    </span>
-                                    <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
-                                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
-                                >
-                                  Accept
-                                </button>
-                                <button
-                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
-                                  className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-                              <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
-                              <div className="grid grid-cols-2 gap-4 text-xs">
-                                <div>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
-                                  <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
-                                  {tool.url ? (
-                                    <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
-                                      {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
-                                    </a>
-                                  ) : (
-                                    <span className="text-slate-400 italic">No URL provided</span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-                {pendingTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).length > 0 && (
-                  <div className="pb-4">
-                    <div className="px-6 py-3 bg-amber-50/80 border-y border-amber-100 sticky top-0 z-10 backdrop-blur-sm">
-                      <h3 className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Uncategorized</h3>
-                    </div>
-                    <ul className="divide-y divide-slate-50">
-                      {pendingTools.filter(t => !CATEGORIES.some(c => c.id === t.category)).map(tool => (
-                          <li key={tool.id || tool._id} className="p-6 flex flex-col hover:bg-slate-50 transition-colors">
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg border border-amber-200 shadow-sm">
-                                  {tool.name ? tool.name.charAt(0).toUpperCase() : '?'}
-                                </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-900 text-lg leading-tight">{tool.name}</h4>
-                                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                    <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
-                                      {tool.category?.replace(/([A-Z])/g, ' $1').trim() || 'Missing Configuration'}
-                                    </span>
-                                    <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-amber-200">Needs Review</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'accept')}
-                                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm"
-                                >
-                                  Accept
-                                </button>
-                                <button
-                                  onClick={() => handleReviewTool(tool.category, tool.id || tool._id, tool.name, 'reject')}
-                                  className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-xl transition-colors"
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            </div>
-                            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-                              <p className="text-sm text-slate-600 mb-4">{tool.description}</p>
-                              <div className="grid grid-cols-2 gap-4 text-xs">
-                                <div>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Architect Handle</p>
-                                  <p className="font-medium text-slate-700">{tool.builder?.name || tool.builder?.handle || 'Anonymous'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Launch Link</p>
-                                  {tool.url ? (
-                                    <a href={tool.url} target="_blank" rel="noreferrer" className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
-                                      {tool.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink size={12} />
-                                    </a>
-                                  ) : (
-                                    <span className="text-slate-400 italic">No URL provided</span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        )}
-
-        {/* ── CONTENT ENGINE TAB ── */}
-        {activeTab === 'content' && (
-          <div className="space-y-8">
-            {/* Crypto News Content Engine */}
-            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-slate-100 bg-slate-900 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Database size={20} className="text-indigo-400" />
-              Crypto News Engine
-            </h2>
-          </div>
-          <div className="p-8 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">News Headline *</label>
-                <input type="text" value={newsForm.title} onChange={e => setNewsForm({ ...newsForm, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="Bitcoin surpasses new ATH..." />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Short Description *</label>
-                <input type="text" value={newsForm.shortDescription} onChange={e => setNewsForm({ ...newsForm, shortDescription: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 font-medium" placeholder="A brief summary for the card..." />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thumbnail Image URL *</label>
-                <input type="url" value={newsForm.thumbnailUrl} onChange={e => setNewsForm({ ...newsForm, thumbnailUrl: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://image-url.jpg" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tags (comma separated)</label>
-                <input type="text" value={newsForm.tags} onChange={e => setNewsForm({ ...newsForm, tags: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="DeFi, Market, Security" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Markdown Content Body *</label>
-              <textarea
-                value={newsForm.content}
-                onChange={e => setNewsForm({ ...newsForm, content: e.target.value })}
-                className="w-full h-[300px] bg-slate-900 text-slate-300 font-mono text-sm border border-slate-800 p-5 rounded-xl focus:ring-2 focus:ring-indigo-500/50 custom-scrollbar"
-                placeholder="# Write your news content here in Markdown..."
-              />
-            </div>
-
-            <button
-              onClick={handlePublishNews}
-              disabled={publishingNews}
-              className="w-full py-4 mt-6 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:-translate-y-0.5 disabled:opacity-50"
-            >
-              {publishingNews ? 'Publishing...' : 'Publish Article to DB'}
-            </button>
-          </div>
-        </div>
-
-        {/* Curated Courses Manager */}
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mt-8">
-          <div className="p-6 border-b border-slate-100 bg-purple-50/50 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Database size={20} className="text-purple-500" />
-              Curated Courses Manager
-            </h2>
-            <span className="text-xs font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full">{curatedCourses.length} courses</span>
-          </div>
-          <div className="p-8 space-y-6">
-            <form onSubmit={handleAddCourse} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Course Title *</label>
-                <input type="text" value={newCourse.title} onChange={e => setNewCourse({ ...newCourse, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="e.g. Prompt Engineering for Developers" required />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Course URL *</label>
-                <input type="url" value={newCourse.url} onChange={e => setNewCourse({ ...newCourse, url: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://..." required />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
-                <input type="text" value={newCourse.description} onChange={e => setNewCourse({ ...newCourse, description: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Short course description..." />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thumbnail URL</label>
-                <input type="text" value={newCourse.thumbnail} onChange={e => setNewCourse({ ...newCourse, thumbnail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Image URL (Leave blank for YouTube videos to auto-generate)" />
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Platform</label>
-                  <select value={newCourse.platform} onChange={e => setNewCourse({ ...newCourse, platform: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
-                    {['Anthropic', 'YouTube', 'Coursera', 'Udemy', 'GitHub', 'Other'].map(p => <option key={p}>{p}</option>)}
-                  </select>
+                    </AdminCard>
+                  ))}
+                  {pendingClaims.length === 0 && <EmptyState text="No pending developer claims." />}
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Level</label>
-                  <select value={newCourse.level} onChange={e => setNewCourse({ ...newCourse, level: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
-                    <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pricing</label>
-                  <select value={newCourse.isFree} onChange={e => setNewCourse({ ...newCourse, isFree: e.target.value === 'true' })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium">
-                    <option value="true">Free</option><option value="false">Paid</option>
-                  </select>
+              </section>
+            </div>
+          )}
+
+          {/* ── QUESTS TAB ── */}
+          {activeTab === 'quests' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              {/* Form Section */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm sticky top-32">
+                  <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+                    <Plus size={20} className="text-amber-500" /> New Quest
+                  </h2>
+                  <form onSubmit={handleCreateQuest} className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Title</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={newQuest.title} 
+                        onChange={e => setNewQuest({ ...newQuest, title: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20" 
+                        placeholder="Quest title..."
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description</label>
+                      <textarea 
+                        required
+                        value={newQuest.description} 
+                        onChange={e => setNewQuest({ ...newQuest, description: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20 resize-none" 
+                        rows={3}
+                        placeholder="What should the user do?"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reward</label>
+                        <input 
+                          type="number" 
+                          value={newQuest.reward} 
+                          onChange={e => setNewQuest({ ...newQuest, reward: parseInt(e.target.value) })} 
+                          className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20" 
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Type</label>
+                        <select 
+                          value={newQuest.type} 
+                          onChange={e => setNewQuest({ ...newQuest, type: e.target.value })} 
+                          className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20 appearance-none"
+                        >
+                          <option value="link">Link Click</option>
+                          <option value="twitter-follow">X Follow</option>
+                          <option value="discord-join">Discord Join</option>
+                          <option value="community-post">Community Post</option>
+                          <option value="app-rating">App Rating</option>
+                          <option value="daily-streak">Daily Streak</option>
+                          <option value="bug-report">Bug Report</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button 
+                      type="submit" 
+                      disabled={savingQuest} 
+                      className="w-full py-5 bg-slate-900 text-white font-black rounded-2xl hover:bg-indigo-600 transition-all shadow-xl disabled:opacity-50 uppercase tracking-widest text-xs"
+                    >
+                      {savingQuest ? 'Creating...' : 'Create Quest'}
+                    </button>
+                  </form>
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tags (comma-separated)</label>
-                <input type="text" value={newCourse.tags} onChange={e => setNewCourse({ ...newCourse, tags: e.target.value })} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="defi, smart-contracts, ai" />
-              </div>
-              <div className="md:col-span-2">
-                <button type="submit" disabled={savingCourse} className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
-                  {savingCourse ? 'Adding...' : '+ Add Course'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-        </div>
-        )}
 
-        {/* ── BUILDER SPOTLIGHT TAB ── */}
-        {activeTab === 'spotlight' && (
-          <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white">
-              <Users size={18} />
-            </div>
-            <div>
-              <h2 className="text-lg font-black text-slate-900">Builder Spotlight</h2>
-              <p className="text-sm text-slate-400">Manage the featured builder on the homepage</p>
-            </div>
-          </div>
-          <div className="p-6 space-y-6">
-            {(() => {
-              const bs = spotlightData?.[0]?.builderSpotlight || spotlightData?.builderSpotlight || {};
-              return (
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  setUpdatingSpotlight(true);
-                  try {
-                    const form = e.target;
-                    const featuredTools = [];
-                    for (let i = 0; i < 2; i++) {
-                      const name = form[`ft_name_${i}`]?.value;
-                      if (name) {
-                        featuredTools.push({
-                          name,
-                          description: form[`ft_desc_${i}`]?.value || '',
-                          initial: form[`ft_init_${i}`]?.value || name.charAt(0),
-                        });
-                      }
-                    }
-                    await updateCommunitySpotlight({
-                      builderSpotlight: {
-                        name: form.bs_name.value,
-                        role: form.bs_role.value,
-                        description: form.bs_description.value,
-                        story: form.bs_story.value,
-                        twitter: form.bs_twitter.value,
-                        xProfileImageUrl: form.bs_pfp.value,
-                        featuredTools,
-                      }
-                    });
-                    alert('Builder Spotlight updated!');
-                  } catch (err) {
-                    alert('Failed to update: ' + err.message);
-                  } finally {
-                    setUpdatingSpotlight(false);
-                  }
-                }} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Builder Name</label>
-                      <input name="bs_name" defaultValue={bs.name || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Zun20" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Role / Title</label>
-                      <input name="bs_role" defaultValue={bs.role || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="Security Researcher & Builder" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">X / Twitter URL</label>
-                      <input name="bs_twitter" defaultValue={bs.twitter || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://x.com/zun20" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Profile Image URL</label>
-                      <input name="bs_pfp" defaultValue={bs.xProfileImageUrl || ''} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium" placeholder="https://..." />
-                    </div>
+              {/* List Section */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
+                  <div className="p-8 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
+                    <h2 className="text-xl font-black text-slate-900">Active Ecosystem Quests</h2>
+                    <span className="text-[10px] font-black text-slate-500 bg-white border border-slate-100 px-4 py-1.5 rounded-full uppercase tracking-widest">{questsList.length} total</span>
                   </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Short Description</label>
-                    <textarea name="bs_description" defaultValue={bs.description || ''} rows={2} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium resize-none" placeholder="A brief tagline about the builder..." />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Story / Biography</label>
-                    <textarea name="bs_story" defaultValue={bs.story || ''} rows={6} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-medium resize-none" placeholder="Write the builder's full story here. This will appear when users click 'Read Their Story'..." />
-                  </div>
-
-                  {/* Featured Tools */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Featured Projects (max 2)</p>
-                    {[0, 1].map(i => {
-                      const ft = bs.featuredTools?.[i] || {};
-                      return (
-                        <div key={i} className="grid grid-cols-[60px_1fr_1fr] gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase">Initial</label>
-                            <input name={`ft_init_${i}`} defaultValue={ft.initial || ''} maxLength={3} className="w-full bg-white border border-slate-200 p-2 rounded-lg text-center font-black text-sm" placeholder="AD" />
+                  <div className="divide-y divide-slate-50">
+                    {questsList.map(quest => (
+                      <div key={quest._id} className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50 transition-colors group">
+                        <div className="flex items-start gap-6">
+                          <div className={`w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg border border-indigo-100 shrink-0`}>
+                            {quest.reward}
                           </div>
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase">Name</label>
-                            <input name={`ft_name_${i}`} defaultValue={ft.name || ''} className="w-full bg-white border border-slate-200 p-2 rounded-lg font-medium text-sm" placeholder="Tool name" />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase">Description</label>
-                            <input name={`ft_desc_${i}`} defaultValue={ft.description || ''} className="w-full bg-white border border-slate-200 p-2 rounded-lg font-medium text-sm" placeholder="Brief description" />
+                          <div>
+                            <h3 className="font-black text-slate-900 text-lg leading-tight mb-1">{quest.title}</h3>
+                            <p className="text-sm text-slate-500 font-medium line-clamp-1 mb-2">{quest.description}</p>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{quest.category}</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">•</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">{quest.type}</span>
+                              <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                quest.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+                              }`}>
+                                {quest.status}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      );
-                    })}
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => setEditingQuest(quest)}
+                            className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                          >
+                            <Edit3 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => handleUpdateQuestStatus(quest._id, quest.status === 'active' ? 'ended' : 'active')}
+                            className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                              quest.status === 'active' ? 'bg-amber-50 border-amber-100 text-amber-600' : 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                            }`}
+                          >
+                            {quest.status === 'active' ? 'End' : 'Start'}
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteQuest(quest._id, quest.title)}
+                            className="p-3 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-                  <button type="submit" disabled={updatingSpotlight} className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-md disabled:opacity-50">
-                    {updatingSpotlight ? 'Saving...' : 'Save Spotlight'}
+          {/* ── CONTENT ENGINE TAB ── */}
+          {activeTab === 'content' && (
+            <div className="space-y-12">
+              {/* Manual News Editor */}
+              <section className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <FileText size={28} />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900">Crypto News Engine</h2>
+                    <p className="text-slate-500 font-medium">Draft and publish manual ecosystem updates.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePublishManualNews} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">News Headline *</label>
+                      <input required value={newManualNews.title} onChange={e => setNewManualNews({...newManualNews, title: e.target.value})} placeholder="Bitcoin surpasses new ATH..." className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Short Description *</label>
+                      <input required value={newManualNews.description} onChange={e => setNewManualNews({...newManualNews, description: e.target.value})} placeholder="A brief summary for the card..." className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thumbnail Image URL *</label>
+                      <input required value={newManualNews.thumbnail} onChange={e => setNewManualNews({...newManualNews, thumbnail: e.target.value})} placeholder="https://image-url.jpg" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tags (Comma Separated)</label>
+                      <input value={newManualNews.tags} onChange={e => setNewManualNews({...newManualNews, tags: e.target.value})} placeholder="DeFi, Market, Security" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Markdown Content Body *</label>
+                    <textarea required rows={10} value={newManualNews.contentMarkdown} onChange={e => setNewManualNews({...newManualNews, contentMarkdown: e.target.value})} placeholder="# Write your news content here in Markdown..." className="w-full bg-[#0f172a] text-slate-300 border border-slate-800 p-8 rounded-3xl font-mono text-sm leading-relaxed outline-none focus:ring-4 focus:ring-indigo-500/10" />
+                  </div>
+                  <button type="submit" disabled={publishingNews} className="w-full py-6 bg-indigo-600 text-white font-black rounded-3xl hover:bg-indigo-700 transition-all shadow-xl disabled:opacity-50 uppercase tracking-widest text-sm">
+                    {publishingNews ? 'Publishing to Chain...' : 'Publish News Article'}
                   </button>
                 </form>
-              );
-            })()}
-          </div>
-        </div>
-        )}
+              </section>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* News Generator */}
+                <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <FileText size={24} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-900">AI News Engine</h2>
+                      <p className="text-sm text-slate-500 font-medium">Generate real-time crypto ecosystem updates.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search Context</label>
+                      <input 
+                        type="text" 
+                        value={newsConfig.query} 
+                        onChange={e => setNewsConfig({ ...newsConfig, query: e.target.value })} 
+                        className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5"
+                      />
+                    </div>
+                    <button 
+                      onClick={async () => {
+                        setGeneratingNews(true);
+                        try { await generateCryptoNews(newsConfig.query, newsConfig.count); alert('News generated successfully!'); loadData(); }
+                        catch (err) { alert(err.message); }
+                        finally { setGeneratingNews(false); }
+                      }}
+                      disabled={generatingNews}
+                      className="w-full py-5 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl disabled:opacity-50 uppercase tracking-widest text-xs"
+                    >
+                      {generatingNews ? 'Synthesizing...' : 'Generate New Briefs'}
+                    </button>
+                  </div>
+                </section>
+
+                {/* Course Manager */}
+                <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <BookOpen size={24} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-900">Curated Courses</h2>
+                      <p className="text-sm text-slate-500 font-medium">Add high-signal external educational content.</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setSavingCourse(true);
+                    try { await createCourse(newCourse); setNewCourse({ title: '', url: '', platform: 'YouTube', level: 'Beginner' }); alert('Course added!'); loadData(); }
+                    catch (err) { alert(err.message); }
+                    finally { setSavingCourse(false); }
+                  }} className="space-y-4">
+                    <input required placeholder="Course Title" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none" />
+                    <input required placeholder="External URL" value={newCourse.url} onChange={e => setNewCourse({...newCourse, url: e.target.value})} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <select value={newCourse.platform} onChange={e => setNewCourse({...newCourse, platform: e.target.value})} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none">
+                        <option>YouTube</option><option>Mirror</option><option>Medium</option><option>Official Docs</option>
+                      </select>
+                      <select value={newCourse.level} onChange={e => setNewCourse({...newCourse, level: e.target.value})} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none">
+                        <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+                      </select>
+                    </div>
+                    <button type="submit" disabled={savingCourse} className="w-full py-5 bg-slate-900 text-white font-black rounded-2xl hover:bg-blue-600 transition-all uppercase tracking-widest text-xs">
+                      {savingCourse ? 'Indexing...' : 'Publish Course'}
+                    </button>
+                  </form>
+                </section>
+              </div>
+
+              {/* News & Courses Lists */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* Existing News */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <FileText size={18} className="text-indigo-600" />
+                    Existing News Articles
+                  </h3>
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    {newsArticles.map(article => (
+                      <div key={article._id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-indigo-100 transition-all">
+                        <div className="min-w-0 flex-1 mr-4">
+                          <h4 className="font-bold text-slate-900 truncate">{article.title}</h4>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(article.publishedAt).toLocaleDateString()}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setEditingNews(article)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                            <Edit3 size={16} />
+                          </button>
+                          <button onClick={() => handleDeleteNews(article._id, article.title)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {newsArticles.length === 0 && <EmptyState text="No news articles found" />}
+                  </div>
+                </div>
+
+                {/* Existing Courses */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <BookOpen size={18} className="text-blue-600" />
+                    Curated Academy Content
+                  </h3>
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    {curatedCourses.map(course => (
+                      <div key={course._id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all">
+                        <div className="min-w-0 flex-1 mr-4">
+                          <h4 className="font-bold text-slate-900 truncate">{course.title}</h4>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{course.platform} • {course.level}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setEditingCourse(course)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                            <Edit3 size={16} />
+                          </button>
+                          <button onClick={() => handleDeleteCourse(course._id, course.title)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {curatedCourses.length === 0 && <EmptyState text="No curated courses found" />}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── SPOTLIGHT TAB ── */}
+          {activeTab === 'spotlight' && spotlightData && (
+            <section className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm max-w-4xl mx-auto space-y-12">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-fuchsia-50 text-fuchsia-600 flex items-center justify-center">
+                  <Users size={28} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900">Builder Spotlight</h2>
+                  <p className="text-slate-500 font-medium">Feature a visionary builder on the ecosystem homepage.</p>
+                </div>
+              </div>
+
+              {(() => {
+                const bs = spotlightData?.[0]?.builderSpotlight || spotlightData?.builderSpotlight || {};
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setUpdatingSpotlight(true);
+                    try {
+                      const form = e.target;
+                      const featuredTools = [];
+                      for (let i = 0; i < 2; i++) {
+                        const name = form[`ft_name_${i}`]?.value;
+                        if (name) featuredTools.push({ name, description: form[`ft_desc_${i}`]?.value || '', initial: form[`ft_init_${i}`]?.value || name.charAt(0) });
+                      }
+                      await updateCommunitySpotlight({
+                        builderSpotlight: {
+                          name: form.bs_name.value, role: form.bs_role.value, description: form.bs_description.value,
+                          story: form.bs_story.value, twitter: form.bs_twitter.value, xProfileImageUrl: form.bs_pfp.value,
+                          featuredTools,
+                        }
+                      });
+                      alert('Spotlight updated!');
+                    } catch (err) { alert(err.message); }
+                    finally { setUpdatingSpotlight(false); }
+                  }} className="space-y-8">
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField label="Builder Name" name="bs_name" val={bs.name} />
+                      <FormField label="Role / Title" name="bs_role" val={bs.role} />
+                      <FormField label="X / Twitter URL" name="bs_twitter" val={bs.twitter} />
+                      <FormField label="PFP URL" name="bs_pfp" val={bs.xProfileImageUrl} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagline</label>
+                      <textarea name="bs_description" defaultValue={bs.description} rows={2} className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Narrative</label>
+                      <textarea name="bs_story" defaultValue={bs.story} rows={8} className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none" />
+                    </div>
+
+                    <div className="space-y-4">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Featured Tool Stack (2)</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[0, 1].map(i => {
+                          const ft = bs.featuredTools?.[i] || {};
+                          return (
+                            <div key={i} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                              <input name={`ft_init_${i}`} defaultValue={ft.initial} placeholder="Init" className="w-full bg-white border border-slate-100 p-3 rounded-xl font-black text-xs uppercase" />
+                              <input name={`ft_name_${i}`} defaultValue={ft.name} placeholder="Name" className="w-full bg-white border border-slate-100 p-3 rounded-xl font-bold text-sm" />
+                              <input name={`ft_desc_${i}`} defaultValue={ft.description} placeholder="Desc" className="w-full bg-white border border-slate-100 p-3 rounded-xl text-xs font-medium" />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <button type="submit" disabled={updatingSpotlight} className="w-full py-5 bg-fuchsia-600 text-white font-black rounded-2xl hover:bg-fuchsia-700 transition-all shadow-xl uppercase tracking-widest text-xs">
+                      {updatingSpotlight ? 'Synchronizing...' : 'Update Spotlight Narrative'}
+                    </button>
+                  </form>
+                );
+              })()}
+            </section>
+          )}
+        </div>
       </div>
+
+      {/* Edit Quest Modal */}
+      <AnimatePresence>
+        {editingQuest && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setEditingQuest(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden">
+              <div className="absolute top-0 right-0 p-8">
+                <button onClick={() => setEditingQuest(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <Edit3 size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Edit Quest</h2>
+                  <p className="text-sm text-slate-500 font-medium">Modify existing ecosystem tasks.</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleUpdateQuest} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Quest Title</label>
+                  <input required value={editingQuest.title} onChange={e => setEditingQuest({...editingQuest, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reward Diamonds</label>
+                  <input type="number" required value={editingQuest.reward} onChange={e => setEditingQuest({...editingQuest, reward: parseInt(e.target.value)})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Target URL</label>
+                  <input type="url" value={editingQuest.targetUrl} onChange={e => setEditingQuest({...editingQuest, targetUrl: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                  Save Changes <Save size={18} />
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit News Modal */}
+      <AnimatePresence>
+        {editingNews && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setEditingNews(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden">
+              <div className="absolute top-0 right-0 p-8">
+                <button onClick={() => setEditingNews(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <Edit3 size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Edit News</h2>
+                  <p className="text-sm text-slate-500 font-medium">Update ecosystem briefing content.</p>
+                </div>
+              </div>
+              <form onSubmit={handleUpdateNews} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Title</label>
+                  <input required value={editingNews.title} onChange={e => setEditingNews({...editingNews, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thumbnail URL</label>
+                  <input required value={editingNews.thumbnail} onChange={e => setEditingNews({...editingNews, thumbnail: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Content Snippet</label>
+                  <textarea rows={4} value={editingNews.description} onChange={e => setEditingNews({...editingNews, description: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none" />
+                </div>
+                <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                  Update Article <Save size={18} />
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Course Modal */}
+      <AnimatePresence>
+        {editingCourse && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setEditingCourse(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative w-full max-w-xl bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden">
+              <div className="absolute top-0 right-0 p-8">
+                <button onClick={() => setEditingCourse(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                  <Edit3 size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Edit Course</h2>
+                  <p className="text-sm text-slate-500 font-medium">Modify curated educational resource.</p>
+                </div>
+              </div>
+              <form onSubmit={handleUpdateCourse} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Course Title</label>
+                  <input required value={editingCourse.title} onChange={e => setEditingCourse({...editingCourse, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Platform</label>
+                    <select value={editingCourse.platform} onChange={e => setEditingCourse({...editingCourse, platform: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none">
+                      <option>YouTube</option><option>Mirror</option><option>Medium</option><option>Official Docs</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Level</label>
+                    <select value={editingCourse.level} onChange={e => setEditingCourse({...editingCourse, level: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none">
+                      <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">URL</label>
+                  <input required value={editingCourse.url} onChange={e => setEditingCourse({...editingCourse, url: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                </div>
+                <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                  Save Changes <Save size={18} />
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function AdminCard({ title, subtitle, desc, children }) {
+  return (
+    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+      <h3 className="text-xl font-black text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">{title}</h3>
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{subtitle}</p>
+      <p className="text-sm text-slate-500 font-medium line-clamp-3 leading-relaxed mb-4">{desc}</p>
+      {children}
+    </div>
+  );
+}
+
+function FormField({ label, name, val }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+      <input name={name} defaultValue={val} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+    </div>
+  );
+}
+
+function EmptyState({ text }) {
+  return (
+    <div className="col-span-full py-16 text-center bg-white rounded-[2.5rem] border border-dashed border-slate-200">
+      <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{text}</p>
+    </div>
+  );
+}
+
+function SafeLink({ href, children, ...props }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+      {children}
+    </a>
   );
 }

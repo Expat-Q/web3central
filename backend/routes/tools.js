@@ -265,7 +265,7 @@ router.get('/my-tools', protect, async (req, res) => {
 // If a key maps to an array, we query ALL of those DB categories
 const CATEGORY_ALIASES = {
   infofi:          ['infofi'],
-  trading:         ['dex', 'perps', 'trading', 'web3Chat'],
+  trading:         ['dex', 'perps', 'trading'],
   bridges:         ['interoperability', 'bridges'],
   defi:            ['defi'],
   staking:         ['staking'],

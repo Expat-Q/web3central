@@ -59,7 +59,7 @@ export default function Academy() {
     const uniqueLevels = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 
     return (
-        <div className="bg-white min-h-screen text-gray-900 pt-32 pb-32 px-6 relative overflow-x-hidden">
+        <div className="bg-white min-h-screen text-gray-900 pt-2 pb-32 px-6 relative overflow-x-hidden">
             {/* Background */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
                 <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 -translate-x-1/2 opacity-60" />

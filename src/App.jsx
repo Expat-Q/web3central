@@ -35,6 +35,9 @@ import DeveloperConsole from "./pages/DeveloperConsole";
 import DevRegister from "./pages/developer/DevRegister";
 import ToolComparison from "./pages/ToolComparison";
 import Admin from "./pages/Admin";
+import Quests from "./pages/Quests";
+import Bookmarks from "./pages/Bookmarks";
+import Leaderboard from "./pages/Leaderboard";
 
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
@@ -52,6 +55,7 @@ import CommunityTools from "./pages/apps/CommunityTools";
 import Web3Chat from "./pages/apps/Web3Chat";
 import BountyHub from "./pages/apps/BountyHub";
 import CategoryPage from "./pages/apps/CategoryPage";
+import Airdrops from "./pages/Airdrops";
 
 const ConditionalFooter = () => {
   const location = useLocation();
@@ -154,6 +158,9 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
     <Route path="/academy" element={<Academy />} />
     <Route path="/academy/:slug" element={<LessonDetail />} />
     <Route path="/profile" element={<Profile />} />
+    <Route path="/quests" element={<Quests />} />
+    <Route path="/bookmarks" element={<Bookmarks />} />
+    <Route path="/leaderboard" element={<Leaderboard />} />
     <Route path="/signup" element={<Signup />} />
     <Route path="/login" element={<Login />} />
     <Route path="/oauth/callback" element={<OAuthCallback />} />
@@ -166,6 +173,7 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
     <Route path="/apps/community-tools" element={<CommunityTools />} />
     <Route path="/apps/perps" element={<Web3Chat />} />
     <Route path="/apps/bounty-hub" element={<BountyHub />} />
+    <Route path="/apps/airdrops" element={<Airdrops />} />
     {/* Dynamic category routes */}
     <Route path="/apps/:categoryKey" element={<CategoryPage />} />
     <Route path="*" element={

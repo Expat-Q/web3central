@@ -66,11 +66,22 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    diamonds: {
+        type: Number,
+        default: 0
+    },
+    completedQuests: [{
+        type: String
+    }],
     rank: {
         type: String,
-        enum: ['Novice', 'Explorer', 'Specialist', 'Grandmaster'],
-        default: 'Novice'
+        enum: ['Member', 'Novice', 'Explorer', 'Specialist', 'Grandmaster'],
+        default: 'Member'
     },
+    streak: { type: Number, default: 0 },
+    lastDailyClaim: { type: Date },
+    postCount: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
     savedTools: [{
         type: String // Tool IDs
     }],

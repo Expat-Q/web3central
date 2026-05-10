@@ -31,6 +31,8 @@ import { useBookmarks } from "../../hooks/useBookmarks";
 import { CardSkeleton } from "../../components/Skeleton";
 import MetricsPanel from "../../components/MetricsPanel";
 import ToolLogo from "../../components/ToolLogo";
+import ChainFilter from "../../components/ChainFilter";
+import { useMetrics } from "../../context/MetricsContext";
 
 
 
@@ -95,6 +97,15 @@ const CATEGORY_META = {
   privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: false  },
   predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: false  },
   community:   { title: 'Community',          desc: 'DAO tools and decentralized coordination', color: 'teal',    comingSoon: false },
+  infra:       { title: 'Infra & Dev Tools',  desc: 'RPCs, Node providers, and SDKs',    color: 'slate',   comingSoon: true  },
+  ai:          { title: 'Artificial Intelligence', desc: 'Agentic protocols and decentralized compute', color: 'indigo', comingSoon: true  },
+  social:      { title: 'Social & DeSoc',     desc: 'Social graphs and messaging',        color: 'blue',    comingSoon: true  },
+  dao:         { title: 'DAOs & Governance',  desc: 'Voting and organizational management', color: 'purple',  comingSoon: true  },
+  depin:       { title: 'DePIN',              desc: 'Decentralized Physical Infrastructure', color: 'orange',  comingSoon: true  },
+  staking:     { title: 'Staking & Yield',    desc: 'LSTs and yield-bearing protocols',   color: 'yellow',  comingSoon: true  },
+  payments:    { title: 'Payments',           desc: 'Remittance and invoicing tools',      color: 'emerald', comingSoon: true  },
+  airdrops:    { title: 'Airdrops',           desc: 'Projects with active or upcoming rewards', color: 'yellow', comingSoon: false },
+  'bounty-hub': { title: 'Bounty Hub',         desc: 'Earn rewards for completing tasks',  color: 'indigo',  comingSoon: false },
   // --- Legacy support ---
   dex:              { title: 'DEX',                    desc: 'Decentralized exchanges',           color: 'purple',  comingSoon: false },
   perps:            { title: 'Perpetuals',             desc: 'Derivatives and perpetual trading', color: 'purple',  comingSoon: false },
@@ -130,6 +141,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { selectedChain } = useMetrics();
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedMetricsProtocol, setSelectedMetricsProtocol] = useState(null);
   const { toggleBookmark, isBookmarked } = useBookmarks();
@@ -234,14 +246,18 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   }, [location.state, loading, data]);
 
   // ── App Store derived data ──
-  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all';
+  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all' || selectedChain !== 'All';
 
   // Featured = highest rated (or first if no ratings)
   const featured = useMemo(() => {
     if (isFiltered) return null;
-    const sorted = [...data].sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
+    let filtered = [...data];
+    if (selectedChain !== 'All') {
+      filtered = filtered.filter(t => t.metrics?.chains?.some(c => c.toLowerCase() === selectedChain.toLowerCase()));
+    }
+    const sorted = filtered.sort((a, b) => (b.averageRating || b.rating || 0) - (a.averageRating || a.rating || 0));
     return sorted[0] || null;
-  }, [data, isFiltered]);
+  }, [data, isFiltered, selectedChain]);
 
   // Trending = next 4 by TVL
   const trending = useMemo(() => {
@@ -266,15 +282,18 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
   // Derived filtered data when search/filters are active
   const filteredData = useMemo(() => {
-    if (!isFiltered) return [];
-    
     let result = [...data];
+
+    // Global Chain Filter
+    if (selectedChain !== 'All') {
+      result = result.filter(t => t.metrics?.chains?.some(c => c.toLowerCase() === selectedChain.toLowerCase()));
+    }
 
     // Trading sub-filter (DEX vs Perps)
     if (categoryKey === 'trading' && tradingSubFilter !== 'all') {
       const subFilterMap = {
         dex: ['dex', 'trading'],
-        perps: ['perps', 'web3Chat'],
+        perps: ['perps'],
       };
       const matchCats = subFilterMap[tradingSubFilter] || [tradingSubFilter];
       result = result.filter(t => matchCats.includes(t.category));
@@ -300,7 +319,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     }
 
     return result;
-  }, [data, isFiltered, searchQuery, chainFilter, sortBy, categoryKey, tradingSubFilter]);
+  }, [data, isFiltered, searchQuery, chainFilter, sortBy, categoryKey, tradingSubFilter, selectedChain]);
 
   const StarRating = ({ value = 0, count }) => (
     <div className="flex items-center gap-1">
@@ -351,14 +370,31 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
         >
           {/* Top row: Logo and Bookmark */}
           <div className="flex items-start justify-between mb-3">
-            <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 relative flex-shrink-0">
-              <ToolLogo tool={app} />
-              {app.verified && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
-                  <ShieldCheck size={8} className="text-white" />
-                </div>
-              )}
+            <div className="flex gap-2.5">
+              <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 relative flex-shrink-0">
+                <ToolLogo tool={app} />
+                {app.verified && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
+                    <ShieldCheck size={8} className="text-white" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Labels/Tags */}
+              <div className="flex flex-col gap-1">
+                {app.hasAirdrop && (
+                  <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border border-amber-100/50">
+                    <Star size={8} className="fill-current" /> Airdrop
+                  </div>
+                )}
+                {app.metrics?.chains?.[0] && (
+                  <div className="bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border border-slate-100 w-fit">
+                    {app.metrics.chains[0]}
+                  </div>
+                )}
+              </div>
             </div>
+
             <div className="flex items-center gap-1.5">
               <button
                 onClick={(e) => {
@@ -466,7 +502,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     return (
       <div className="min-h-screen bg-white flex flex-col">
         {/* Header */}
-        <div className="pt-16 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="pt-4 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
           <div className="flex items-center gap-3">
             <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
               <ChevronLeft size={18} />
@@ -594,34 +630,40 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     <div className="bg-white min-h-screen text-gray-900">
 
       {/* ── Section 1: Header ── */}
-      <div className="pt-16 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
+      <div className="pt-4 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
               <ChevronLeft size={18} />
             </Link>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 leading-none">{title}</h1>
-              <p className="text-xs text-gray-400 mt-0.5">{data.length} protocol{data.length !== 1 ? 's' : ''}</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {isFiltered ? filteredData.length : data.length} protocol{(isFiltered ? filteredData.length : data.length) !== 1 ? 's' : ''}
+                {selectedChain !== 'All' && <span className="ml-1 text-purple-500 font-bold">on {selectedChain}</span>}
+              </p>
             </div>
           </div>
 
-          {/* Bench bar — inline on desktop */}
-          {bench.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="hidden md:flex items-center gap-3 px-4 py-2 bg-indigo-600 rounded-2xl text-white shadow-lg"
-            >
-              <span className="text-sm font-bold">{bench.length} selected</span>
-              <Link
-                to={`/tool-comparison?tools=${bench.join(',')}`}
-                className="px-4 py-1.5 bg-white text-indigo-600 text-xs font-black rounded-xl uppercase tracking-wider"
+          <div className="flex items-center gap-4">
+            <ChainFilter />
+            {/* Bench bar — inline on desktop */}
+            {bench.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="hidden md:flex items-center gap-3 px-4 py-2 bg-indigo-600 rounded-2xl text-white shadow-lg"
               >
-                Analyze →
-              </Link>
-            </motion.div>
-          )}
+                <span className="text-sm font-bold">{bench.length} selected</span>
+                <Link
+                  to={`/tool-comparison?tools=${bench.join(',')}`}
+                  className="px-4 py-1.5 bg-white text-indigo-600 text-xs font-black rounded-xl uppercase tracking-wider"
+                >
+                  Analyze →
+                </Link>
+              </motion.div>
+            )}
+          </div>
         </div>
 
         {/* Bench bar — full width on mobile */}

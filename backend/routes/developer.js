@@ -420,6 +420,33 @@ router.post('/pending-claims/:claimId/approve', protect, async (req, res) => {
     }
 });
 
+// Admin: POST /api/developer/pending-claims/:claimId/reject
+router.post('/pending-claims/:claimId/reject', protect, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+
+        const { profileId } = req.body;
+        const profile = await DeveloperProfile.findById(profileId);
+        if (!profile) return res.status(404).json({ error: 'Profile not found' });
+
+        const claim = profile.pendingClaims.id(req.params.claimId);
+        if (!claim) return res.status(404).json({ error: 'Claim not found' });
+
+        claim.status = 'rejected';
+        await profile.save();
+
+        // Reset the tool's pending status
+        await Tool.findOneAndUpdate(
+            { id: claim.toolId },
+            { developerClaimPending: false }
+        );
+
+        res.json({ success: true, message: `Claim for ${claim.toolName} rejected.` });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 /* ────────────────────────────────────────────────────────
    POST /api/developer/verify-publish-tx
    Verifies on-chain listing fee tx via Etherscan before

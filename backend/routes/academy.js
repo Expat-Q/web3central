@@ -83,6 +83,10 @@ router.post('/community', protect, async (req, res) => {
             author: req.user.id
         });
 
+        await User.findByIdAndUpdate(req.user.id, {
+            $inc: { postCount: 1 }
+        });
+
         res.status(201).json({ success: true, data: newLesson });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -325,6 +329,22 @@ router.delete('/courses/:id', protect, admin, async (req, res) => {
         const course = await Course.findByIdAndDelete(req.params.id);
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
         res.status(200).json({ success: true, message: 'Course deleted' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Update a curated course
+// @route   PUT /api/academy/courses/:id
+// @access  Private/Admin
+router.put('/courses/:id', protect, admin, async (req, res) => {
+    try {
+        const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+        if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        res.status(200).json({ success: true, data: course });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

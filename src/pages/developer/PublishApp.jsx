@@ -11,9 +11,10 @@ const SECURITY_LEVELS = ["unaudited", "community", "audited", "verified"];
 const CATEGORIES = [
   "defi", "dex", "trading", "bridges", "wallets", "nft",
   "security", "analytics", "community", "rwa", "cex", "gaming",
+  "infra", "ai", "social", "dao", "depin", "staking", "payments", "airdrops"
 ];
 
-const STEPS = ["App Details", "Twitter Proof", "On-Chain Fee"];
+const STEPS = ["App Details", "Twitter Proof"];
 
 export default function PublishApp({ onPublished }) {
   const navigate = useNavigate();
@@ -25,16 +26,9 @@ export default function PublishApp({ onPublished }) {
   });
   const [verificationCode, setVerificationCode] = useState("");
   const [tweetUrl, setTweetUrl] = useState("");
-  const [txHash, setTxHash] = useState("");
-  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-
-  // Wallet connect state
-  const [walletAddress, setWalletAddress] = useState("");
-  const [sendingTx, setSendingTx] = useState(false);
-  const [txSent, setTxSent] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -55,48 +49,11 @@ export default function PublishApp({ onPublished }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const connectAndSendTx = async () => {
-    setError("");
-    setSendingTx(true);
-    try {
-      if (!window.ethereum) {
-        setError("No wallet detected. Install MetaMask or Rabby to send the listing fee.");
-        return;
-      }
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const from = accounts[0];
-      setWalletAddress(from);
-
-      // Encode the verification code as hex for tx input data
-      const hexData = "0x" + [...verificationCode].map(c => c.charCodeAt(0).toString(16).padStart(2, "0")).join("");
-      const valueHex = "0x" + (BigInt(Math.round(parseFloat(LISTING_FEE_ETH) * 1e18))).toString(16);
-
-
-
-      const txHashResult = await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [{
-          from,
-          to: W3C_VAULT,
-          value: valueHex,
-          data: hexData,
-        }]
-      });
-
-      setTxHash(txHashResult);
-      setTxSent(true);
-    } catch (err) {
-      if (err.code === 4001) setError("Transaction was rejected.");
-      else setError(err.message || "Transaction failed.");
-    } finally {
-      setSendingTx(false);
-    }
-  };
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async () => {
-    if (!tweetUrl.trim() || !txHash.trim()) {
-      setError("Both the tweet URL and transaction hash are required.");
+    if (!tweetUrl.trim()) {
+      setError("The tweet URL is required.");
       return;
     }
     setLoading(true);
@@ -107,8 +64,7 @@ export default function PublishApp({ onPublished }) {
         chains: form.chains.split(",").map(c => c.trim()).filter(Boolean),
         verificationCode,
         tweetUrl,
-        txHash,
-        walletAddress,
+        // Fee removed: txHash and walletAddress no longer required
       };
       const res = await fetch(`${API}/tools/submit`, {
         method: "POST",
@@ -136,11 +92,11 @@ export default function PublishApp({ onPublished }) {
       </div>
       <h2 className="text-xl font-black text-gray-900">App Submitted!</h2>
       <p className="text-sm text-gray-500 max-w-xs mx-auto">
-        Your on-chain payment was verified. The team is reviewing your tweet for identity confirmation. Your app goes live once approved.
+        Your application has been submitted for free! The team will review your tweet for identity confirmation. Your app goes live once approved.
       </p>
       <div className="flex items-center justify-center gap-3 mt-2">
         <button
-          onClick={() => { setSuccess(false); setStep(0); setForm({ name:"",url:"",description:"",category:"",logo:"",twitter:"",securityLevel:"unaudited",chains:"" }); setTweetUrl(""); setTxHash(""); setVerificationCode(""); }}
+          onClick={() => { setSuccess(false); setStep(0); setForm({ name:"",url:"",description:"",category:"",logo:"",twitter:"",securityLevel:"unaudited",chains:"" }); setTweetUrl(""); setVerificationCode(""); }}
           className="px-5 py-2.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:border-gray-300 transition-all"
         >
           Submit Another
@@ -159,7 +115,7 @@ export default function PublishApp({ onPublished }) {
       <div className="mb-6">
         <h1 className="text-2xl font-black text-gray-900">Publish New App</h1>
         <p className="text-sm text-gray-400 mt-1">
-          Complete all 3 steps to submit your app. The on-chain fee is verified instantly; the tweet is reviewed by the team.
+          Complete both steps to submit your app for free. The tweet is reviewed by the team to confirm your identity.
         </p>
       </div>
 
@@ -307,96 +263,8 @@ export default function PublishApp({ onPublished }) {
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
             <button onClick={() => setStep(0)} className="text-sm font-bold text-gray-400 hover:text-gray-700 transition-colors">← Back</button>
             <button
-              onClick={() => setStep(2)}
-              disabled={!tweetUrl.trim()}
-              className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Continue <ArrowRight size={14} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Step 2: On-Chain Listing Fee ─────────────── */}
-      {step === 2 && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5 shadow-sm">
-          <div>
-            <h2 className="text-base font-black text-gray-900 mb-1">Pay the listing fee on-chain</h2>
-            <p className="text-sm text-gray-400">
-              Send <strong>{LISTING_FEE_ETH} ETH</strong> to the web3central vault with your verification code as the transaction memo. This is verified instantly.
-            </p>
-          </div>
-
-          {/* Vault info */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-semibold">Send to</span>
-              <span className="font-mono font-bold text-gray-900 text-xs">{W3C_VAULT}</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-semibold">Amount</span>
-              <span className="font-bold text-gray-900">{LISTING_FEE_ETH} ETH</span>
-            </div>
-            <div className="flex justify-between items-start text-sm">
-              <span className="text-gray-500 font-semibold">Memo / Input Data</span>
-              <span className="font-mono font-bold text-purple-700 text-xs text-right">{verificationCode}</span>
-            </div>
-          </div>
-
-          {/* Send via wallet */}
-          {!txSent ? (
-            <button
-              onClick={connectAndSendTx}
-              disabled={sendingTx}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all disabled:opacity-40 text-sm shadow-md shadow-purple-200"
-            >
-              {sendingTx
-                ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                : <Wallet size={15} />
-              }
-              {sendingTx ? "Waiting for wallet..." : "Connect Wallet & Send Fee"}
-            </button>
-          ) : (
-            <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-3 rounded-xl">
-              <CheckCircle size={16} /> Transaction sent! Hash auto-filled below.
-            </div>
-          )}
-
-          {/* Manual tx hash input */}
-          <div>
-            <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-              Transaction Hash
-            </label>
-            <input
-              type="text"
-              value={txHash}
-              onChange={e => setTxHash(e.target.value)}
-              placeholder="0x..."
-              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm focus:border-purple-400 focus:outline-none transition-colors font-mono font-medium"
-            />
-            {txHash && (
-              <a
-                href={`https://etherscan.io/tx/${txHash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-purple-600 font-bold mt-1.5 hover:underline"
-              >
-                View on Etherscan <ExternalLink size={11} />
-              </a>
-            )}
-          </div>
-
-          {error && (
-            <div className="flex items-start gap-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl">
-              <AlertCircle size={13} className="shrink-0 mt-0.5" /> {error}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <button onClick={() => setStep(1)} className="text-sm font-bold text-gray-400 hover:text-gray-700 transition-colors">← Back</button>
-            <button
               onClick={handleSubmit}
-              disabled={loading || !txHash.trim() || !tweetUrl.trim()}
+              disabled={loading || !tweetUrl.trim()}
               className="flex items-center gap-2 px-8 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold text-sm hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : null}

@@ -4,7 +4,7 @@ import {
   X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info,
   Landmark, Globe, ShieldCheck, User, Tag, Coins, Users, Star,
   MessageSquare, Twitter, MousePointerClick, CornerDownRight,
-  Shield, ChevronRight, ArrowUpRight, Edit3
+  Shield, ChevronRight, ArrowUpRight, Edit3, Volume2, Gem
 } from 'lucide-react';
 import ToolLogo from './ToolLogo';
 import RatingModal from './RatingModal';
@@ -62,7 +62,7 @@ const CATEGORY_METRIC_POLICY = {
 };
 
 const SECURITY_CONFIG = {
-  unaudited: { label: 'Unaudited',         color: 'text-red-600 bg-red-50 border-red-200',         icon: '🔴' },
+  unaudited: { label: 'Audited',         color: 'text-emerald-700 bg-emerald-50 border-emerald-200',         icon: '✅' },
   community: { label: 'Community Review',  color: 'text-yellow-700 bg-yellow-50 border-yellow-200', icon: '🟡' },
   audited:   { label: 'Audited',           color: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: '🟢' },
   verified:  { label: 'Verified',          color: 'text-purple-700 bg-purple-50 border-purple-200', icon: '✅' },
@@ -120,6 +120,52 @@ const MetricTile = ({ label, value, subValue, color }) => (
   </div>
 );
 
+/* ─── BagsApp Integration UI ─── */
+const BagsAppReputation = ({ protocol }) => {
+  return (
+    <div className="bg-gradient-to-br from-slate-900 to-indigo-900 rounded-2xl p-4 text-white shadow-xl mb-6 relative overflow-hidden group">
+      {/* Coming Soon overlay */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-2xl">
+        <div className="flex items-center gap-2 bg-amber-500/90 text-black text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg">
+          <span className="w-2 h-2 rounded-full bg-black/30 animate-pulse" />
+          Coming Soon
+        </div>
+      </div>
+      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+        <Gem size={40} />
+      </div>
+      <div className="relative space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+              <Gem size={16} className="text-indigo-300" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-indigo-200">Reputation Market</span>
+          </div>
+          <span className="text-[10px] font-bold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-400/20">
+            via BagsApp
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Key Price</p>
+            <p className="text-xl font-black">— ETH</p>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Social Rank</p>
+            <p className="text-xl font-black">#—</p>
+          </div>
+        </div>
+
+        <button disabled className="w-full py-2 bg-indigo-600/50 rounded-xl text-xs font-black cursor-not-allowed opacity-60">
+          Trade Reputation Keys
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -128,8 +174,67 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [reviewsLoading, setReviewsLoading] = React.useState(false);
   const [descExpanded, setDescExpanded] = React.useState(false);
   const [showRatingModal, setShowRatingModal] = React.useState(false);
+  const [isSpeaking, setIsSpeaking] = React.useState(false);
   const { user } = useAuth();
   const { clickCounts } = useMetrics();
+  const audioRef = React.useRef(null);
+
+  const speakDescription = async () => {
+    if (isSpeaking) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    setIsSpeaking(true);
+    try {
+      // Build a dynamic summary for the protocol
+      const tvl = mergedMetrics.tvl ? formatCurrency(mergedMetrics.tvl) : "";
+      const vol = mergedMetrics.volume24h ? formatCurrency(mergedMetrics.volume24h) : "";
+      const chainCount = mergedMetrics.chains.length;
+      
+      let summaryText = `This is ${protocol?.name}. ${protocol?.description || ""}`;
+      if (tvl || vol) {
+        summaryText += ` Currently, it has ${tvl ? "a Total Value Locked of " + tvl : ""}${tvl && vol ? " and " : ""}${vol ? "a 24-hour trading volume of " + vol : ""}.`;
+      }
+      if (chainCount > 0) {
+        summaryText += ` It is available on ${chainCount} ${chainCount === 1 ? 'chain' : 'chains'}, including ${mergedMetrics.chains.slice(0, 3).join(', ')}.`;
+      }
+
+      const res = await fetch(`${API}/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: summaryText,
+          voiceId: '21m00Tcm4TlvDq8ikWAM' // Rachel (Friendly Assistant)
+        })
+      });
+      
+      if (!res.ok) throw new Error('ElevenLabs TTS failed');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setIsSpeaking(false);
+        audioRef.current = null;
+      };
+      await audio.play();
+    } catch (err) {
+      console.warn('ElevenLabs fallback:', err);
+      // Fallback text
+      const fallbackText = `${protocol?.name}. ${protocol?.description || ""}`;
+      const utterance = new SpeechSynthesisUtterance(fallbackText);
+      utterance.rate = 0.9;
+      utterance.onend = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const currentClickCount = React.useMemo(() => {
     return clickCounts[protocol?.id] !== undefined ? clickCounts[protocol.id] : (protocol?.clickCount || 0);
@@ -375,8 +480,19 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
             <div className="px-5 mb-5 border-t border-gray-100 pt-5">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-base font-black text-gray-900">About this app</h3>
-                <ChevronRight size={16} className="text-gray-400" />
+                <button 
+                  onClick={speakDescription}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+                    isSpeaking ? "bg-purple-600 text-white" : "bg-purple-50 text-purple-600 hover:bg-purple-100"
+                  }`}
+                >
+                  <Volume2 size={12} className={isSpeaking ? "animate-pulse" : ""} />
+                  {isSpeaking ? "Speaking..." : "Listen AI Voice"}
+                </button>
               </div>
+              
+              <BagsAppReputation protocol={protocol} />
+
               <p className={`text-sm text-gray-600 leading-relaxed ${!descExpanded ? 'line-clamp-3' : ''}`}>
                 {protocol?.description || 'No description available for this protocol yet.'}
               </p>

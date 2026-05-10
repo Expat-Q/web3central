@@ -51,6 +51,27 @@ router.post('/', protect, admin, asyncHandler(async (req, res) => {
     });
 }));
 
+// @desc    Update a news article
+// @route   PUT /api/news/:id
+// @access  Private/Admin
+router.put('/:id', protect, admin, asyncHandler(async (req, res) => {
+    let article = await News.findById(req.params.id);
+
+    if (!article) {
+        return res.status(404).json({ success: false, message: `No news article found with id ${req.params.id}` });
+    }
+
+    article = await News.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true
+    });
+
+    res.status(200).json({
+        success: true,
+        data: article
+    });
+}));
+
 // @desc    Delete a news article
 // @route   DELETE /api/news/:id
 // @access  Private/Admin

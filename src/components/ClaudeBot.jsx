@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, User, Sparkles, Maximize2, Minimize2 } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Sparkles, Maximize2, Minimize2, Volume2, VolumeX, Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const API_BASE_URL = window.location.hostname === 'localhost'
@@ -28,7 +28,11 @@ export default function ClaudeBot() {
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [lastProvider, setLastProvider] = useState(null);
+    const [speakingMsgId, setSpeakingMsgId] = useState(null);
+    const [isListening, setIsListening] = useState(false);
     const messagesEndRef = useRef(null);
+    const audioRef = useRef(null);
+    const recognitionRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,6 +47,121 @@ export default function ClaudeBot() {
         window.addEventListener('open-claude', handleOpenClaude);
         return () => window.removeEventListener('open-claude', handleOpenClaude);
     }, []);
+
+    // Cleanup audio on unmount
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+            window.speechSynthesis?.cancel();
+        };
+    }, []);
+
+    /* ── TTS: Speak a message via ElevenLabs ── */
+    const speakMessage = async (msgId, text) => {
+        // If already speaking this message, stop
+        if (speakingMsgId === msgId) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+            window.speechSynthesis?.cancel();
+            setSpeakingMsgId(null);
+            return;
+        }
+
+        // Stop any currently playing audio
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+        window.speechSynthesis?.cancel();
+
+        setSpeakingMsgId(msgId);
+
+        // Strip markdown for cleaner speech
+        const cleanText = text
+            .replace(/#{1,6}\s/g, '')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/`{1,3}[^`]*`{1,3}/g, '')
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            .replace(/[⚠️👋🔴🟡🟢✅]/g, '')
+            .trim();
+
+        if (!cleanText) {
+            setSpeakingMsgId(null);
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/tts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: cleanText.substring(0, 2000) })
+            });
+
+            if (!res.ok) throw new Error('ElevenLabs TTS failed');
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audioRef.current = audio;
+            audio.onended = () => {
+                setSpeakingMsgId(null);
+                audioRef.current = null;
+                URL.revokeObjectURL(url);
+            };
+            audio.onerror = () => {
+                setSpeakingMsgId(null);
+                audioRef.current = null;
+            };
+            await audio.play();
+        } catch (err) {
+            console.warn('ElevenLabs fallback to browser synthesis:', err);
+            const utterance = new SpeechSynthesisUtterance(cleanText.substring(0, 1000));
+            utterance.rate = 0.95;
+            utterance.pitch = 1;
+            utterance.onend = () => setSpeakingMsgId(null);
+            utterance.onerror = () => setSpeakingMsgId(null);
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
+    /* ── Speech-to-Text: Voice input ── */
+    const toggleListening = () => {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert('Speech recognition is not supported in your browser.');
+            return;
+        }
+
+        if (isListening) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInputValue(prev => prev + transcript);
+            setIsListening(false);
+        };
+
+        recognition.onerror = () => setIsListening(false);
+        recognition.onend = () => setIsListening(false);
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsListening(true);
+    };
 
     const sendMessage = async (text) => {
         if (!text?.trim() || isTyping) return;
@@ -180,14 +299,16 @@ export default function ClaudeBot() {
                             }`}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-slate-900 to-purple-900 text-white rounded-t-2xl">
+                        <div className={`flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-slate-900 to-purple-900 text-white ${isFullScreen ? '' : 'rounded-t-2xl'}`}>
                             <div className="flex items-center gap-3">
                                 <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                                     <Sparkles size={18} />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-sm">Web3Central AI</h3>
-                                    <p className="text-[11px] text-purple-300">AI assistant powered by OpenAI</p>
+                                    <p className="text-[11px] text-purple-300">
+                                        {speakingMsgId ? '🔊 Speaking...' : 'AI assistant · Voice enabled'}
+                                    </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -230,9 +351,30 @@ export default function ClaudeBot() {
                                                 ? renderMarkdownMessage(msg.content)
                                                 : <span className="whitespace-pre-wrap">{msg.content}</span>}
                                         </div>
-                                        {msg.provider && (
-                                            <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
-                                                via {msg.provider === 'openai' ? 'OpenAI' : msg.provider === 'grok' ? 'Grok' : 'Offline Fallback'}
+                                        
+                                        {/* Footer: provider + speak button */}
+                                        {msg.role === 'assistant' && (
+                                            <div className="mt-2 pt-2 border-t border-gray-50 flex items-center justify-between">
+                                                {msg.provider && (
+                                                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+                                                        via {msg.provider === 'openai' ? 'OpenAI' : msg.provider === 'grok' ? 'Grok' : 'Fallback'}
+                                                    </span>
+                                                )}
+                                                <button
+                                                    onClick={() => speakMessage(msg.id, msg.content)}
+                                                    className={`ml-auto p-1.5 rounded-lg transition-all ${
+                                                        speakingMsgId === msg.id
+                                                            ? 'bg-purple-100 text-purple-600 shadow-sm'
+                                                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                                                    }`}
+                                                    title={speakingMsgId === msg.id ? 'Stop speaking' : 'Listen to this message'}
+                                                >
+                                                    {speakingMsgId === msg.id ? (
+                                                        <VolumeX size={14} className="animate-pulse" />
+                                                    ) : (
+                                                        <Volume2 size={14} />
+                                                    )}
+                                                </button>
                                             </div>
                                         )}
                                     </div>
@@ -278,14 +420,27 @@ export default function ClaudeBot() {
                         {/* Input */}
                         <form
                             onSubmit={handleSendMessage}
-                            className="p-3 border-t border-gray-100 bg-white rounded-b-2xl"
+                            className={`p-3 border-t border-gray-100 bg-white ${isFullScreen ? '' : 'rounded-b-2xl'}`}
                         >
                             <div className="flex items-end gap-2">
+                                {/* Mic button */}
+                                <button
+                                    type="button"
+                                    onClick={toggleListening}
+                                    className={`p-2.5 rounded-xl transition-all shrink-0 ${
+                                        isListening
+                                            ? 'bg-red-500 text-white shadow-md shadow-red-200 animate-pulse'
+                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                                    }`}
+                                    title={isListening ? 'Stop listening' : 'Voice input'}
+                                >
+                                    {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+                                </button>
                                 <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyDown={handleKeyDown}
-                                    placeholder="Ask about DeFi, smart contracts..."
+                                    placeholder={isListening ? "Listening..." : "Ask about DeFi, smart contracts..."}
                                     rows={1}
                                     className="flex-1 resize-none border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 placeholder-gray-400"
                                     style={{ maxHeight: '100px' }}

@@ -91,6 +91,15 @@ const ToolSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    hasAirdrop: {
+        type: Boolean,
+        default: false
+    },
+    airdropStatus: {
+        type: String,
+        enum: ['none', 'upcoming', 'active', 'ended'],
+        default: 'none'
+    },
     securityLevel: {
         type: String,
         enum: ['unaudited', 'community', 'audited', 'verified'],

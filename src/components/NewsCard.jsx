@@ -1,10 +1,50 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Share2, ChevronRight, Check } from 'lucide-react';
+import { Share2, ChevronRight, Check, Volume2 } from 'lucide-react';
 
 export default function NewsCard({ article, index = 0 }) {
   const [copied, setCopied] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+
+  const speakArticle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    setIsSpeaking(true);
+    try {
+      const res = await fetch(`${API}/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: article.shortDescription || article.title,
+          voiceId: 'Xb7hHahAlSoxWIwCY9E2' // Alice (News style)
+        })
+      });
+      
+      if (!res.ok) throw new Error('ElevenLabs TTS failed');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.onended = () => setIsSpeaking(false);
+      await audio.play();
+    } catch (err) {
+      console.warn('ElevenLabs fallback to browser synthesis:', err);
+      const utterance = new SpeechSynthesisUtterance(article.shortDescription || article.title);
+      utterance.rate = 0.9;
+      utterance.onend = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const handleShare = async (e) => {
     e.preventDefault();
@@ -108,6 +148,13 @@ export default function NewsCard({ article, index = 0 }) {
       <div className="p-6 md:p-8 flex flex-col flex-grow">
         <div className="text-xs font-semibold text-slate-400 mb-3 flex items-center justify-between">
           <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+          <button 
+            onClick={speakArticle}
+            className={`flex items-center gap-1 p-1 rounded-md transition-all ${isSpeaking ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
+            title="Listen to summary"
+          >
+            <Volume2 size={14} className={isSpeaking ? 'animate-pulse' : ''} />
+          </button>
         </div>
         
         <h3 className="text-lg font-black text-slate-900 leading-snug mb-3 group-hover:text-indigo-600 transition-colors line-clamp-2">

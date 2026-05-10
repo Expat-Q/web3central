@@ -78,7 +78,9 @@ const findOrCreateUser = async (providerIdField, profile, emailField, nameField,
             [providerIdField]: profile.id,
             name: finalName,
             email: finalEmail,
-            avatarUrl: avatarField || ''
+            avatarUrl: avatarField || '',
+            // Auto-promote if email matches admin env var
+            role: (process.env.ADMIN_EMAIL && finalEmail === process.env.ADMIN_EMAIL) ? 'admin' : 'user'
         };
 
         user = await User.create(newUser);

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { motion } from 'framer-motion';
-import { ChevronLeft, Calendar, User, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Calendar, User, Volume2, StopCircle, PlayCircle } from 'lucide-react';
 import { fetchNewsBySlug } from '../services/apiService';
 
 export default function NewsArticle() {
@@ -10,6 +10,10 @@ export default function NewsArticle() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const audioRef = useRef(null);
+
+  const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
 
   useEffect(() => {
     const loadNews = async () => {
@@ -25,7 +29,55 @@ export default function NewsArticle() {
       }
     };
     loadNews();
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, [slug]);
+
+  const speakArticle = async () => {
+    if (isSpeaking) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      setIsSpeaking(false);
+      return;
+    }
+
+    setIsSpeaking(true);
+    try {
+      // Use the full content or a long summary
+      const textToSpeak = article.title + ". " + (article.shortDescription || "") + ". " + article.contentMarkdown.replace(/[#*`]/g, '').slice(0, 4000);
+      
+      const res = await fetch(`${API}/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: textToSpeak,
+          voiceId: 'Xb7hHahAlSoxWIwCY9E2' // Alice (News style)
+        })
+      });
+      
+      if (!res.ok) throw new Error('ElevenLabs TTS failed');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setIsSpeaking(false);
+        audioRef.current = null;
+      };
+      await audio.play();
+    } catch (err) {
+      console.warn('ElevenLabs fallback:', err);
+      setIsSpeaking(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -51,10 +103,27 @@ export default function NewsArticle() {
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-bold mb-8 transition-colors">
-          <ChevronLeft size={20} className="mr-1" />
-          Back to Home
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link to="/" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-bold transition-colors">
+            <ChevronLeft size={20} className="mr-1" />
+            Back to Home
+          </Link>
+
+          <button
+            onClick={speakArticle}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold transition-all shadow-sm ${
+              isSpeaking 
+                ? "bg-rose-500 text-white shadow-rose-200" 
+                : "bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-50"
+            }`}
+          >
+            {isSpeaking ? (
+              <><StopCircle size={18} /> Stop Listening</>
+            ) : (
+              <><Volume2 size={18} /> Listen to Article</>
+            )}
+          </button>
+        </div>
 
         <motion.article 
           initial={{ opacity: 0, y: 20 }}
@@ -78,6 +147,29 @@ export default function NewsArticle() {
                 ))}
               </div>
             )}
+
+            {/* Audio Progress Overlay (Optional) */}
+            <AnimatePresence>
+              {isSpeaking && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-15 bg-indigo-900/40 backdrop-blur-[2px] flex items-center justify-center"
+                >
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <motion.div
+                        key={i}
+                        animate={{ height: [15, 40, 15] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.1 }}
+                        className="w-1.5 bg-white rounded-full"
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="p-8 md:p-12">

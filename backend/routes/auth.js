@@ -66,6 +66,7 @@ const serializeUser = (user) => ({
     bio: user.bio || '',
     twitter: user.twitter || '',
     avatarUrl: user.avatarUrl || deriveAvatarUrlFromTwitter(user.twitter || ''),
+    diamonds: user.diamonds || 0,
     totalXP: user.totalXP || 0,
     rank: user.rank || 'Novice',
     learningProgress: serializeLearningProgress(user.learningProgress)
@@ -204,6 +205,13 @@ router.post('/login', validate(loginSchema), async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
+        // Auto-promote if email matches admin env var
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (adminEmail && user.email === adminEmail && user.role !== 'admin') {
+            user.role = 'admin';
+            await user.save();
+        }
+
         sendTokenResponse(user, 200, res);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -242,7 +250,16 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Private
 router.get('/me', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        let user = await User.findById(req.user.id);
+        
+        // Auto-promote to admin if email matches ADMIN_EMAIL
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (adminEmail && user.email === adminEmail && user.role !== 'admin') {
+            console.log(`[AUTH] Auto-promoting ${user.email} to admin`);
+            user.role = 'admin';
+            await user.save();
+        }
+
         normalizeLearningProgressMap(user);
         res.status(200).json({
             success: true,
@@ -291,6 +308,32 @@ router.put('/profile', protect, validate(profileUpdateSchema), async (req, res) 
     } catch (error) {
         console.error("Profile Save Error:", error);
         res.status(500).json({ success: false, error: error.message || 'Failed to update profile' });
+    }
+});
+
+// @desc    Get leaderboard
+// @route   GET /api/auth/leaderboard
+// @access  Public
+router.get('/leaderboard', async (req, res) => {
+    try {
+        const users = await User.find()
+            .sort({ diamonds: -1, totalXP: -1 })
+            .limit(50)
+            .select('name diamonds totalXP twitter avatarUrl rank');
+        
+        const leaderboard = users.map(user => ({
+            id: user._id,
+            name: user.name,
+            diamonds: user.diamonds || 0,
+            totalXP: user.totalXP || 0,
+            twitter: user.twitter || '',
+            avatarUrl: user.avatarUrl || deriveAvatarUrlFromTwitter(user.twitter || ''),
+            rank: user.rank || 'Novice'
+        }));
+
+        res.status(200).json({ success: true, leaderboard });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 

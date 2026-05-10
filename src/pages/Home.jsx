@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { fetchToolsData, fetchLatestNews, fetchCommunitySpotlight } from "../services/apiService";
 import {
   Star, ExternalLink, ChevronRight, Search, X,
@@ -15,6 +15,7 @@ import CategorySidebar from "../components/CategorySidebar";
 // Sidebar is now rendered globally in App.jsx  import kept for potential direct use
 import { PageSkeleton } from "../components/Skeleton";
 import SafeLink from "../components/SafeLink";
+import { useMetrics } from "../context/MetricsContext";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
 
@@ -167,6 +168,7 @@ const TopChartsSection = ({ tools, onOpen }) => {
    HOME PAGE
    ---------------------------------------- */
 export default function Home() {
+  const { selectedChain } = useMetrics();
 
 
   const [allTools, setAllTools] = useState([]);
@@ -227,6 +229,19 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Handle cross-page scrolling from sidebar
+  const location = useLocation();
+  useEffect(() => {
+    if (!loading && location.state?.scrollToSection) {
+      setTimeout(() => {
+        const el = document.getElementById(`section-${location.state.scrollToSection}`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Clear state to avoid scrolling again on re-render
+        navigate("/", { replace: true, state: {} });
+      }, 100);
+    }
+  }, [loading, location.state, navigate]);
+
   /*  Spotlight Carousel Interval  */
   useEffect(() => {
     if (spotlightList.length <= 1) return;
@@ -286,10 +301,23 @@ export default function Home() {
 
   /*  Derived data  */
   const byCats = (cats) =>
-    allTools.filter(t => cats.includes(norm(t.category))).sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
+    filteredTools.filter(t => cats.includes(norm(t.category))).sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
 
-  const trending    = [...allTools].sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 12);
-  const newArrivals = [...allTools].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 12);
+  const filteredTools = selectedChain === 'All' 
+    ? allTools 
+    : allTools.filter(t => t.metrics?.chains?.some(c => c.toLowerCase() === selectedChain.toLowerCase()));
+
+  const trending    = [...filteredTools].sort((a, b) => trendScore(b) - trendScore(a)).slice(0, 10);
+  const topRated = [...filteredTools].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0)).slice(0, 10);
+  const newArrivals = [...filteredTools].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 10);
+
+  // Filter top charts by chain too
+  const filteredTopCharts = {};
+  Object.keys(topCharts).forEach(cat => {
+    filteredTopCharts[cat] = topCharts[cat].filter(t => 
+      selectedChain === 'All' || t.metrics?.chains?.some(c => c.toLowerCase() === selectedChain.toLowerCase())
+    );
+  });
   const tradingApps  = byCats(["trading", "dex", "perps"]);
   const defiApps     = byCats(["defi"]);
   const bridgesApps  = byCats(["bridges", "interoperability", "bridge"]);
@@ -300,9 +328,6 @@ export default function Home() {
 
   return (
     <div className="flex-1 min-w-0 w-full overflow-x-hidden">
-      {/* Spacer for fixed navbar */}
-      <div className="h-16" />
-
       {/*  New arrivals ticker  */}
       {newArrivals.length > 0 && (
         <div className="w-full bg-purple-50 border-b border-purple-100 overflow-hidden flex py-1.5">
@@ -325,10 +350,9 @@ export default function Home() {
       )}
 
       {/*  Main content  */}
-      <main className="px-4 sm:px-5 lg:px-7 py-5 space-y-8">
-
+      <main className="px-4 sm:px-5 lg:px-7 pt-0 pb-8 space-y-4">
         {/* Search bar */}
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
             <div ref={searchRef} className="relative flex-1">
               <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-purple-400 transition-all shadow-sm">
                 <Search size={16} className="text-gray-300 shrink-0" />
@@ -437,7 +461,7 @@ export default function Home() {
                         currentCount={trending[currentFeaturedIndex].clickCount}
                         className="flex justify-center items-center gap-1.5 md:gap-2 px-4 py-2 md:px-6 md:py-3 w-full md:w-40 bg-white text-gray-900 rounded-xl font-bold text-sm md:text-base hover:bg-gray-50 transition-colors shadow-lg"
                       >
-                        <ExternalLink size={14} className="md:w-4 md:h-4" /> Open App
+                        <ExternalLink size={14} className="md:w-4 md:h-4" /> Open
                       </SafeLink>
                     )}
                     <button 
@@ -626,10 +650,10 @@ export default function Home() {
           />
 
           {/*  Top Charts: combined top protocols from all categories  */}
-          <section className="py-8">
+          <section id="section-top-charts" className="py-4">
             <SectionHeader icon={Trophy} iconColor="text-amber-500" title="Top Charts" subtitle="Ranked by clicks, ratings & weekly trend" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {[...allTools].sort((a,b) => trendScore(b) - trendScore(a)).slice(0, 10).map((tool, idx) => (
+              {[...filteredTools].sort((a,b) => trendScore(b) - trendScore(a)).slice(0, 10).map((tool, idx) => (
                 <button key={tool.id} onClick={() => openTool(tool)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left group">
                   <span className="font-mono text-xs text-gray-400 w-6 shrink-0">#{idx + 1}</span>
                   <div className="w-9 h-9 rounded-xl border border-gray-100 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
@@ -652,7 +676,7 @@ export default function Home() {
 
           {/*  Latest News */}
           {newsFeed.length > 0 && (
-            <section className="border-t border-gray-100 pt-6">
+            <section id="section-news" className="border-t border-gray-100 pt-4">
               <SectionHeader
                 icon={BarChart3}
                 iconColor="text-purple-500"

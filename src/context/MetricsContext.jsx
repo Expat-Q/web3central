@@ -4,6 +4,7 @@ const MetricsContext = createContext();
 
 export const MetricsProvider = ({ children }) => {
   const [clickCounts, setClickCounts] = useState({});
+  const [selectedChain, setSelectedChain] = useState('All');
 
   const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
 
@@ -34,7 +35,7 @@ export const MetricsProvider = ({ children }) => {
   }, [API]);
 
   return (
-    <MetricsContext.Provider value={{ clickCounts, incrementClick }}>
+    <MetricsContext.Provider value={{ clickCounts, incrementClick, selectedChain, setSelectedChain }}>
       {children}
     </MetricsContext.Provider>
   );

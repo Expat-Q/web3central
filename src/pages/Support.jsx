@@ -88,7 +88,7 @@ export default function Support() {
   ];
 
   return (
-    <div className="relative min-h-screen pt-24 pb-24 px-6 overflow-hidden bg-white">
+    <div className="relative min-h-screen pt-2 pb-24 px-6 overflow-hidden bg-white">
       {/* Subtle Background Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-purple-50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60" />
       <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-indigo-50 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2 opacity-60" />
