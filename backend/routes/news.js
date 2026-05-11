@@ -90,4 +90,82 @@ router.delete('/:id', protect, admin, asyncHandler(async (req, res) => {
     });
 }));
 
+// @desc    Generate news articles using AI
+// @route   POST /api/news/generate
+// @access  Private/Admin
+router.post('/generate', protect, admin, asyncHandler(async (req, res) => {
+    const { query, count = 3 } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        return res.status(500).json({ success: false, message: 'GEMINI_API_KEY not configured' });
+    }
+
+    const prompt = `You are a professional Web3 news curator. Generate ${count} high-quality news articles about: "${query}".
+    
+    Each article must include:
+    - title: Catchy, journalistic title (max 120 chars)
+    - shortDescription: A 2-sentence summary (max 300 chars)
+    - contentMarkdown: A detailed markdown body (min 300 words). Use H3 and H4 for sections.
+    - tags: Array of 3-4 relevant crypto tags
+    - thumbnailUrl: Use a high-quality Unsplash crypto image URL (e.g., https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1000)
+
+    Return ONLY valid JSON in this format:
+    [
+      {
+        "title": "...",
+        "shortDescription": "...",
+        "contentMarkdown": "...",
+        "tags": ["tag1", "tag2"],
+        "thumbnailUrl": "..."
+      }
+    ]`;
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const errText = await response.text();
+        console.error('Gemini error:', errText);
+        throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) throw new Error('Empty response from Gemini');
+
+    const cleanedText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const articles = JSON.parse(cleanedText);
+
+    const createdArticles = [];
+    for (const data of articles) {
+        // Generate a unique slug
+        const baseSlug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+        
+        const article = await News.create({
+            ...data,
+            slug,
+            publishedAt: new Date(),
+            author: 'Web3Central AI'
+        });
+        createdArticles.push(article);
+    }
+
+    res.status(201).json({
+        success: true,
+        count: createdArticles.length,
+        data: createdArticles
+    });
+}));
+
 module.exports = router;

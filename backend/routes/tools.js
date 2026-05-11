@@ -32,6 +32,40 @@ router.post('/sync', protect, admin, async (req, res) => {
   }
 });
 
+// @desc    Get all pending tools for review
+// @route   GET /api/tools/pending
+// @access  Private/Admin
+router.get('/pending', protect, admin, async (req, res) => {
+  try {
+    const tools = await Tool.find({ status: 'pending' }).lean();
+    res.json({ success: true, data: tools.map(decorateToolWithLogo) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @desc    Review/Approve/Reject a tool submission by MongoDB ID
+// @route   PUT /api/tools/review/:id
+// @access  Private/Admin
+router.put('/review/:id', protect, admin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['approved', 'rejected', 'active'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status. Use approved or rejected.' });
+    }
+
+    const tool = await Tool.findById(req.params.id).populate('submitter', 'name email');
+    if (!tool) return res.status(404).json({ success: false, error: 'Tool not found' });
+
+    tool.status = (status === 'approved' || status === 'active') ? 'active' : 'rejected';
+    await tool.save();
+
+    res.json({ success: true, tool });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // @desc    Increment click count for a tool (fire-and-forget analytics)
 // @route   POST /api/tools/:id/click
 // @access  Public

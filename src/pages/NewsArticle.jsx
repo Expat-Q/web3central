@@ -134,9 +134,13 @@ export default function NewsArticle() {
           <div className="relative h-64 md:h-[400px] w-full">
             <div className="absolute inset-0 bg-slate-900/20 z-10"></div>
             <img 
-              src={article.thumbnailUrl} 
+              src={article.thumbnailUrl || 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1000'} 
               alt={article.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1000';
+              }}
             />
             {article.tags && article.tags.length > 0 && (
               <div className="absolute top-6 left-6 z-20 flex flex-wrap gap-2">
