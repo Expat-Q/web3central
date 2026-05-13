@@ -43,7 +43,7 @@ export default function Admin() {
   const [curatedCourses, setCuratedCourses] = useState([]);
   const [editingNews, setEditingNews] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
-  const [newManualNews, setNewManualNews] = useState({ title: '', description: '', thumbnail: '', tags: '', contentMarkdown: '' });
+  const [newManualNews, setNewManualNews] = useState({ title: '', shortDescription: '', thumbnailUrl: '', tags: '', contentMarkdown: '' });
   const [publishingNews, setPublishingNews] = useState(false);
 
   useEffect(() => {
@@ -105,7 +105,11 @@ export default function Admin() {
     e.preventDefault();
     setSavingQuest(true);
     try {
-      await createQuest(newQuest);
+      const questData = {
+        ...newQuest,
+        id: newQuest.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      };
+      await createQuest(questData);
       setNewQuest({ title: '', description: '', reward: 50, category: 'Social', type: 'link', targetUrl: '' });
       loadData();
     } catch (err) { alert(err.message); }
@@ -180,7 +184,7 @@ export default function Admin() {
         publishedAt: new Date()
       };
       await publishNewsArticle(newsData);
-      setNewManualNews({ title: '', description: '', thumbnail: '', tags: '', contentMarkdown: '' });
+      setNewManualNews({ title: '', shortDescription: '', thumbnailUrl: '', tags: '', contentMarkdown: '' });
       alert('News article published!');
       loadData();
     } catch (err) { alert(err.message); }
@@ -515,11 +519,11 @@ export default function Admin() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Short Description *</label>
-                      <input required value={newManualNews.description} onChange={e => setNewManualNews({...newManualNews, description: e.target.value})} placeholder="A brief summary for the card..." className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                      <input required value={newManualNews.shortDescription} onChange={e => setNewManualNews({...newManualNews, shortDescription: e.target.value})} placeholder="A brief summary for the card..." className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thumbnail Image URL *</label>
-                      <input required value={newManualNews.thumbnail} onChange={e => setNewManualNews({...newManualNews, thumbnail: e.target.value})} placeholder="https://image-url.jpg" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                      <input required value={newManualNews.thumbnailUrl} onChange={e => setNewManualNews({...newManualNews, thumbnailUrl: e.target.value})} placeholder="https://image-url.jpg" className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tags (Comma Separated)</label>
@@ -822,11 +826,11 @@ export default function Admin() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Thumbnail URL</label>
-                  <input required value={editingNews.thumbnail} onChange={e => setEditingNews({...editingNews, thumbnail: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
+                  <input required value={editingNews.thumbnailUrl} onChange={e => setEditingNews({...editingNews, thumbnailUrl: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Content Snippet</label>
-                  <textarea rows={4} value={editingNews.description} onChange={e => setEditingNews({...editingNews, description: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none" />
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Short Description</label>
+                  <textarea rows={4} value={editingNews.shortDescription} onChange={e => setEditingNews({...editingNews, shortDescription: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 font-medium outline-none focus:ring-4 focus:ring-indigo-500/5 resize-none" />
                 </div>
                 <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
                   Update Article <Save size={18} />
