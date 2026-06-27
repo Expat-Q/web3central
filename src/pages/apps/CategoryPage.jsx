@@ -25,7 +25,8 @@ import {
   Coins,
   Bookmark,
   Share2,
-  X
+  X,
+  Users
 } from "lucide-react";
 import { useBookmarks } from "../../hooks/useBookmarks";
 import { CardSkeleton } from "../../components/Skeleton";
@@ -96,11 +97,11 @@ const CATEGORY_META = {
   gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: false },
   privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: false  },
   predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: false  },
-  community:   { title: 'Community',          desc: 'DAO tools and decentralized coordination', color: 'teal',    comingSoon: false },
+  community:   { title: 'Onchain Tools',      desc: 'On-chain utilities, explorers & developer tools', color: 'teal',    comingSoon: false },
   infra:       { title: 'Infra & Dev Tools',  desc: 'RPCs, Node providers, and SDKs',    color: 'slate',   comingSoon: true  },
   ai:          { title: 'Artificial Intelligence', desc: 'Agentic protocols and decentralized compute', color: 'indigo', comingSoon: true  },
   social:      { title: 'Social & DeSoc',     desc: 'Social graphs and messaging',        color: 'blue',    comingSoon: true  },
-  dao:         { title: 'DAOs & Governance',  desc: 'Voting and organizational management', color: 'purple',  comingSoon: true  },
+  dao:         { title: 'DAO',                desc: 'Voting and organizational management', color: 'purple',  comingSoon: false },
   depin:       { title: 'DePIN',              desc: 'Decentralized Physical Infrastructure', color: 'orange',  comingSoon: true  },
   staking:     { title: 'Staking & Yield',    desc: 'LSTs and yield-bearing protocols',   color: 'yellow',  comingSoon: true  },
   payments:    { title: 'Payments',           desc: 'Remittance and invoicing tools',      color: 'emerald', comingSoon: true  },
@@ -145,6 +146,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   const [selectedTool, setSelectedTool] = useState(null);
   const [selectedMetricsProtocol, setSelectedMetricsProtocol] = useState(null);
   const { toggleBookmark, isBookmarked } = useBookmarks();
+  const [daoApplicationTarget, setDaoApplicationTarget] = useState(null);
 
 
   // Filters & Search State
@@ -152,6 +154,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   const [sortBy, setSortBy] = useState("default");
   const [chainFilter, setChainFilter] = useState("all");
   const [tradingSubFilter, setTradingSubFilter] = useState("all"); // 'all' | 'dex' | 'perps'
+  const [networkScope, setNetworkScope] = useState("all"); // 'all' | 'mainnet' | 'testnet'
 
   // Comparison Bench State (Synced with URL for ToolComparison compatibility)
   const [bench, setBench] = useState([]);
@@ -220,24 +223,10 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       const match = data.find(t => (t.id || t._id) === id || String(t.id) === String(id) || String(t._id) === String(id));
       if (match) {
         setSelectedMetricsProtocol({
+          ...match,
           id: match.id || match._id,
           slug: match.llamaSlug || match.slug || match.id,
-          name: match.name,
-          description: match.description,
-          logoUrl: match.logoUrl,
-          logo: match.logo,
-          url: match.url,
-          twitter: match.twitter,
-          builder: match.builder,
-          category: match.category,
-          verified: match.verified,
-          metrics: match.metrics,
-          geckoId: match.geckoId,
-          monthlyUsers: match.monthlyUsers,
-          reviews: match.reviews,
           rating: match.averageRating || match.rating,
-          ratingCount: match.ratingCount,
-          clickCount: match.clickCount,
         });
         // Clear state so refresh doesn't re-open
         window.history.replaceState({}, '');
@@ -246,7 +235,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   }, [location.state, loading, data]);
 
   // ── App Store derived data ──
-  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all' || selectedChain !== 'All';
+  const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all' || selectedChain !== 'All' || networkScope !== 'all';
 
   // Featured = highest rated (or first if no ratings)
   const featured = useMemo(() => {
@@ -308,6 +297,12 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       );
     }
 
+    if (networkScope === 'mainnet') {
+      result = result.filter(t => !t.isTestnet);
+    } else if (networkScope === 'testnet') {
+      result = result.filter(t => t.isTestnet);
+    }
+
     if (chainFilter !== 'all') {
       result = result.filter(t => t.metrics?.chains?.includes(chainFilter));
     }
@@ -319,7 +314,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     }
 
     return result;
-  }, [data, isFiltered, searchQuery, chainFilter, sortBy, categoryKey, tradingSubFilter, selectedChain]);
+  }, [data, isFiltered, searchQuery, chainFilter, sortBy, categoryKey, tradingSubFilter, selectedChain, networkScope]);
 
   const StarRating = ({ value = 0, count }) => (
     <div className="flex items-center gap-1">
@@ -346,25 +341,10 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
       >
         <div 
           onClick={() => setSelectedMetricsProtocol({
+            ...app,
             id: app.id || app._id,
             slug: app.llamaSlug || app.slug || app.id,
-            name: app.name,
-            description: app.description,
-            logoUrl: app.logoUrl,
-            logo: app.logo,
-            url: app.url,
-            twitter: app.twitter,
-            builder: app.builder,
-            category: app.category,
-            verified: app.verified,
-            metrics: app.metrics,
-            geckoId: app.geckoId,
-            monthlyUsers: app.monthlyUsers,
-            reviews: app.reviews,
             rating: app.averageRating || app.rating,
-            ratingCount: app.ratingCount,
-            clickCount: app.clickCount,
-            popularWith: app.popularWith,
           })}
           className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
         >
@@ -373,11 +353,7 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             <div className="flex gap-2.5">
               <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 relative flex-shrink-0">
                 <ToolLogo tool={app} />
-                {app.verified && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center pointer-events-none">
-                    <ShieldCheck size={8} className="text-white" />
-                  </div>
-                )}
+
               </div>
               
               {/* Labels/Tags */}
@@ -429,7 +405,10 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           </div>
 
           {/* Name */}
-          <h4 className="font-bold text-[15px] leading-tight mb-1 text-gray-900 truncate group-hover:text-purple-700 transition-colors">{app.name}</h4>
+          <h4 className="font-bold text-[15px] leading-tight mb-1 text-gray-900 truncate group-hover:text-purple-700 transition-colors flex items-center gap-1">
+            {app.name}
+            {app.verified && <ShieldCheck size={12} className="text-emerald-500 shrink-0" />}
+          </h4>
 
           {/* Description */}
           <p className="text-[11px] text-gray-500 leading-snug line-clamp-2 mb-4 flex-grow tracking-wide">
@@ -468,6 +447,23 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
               )}
             </div>
           </div>
+
+          {/* Request to Join DAO */}
+          {categoryKey === 'dao' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!user || user.email === 'guest@web3central.internal') {
+                  navigate('/login?redirect=' + encodeURIComponent(location.pathname));
+                  return;
+                }
+                setDaoApplicationTarget(app);
+              }}
+              className="w-full text-[11px] font-bold uppercase tracking-wider py-1.5 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 transition-all border border-purple-200/50 mb-2 flex items-center justify-center gap-1.5"
+            >
+              <Users size={12} /> Request to Join
+            </button>
+          )}
 
           {/* Compare bench toggle */}
           <button
@@ -710,9 +706,30 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-3">
+        {/* Network Scope Selector */}
+        <div className="flex gap-1 p-1 bg-gray-50 border border-gray-100 rounded-2xl w-fit">
+          {[
+            { label: '🌐 All Networks', value: 'all' },
+            { label: '⚡ Mainnet', value: 'mainnet' },
+            { label: '🧪 Testnet', value: 'testnet' },
+          ].map(ns => (
+            <button
+              key={ns.value}
+              onClick={() => setNetworkScope(ns.value)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                networkScope === ns.value
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  : 'text-gray-500 hover:text-gray-900 border border-transparent'
+              }`}
+            >
+              {ns.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="w-full">
           {/* Search */}
-          <div className="relative flex-grow">
+          <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
@@ -726,27 +743,6 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
                 <X size={15} />
               </button>
             )}
-          </div>
-
-          {/* Filter pills */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 shrink-0">
-            {[
-              { label: 'All', action: () => { setSortBy('default'); setChainFilter('all'); } , active: !isFiltered },
-              { label: 'High TVL', action: () => setSortBy('tvl'), active: sortBy === 'tvl' },
-              { label: 'Top Rated', action: () => setSortBy('rating'), active: sortBy === 'rating' },
-              { label: 'Verified', action: () => setSortBy('default'), active: false },
-              ...chainPills.map(c => ({ label: c, action: () => setChainFilter(c), active: chainFilter === c }))
-            ].map(pill => (
-              <button
-                key={pill.label}
-                onClick={pill.action}
-                className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${pill.active
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-              >
-                {pill.label}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -881,7 +877,6 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
 
       {/* Rating Modal */}
       {selectedTool && (
-
         <RatingModal
           tool={selectedTool}
           onClose={() => setSelectedTool(null)}
@@ -890,6 +885,146 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           }}
         />
       )}
+
+      {/* DAO Application Modal */}
+      {daoApplicationTarget && (
+        <DaoApplicationModal
+          dao={daoApplicationTarget}
+          onClose={() => setDaoApplicationTarget(null)}
+        />
+      )}
     </div>
   );
 }
+
+/* ─── DAO Application Modal ─── */
+const DaoApplicationModal = ({ dao, onClose }) => {
+  const [talent, setTalent] = useState("developer");
+  const [valueAdd, setValueAdd] = useState("");
+  const [portfolio, setPortfolio] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (valueAdd.trim().length < 10) {
+      setError("Please describe the value you bring in at least 10 characters.");
+      return;
+    }
+    setSubmitting(true);
+    setError("");
+    try {
+      const API_BASE = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
+      const res = await fetch(`${API_BASE}/tools/daos/${dao._id || dao.id}/apply`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ talent, valueAdd, portfolio })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to submit application");
+      }
+      setSuccess(true);
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setError(err.message || "Failed to submit application.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-3xl border border-gray-150 shadow-2xl max-w-md w-full p-6 text-left relative"
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors">
+          <X size={18} />
+        </button>
+
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 font-bold shrink-0">
+            🏛️
+          </div>
+          <div>
+            <h3 className="text-lg font-black text-gray-900 leading-tight">Apply to {dao.name}</h3>
+            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">Talent Registry & Onboarding</p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs font-semibold">
+            {error}
+          </div>
+        )}
+
+        {success ? (
+          <div className="py-8 text-center space-y-3">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl mx-auto">
+              ✓
+            </div>
+            <h4 className="text-base font-bold text-gray-900">Application Submitted!</h4>
+            <p className="text-xs text-gray-400">The DAO maintainers will review your profile and contact you soon.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-widest">Select Your Talent</label>
+              <select
+                value={talent}
+                onChange={e => setTalent(e.target.value)}
+                className="w-full px-4 py-2.5 bg-gray-50 border-2 border-gray-100 rounded-xl text-sm focus:border-purple-400 focus:outline-none transition-colors font-medium text-gray-750"
+              >
+                <option value="developer">Developer (Smart Contracts, Frontend, Infra)</option>
+                <option value="designer">Designer (UI/UX, Brand, Media)</option>
+                <option value="marketing">Marketing (Growth, Copywriting, SEO)</option>
+                <option value="community">Community (Moderation, Events, Support)</option>
+                <option value="research">Research (Tokenomics, Data Science, Writing)</option>
+                <option value="operations">Operations (Treasury, Legal, Management)</option>
+                <option value="other">Other Unique Value Add</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-widest">Value-Add & Experience</label>
+              <textarea
+                value={valueAdd}
+                onChange={e => setValueAdd(e.target.value)}
+                placeholder="Briefly describe what value you can add to the DAO and why you'd like to join..."
+                rows={4}
+                maxLength={500}
+                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-sm focus:border-purple-400 focus:outline-none transition-colors resize-none font-medium text-gray-750"
+              />
+              <p className="text-[10px] text-gray-300 mt-1 text-right">{valueAdd.length}/500</p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-widest">Portfolio or Profile Link (Optional)</label>
+              <input
+                type="url"
+                value={portfolio}
+                onChange={e => setPortfolio(e.target.value)}
+                placeholder="https://github.com/username or portfolio link"
+                className="w-full px-4 py-2.5 border-2 border-gray-100 rounded-xl text-sm focus:border-purple-400 focus:outline-none transition-colors font-medium text-gray-750"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm transition-all shadow-md shadow-purple-200 disabled:opacity-50"
+            >
+              {submitting ? "Submitting Application..." : "Submit Join Request"}
+            </button>
+          </form>
+        )}
+      </motion.div>
+    </div>
+  );
+};

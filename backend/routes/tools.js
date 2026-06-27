@@ -54,15 +54,90 @@ router.put('/review/:id', protect, admin, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid status. Use approved or rejected.' });
     }
 
-    const tool = await Tool.findById(req.params.id).populate('submitter', 'name email');
+    const targetStatus = (status === 'approved' || status === 'active') ? 'active' : 'rejected';
+    const tool = await Tool.findByIdAndUpdate(
+      req.params.id,
+      { $set: { status: targetStatus } },
+      { new: true }
+    ).populate('submitter', 'name email');
     if (!tool) return res.status(404).json({ success: false, error: 'Tool not found' });
-
-    tool.status = (status === 'approved' || status === 'active') ? 'active' : 'rejected';
-    await tool.save();
 
     res.json({ success: true, tool });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// @desc    Vote bull or bear sentiment on a tool
+// @route   POST /api/tools/:id/vote
+// @access  Public
+router.post('/:id/vote', async (req, res) => {
+  try {
+    const { type } = req.body; // 'bull' or 'bear'
+    if (!['bull', 'bear'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid vote type. Use bull or bear.' });
+    }
+
+    // Generate a voter fingerprint from IP
+    const voterIp = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || 'unknown';
+    const crypto = require('crypto');
+    const voterId = crypto.createHash('sha256').update(voterIp).digest('hex').slice(0, 16);
+
+    const tool = await Tool.findOne({ id: req.params.id });
+    if (!tool) return res.status(404).json({ error: 'Tool not found' });
+
+    // Initialize sentiment if missing
+    if (!tool.sentiment) tool.sentiment = { bullish: [], bearish: [] };
+
+    // Check if user already voted in either direction
+    const alreadyBull = tool.sentiment.bullish.includes(voterId);
+    const alreadyBear = tool.sentiment.bearish.includes(voterId);
+
+    if (type === 'bull') {
+      if (alreadyBull) {
+        // Remove vote (toggle off)
+        tool.sentiment.bullish = tool.sentiment.bullish.filter(v => v !== voterId);
+      } else {
+        // Remove from bear if switching, then add to bull
+        tool.sentiment.bearish = tool.sentiment.bearish.filter(v => v !== voterId);
+        tool.sentiment.bullish.push(voterId);
+      }
+    } else {
+      if (alreadyBear) {
+        // Remove vote (toggle off)
+        tool.sentiment.bearish = tool.sentiment.bearish.filter(v => v !== voterId);
+      } else {
+        // Remove from bull if switching, then add to bear
+        tool.sentiment.bullish = tool.sentiment.bullish.filter(v => v !== voterId);
+        tool.sentiment.bearish.push(voterId);
+      }
+    }
+
+    const lastUpdated = new Date();
+    await Tool.updateOne(
+      { id: req.params.id },
+      {
+        $set: {
+          'sentiment.bullish': tool.sentiment.bullish,
+          'sentiment.bearish': tool.sentiment.bearish,
+          'sentiment.lastUpdated': lastUpdated
+        }
+      }
+    );
+    tool.sentiment.lastUpdated = lastUpdated;
+
+    res.json({
+      success: true,
+      sentiment: {
+        bullish: tool.sentiment.bullish.length,
+        bearish: tool.sentiment.bearish.length,
+        userVote: tool.sentiment.bullish.includes(voterId) ? 'bull' : tool.sentiment.bearish.includes(voterId) ? 'bear' : null,
+        voterId
+      }
+    });
+  } catch (err) {
+    console.error('Sentiment vote error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -134,6 +209,95 @@ router.get('/top-charts', async (req, res) => {
   }
 });
 
+// Common multi-service public platforms where parent-domain matching is blocked to avoid false positives
+const PUBLIC_PLATFORMS = new Set([
+  'google.com', 'github.com', 'twitter.com', 'x.com', 'discord.com',
+  'vercel.app', 'github.io', 'gitbook.io', 'medium.com', 'substack.com',
+  'notion.so', 'render.com', 'netlify.app', 'herokuapp.com', 'chromewebstore.google.com'
+]);
+
+// @desc    Verify safety of a domain (used by Scam Shield Chrome Extension)
+// @route   GET /api/tools/verify-domain
+// @access  Public
+router.get('/verify-domain', async (req, res) => {
+  try {
+    const { domain } = req.query;
+    if (!domain) {
+      return res.status(400).json({ success: false, error: 'Domain parameter is required' });
+    }
+
+    const cleanDomain = domain.toLowerCase().replace(/^www\./, '').trim();
+
+    // Fetch all active tools
+    const tools = await Tool.find({ status: 'active' }).lean();
+
+    // 1. Direct safety check (exact hostname OR valid official subdomain/parent match)
+    const matchedTool = tools.find(tool => {
+      try {
+        const toolUrl = new URL(tool.url);
+        const officialDomain = toolUrl.hostname.toLowerCase().replace(/^www\./, '');
+        // Match exact domain (uniswap.org) OR official subdomains (app.uniswap.org)
+        // Allow parent domains ONLY if not a public suffix platform (e.g. uniswap.org matches app.uniswap.org but google.com does not match chromewebstore.google.com)
+        return cleanDomain === officialDomain || 
+               cleanDomain.endsWith(`.${officialDomain}`) || 
+               (!PUBLIC_PLATFORMS.has(cleanDomain) && officialDomain.endsWith(`.${cleanDomain}`));
+      } catch (e) {
+        return false;
+      }
+    });
+
+    if (matchedTool) {
+      return res.json({
+        success: true,
+        status: 'verified',
+        appName: matchedTool.name,
+        officialUrl: matchedTool.url,
+        rating: matchedTool.rating || 4.5,
+        reviews: matchedTool.reviews || 0
+      });
+    }
+
+    // 2. Proactive phishing copycat detection (Similarity Heuristic)
+    // Suspicious if it contains the lowercase name of an app but isn't its official domain
+    const suspiciousClone = tools.find(tool => {
+      if (!tool.verified) return false;
+      const cleanName = tool.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanName.length < 4) return false; // Ignore short names to prevent false positives
+
+      try {
+        const officialDomain = new URL(tool.url).hostname.toLowerCase().replace(/^www\./, '');
+        const isOfficial = cleanDomain === officialDomain || 
+                           cleanDomain.endsWith(`.${officialDomain}`) || 
+                           (!PUBLIC_PLATFORMS.has(cleanDomain) && officialDomain.endsWith(`.${cleanDomain}`));
+        const containsName = cleanDomain.includes(cleanName);
+        return !isOfficial && containsName;
+      } catch (e) {
+        return false;
+      }
+    });
+
+    if (suspiciousClone) {
+      return res.json({
+        success: true,
+        status: 'phishing',
+        appName: suspiciousClone.name,
+        officialUrl: suspiciousClone.url,
+        rating: suspiciousClone.rating || 4.5,
+        reviews: suspiciousClone.reviews || 0
+      });
+    }
+
+    // 3. Unlisted domain
+    return res.json({
+      success: true,
+      status: 'unlisted'
+    });
+  } catch (err) {
+    console.error('Domain safety verification error:', err);
+    res.status(500).json({ success: false, error: 'Verification failed' });
+  }
+});
+
 // @desc    Get trending tools platform-wide
 // @route   GET /api/tools/trending
 // @access  Public
@@ -158,8 +322,8 @@ router.post('/:id/claim', protect, async (req, res) => {
     if (!tool) return res.status(404).json({ error: 'App not found' });
     if (tool.developerClaimedBy) return res.status(400).json({ error: 'This app has already been claimed.' });
 
+    await Tool.updateOne({ id: req.params.id }, { $set: { developerClaimPending: true } });
     tool.developerClaimPending = true;
-    await tool.save();
 
     // Email admin for approval
     try {
@@ -342,7 +506,7 @@ const axios = require('axios');
 // POST a new tool (Public Submission)
 router.post('/submit', protect, async (req, res) => {
   try {
-    const { name, link, category, chain, handle, builderHandle, description, auditLink } = req.body;
+    const { name, link, category, chain, handle, builderHandle, description, auditLink, twitter, discord, telegram, contractAddresses, githubRepo } = req.body;
     const submitHandle = handle || builderHandle || '';
 
     // Generate a slug-like ID from the name
@@ -375,6 +539,17 @@ router.post('/submit', protect, async (req, res) => {
       // Not found or error: stay unverified (Tier 4)
     }
 
+    // Fetch initial GitHub commits if repository handle is provided
+    let commits30d = 0;
+    if (githubRepo && githubRepo.trim()) {
+      try {
+        const { fetchGitHubCommits } = require('../services/githubService');
+        commits30d = await fetchGitHubCommits(githubRepo);
+      } catch (e) {
+        console.warn(`[Submit] Pre-fetching commits for ${githubRepo} failed:`, e.message);
+      }
+    }
+
     const derivedLogo = deriveToolLogo({
       name,
       url: link,
@@ -395,13 +570,22 @@ router.post('/submit', protect, async (req, res) => {
       verified,
       builder: {
         name: submitHandle || 'Anonymous',
-        handle: submitHandle
+        handle: submitHandle,
+        twitter: twitter ? (twitter.startsWith('http') ? twitter : `https://x.com/${twitter.replace(/^@/, '')}`) : '',
+        discord: discord || '',
+        telegram: telegram || ''
       },
       submitter: req.user.id,
       status: 'pending',
       metrics: metrics,
       logoUrl: derivedLogo.logoUrl,
-      logoSource: derivedLogo.logoSource
+      logoSource: derivedLogo.logoSource,
+      contractAddresses: Array.isArray(contractAddresses) ? contractAddresses.filter(c => c.address && c.address.trim()) : [],
+      githubRepo: githubRepo || '',
+      githubCommits: {
+        count30d: commits30d,
+        lastUpdated: new Date()
+      }
     });
 
     // Send email notification
@@ -530,7 +714,7 @@ router.put('/:category/:id/review', protect, async (req, res) => {
       return res.status(400).json({ error: 'Invalid action. Use accept or reject.' });
     }
 
-    await tool.save();
+    await Tool.updateOne({ id }, { $set: { status: tool.status } });
 
     // Send notification email to the submitter if their email is available
     if (tool.submitter && tool.submitter.email && process.env.SMTP_USER && process.env.SMTP_PASS) {
@@ -605,6 +789,29 @@ router.put('/:category/:id', protect, async (req, res) => {
       return res.status(404).json({ error: 'Tool not found' });
     }
 
+    // Check authorization: must be admin OR matching developer
+    const isAdmin = req.user.role === 'admin';
+    const isDeveloper = (existingTool.developerClaimedBy && String(existingTool.developerClaimedBy) === String(req.user.id)) ||
+                        (existingTool.submitter && String(existingTool.submitter) === String(req.user.id));
+                        
+    if (!isAdmin && !isDeveloper) {
+      return res.status(403).json({ error: 'You are not authorized to update this tool' });
+    }
+
+    // Pre-fetch commits if githubRepo was changed or added
+    if (updateData.githubRepo && updateData.githubRepo !== existingTool.githubRepo) {
+      try {
+        const { fetchGitHubCommits } = require('../services/githubService');
+        const commitCount = await fetchGitHubCommits(updateData.githubRepo);
+        updateData.githubCommits = {
+          count30d: commitCount,
+          lastUpdated: new Date()
+        };
+      } catch (e) {
+        console.warn(`[Update] Pre-fetching commits for ${updateData.githubRepo} failed:`, e.message);
+      }
+    }
+
     const mergedForLogo = {
       ...existingTool.toObject(),
       ...updateData,
@@ -650,6 +857,41 @@ router.delete('/:category/:id', protect, async (req, res) => {
     res.json({ message: 'Tool deleted successfully', tool: deletedTool });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// @desc    Apply to join a DAO
+// @route   POST /api/tools/daos/:id/apply
+// @access  Private
+const DaoApplication = require('../models/DaoApplication');
+
+router.post('/daos/:id/apply', protect, async (req, res) => {
+  try {
+    const { talent, valueAdd, portfolio } = req.body;
+
+    // Verify the tool exists and is a DAO
+    const tool = await Tool.findById(req.params.id);
+    if (!tool) return res.status(404).json({ success: false, error: 'Tool not found' });
+    if (tool.category !== 'dao') {
+      return res.status(400).json({ success: false, error: 'This tool is not a DAO' });
+    }
+
+    const application = await DaoApplication.create({
+      dao: tool._id,
+      user: req.user.id,
+      talent,
+      valueAdd,
+      portfolio
+    });
+
+    res.status(201).json({ success: true, application });
+  } catch (err) {
+    // Handle duplicate application (unique index on dao + user)
+    if (err.code === 11000) {
+      return res.status(409).json({ success: false, error: 'You have already applied to this DAO' });
+    }
+    console.error('DAO application error:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

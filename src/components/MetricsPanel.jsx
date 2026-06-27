@@ -4,13 +4,16 @@ import {
   X, ExternalLink, Activity, DollarSign, BarChart3, Layers, Info,
   Landmark, Globe, ShieldCheck, User, Tag, Coins, Users, Star,
   MessageSquare, Twitter, MousePointerClick, CornerDownRight,
-  Shield, ChevronRight, ArrowUpRight, Edit3, Volume2, Gem
+  Shield, ChevronRight, ArrowUpRight, Edit3, Volume2, Gem,
+  MessageCircle, Send
 } from 'lucide-react';
 import ToolLogo from './ToolLogo';
 import RatingModal from './RatingModal';
 import { useAuth } from '../context/AuthContext';
 import { useMetrics } from '../context/MetricsContext';
 import SafeLink from './SafeLink';
+import SentimentMeter from './SentimentMeter';
+import DevPulse from './DevPulse';
 
 const metricsCache = new Map();
 
@@ -42,7 +45,7 @@ const CATEGORY_ALIASES = {
   communitytools: 'community', community: 'community',
   security: 'security', analytics: 'analytics', infofi: 'analytics', researchfiles: 'analytics',
   wallets: 'wallets', wallet: 'wallets', nft: 'nft', defi: 'defi',
-  staking: 'staking', rwa: 'rwa', l2: 'l2', onchainautonomy: 'onchain', vibecoding: 'community',
+  staking: 'staking', rwa: 'rwa', l2: 'l2', onchainautonomy: 'onchain',
 };
 
 const CATEGORY_METRIC_POLICY = {
@@ -69,6 +72,35 @@ const SECURITY_CONFIG = {
 };
 
 /* ─── Star Row ─── */
+const ReviewAvatar = ({ user, isZKVerified }) => {
+  const [hasError, setHasError] = React.useState(false);
+  
+  if (user?.avatarUrl && !hasError) {
+    return (
+      <img 
+        src={user.avatarUrl} 
+        alt={user.name} 
+        className="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-100 shadow-sm"
+        onError={() => setHasError(true)}
+      />
+    );
+  }
+  
+  if (isZKVerified) {
+    return (
+      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-purple-800 flex items-center justify-center text-indigo-200 border border-indigo-500/20 shadow-md shrink-0">
+        <Shield size={16} className="text-indigo-300" />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0">
+      {user?.name?.[0]?.toUpperCase() || 'U'}
+    </div>
+  );
+};
+
 const StarRow = ({ score, size = 12 }) => (
   <div className="flex gap-0.5">
     {[1, 2, 3, 4, 5].map((s) => (
@@ -174,6 +206,7 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
   const [reviewsLoading, setReviewsLoading] = React.useState(false);
   const [descExpanded, setDescExpanded] = React.useState(false);
   const [showRatingModal, setShowRatingModal] = React.useState(false);
+  const [inspectReview, setInspectReview] = React.useState(null);
   const [isSpeaking, setIsSpeaking] = React.useState(false);
   const { user } = useAuth();
   const { clickCounts } = useMetrics();
@@ -414,19 +447,21 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
               </div>
               {/* Name + meta */}
               <div className="flex-1 min-w-0 pt-1">
-                <h2 className="text-xl font-black text-gray-900 leading-tight">{protocol?.name}</h2>
+                <h2 className="text-xl font-black text-gray-900 leading-tight flex items-center gap-1.5">
+                  {protocol?.name}
+                  {protocol?.verified && (
+                    <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100 shrink-0">
+                      <ShieldCheck size={9} /> Verified
+                    </span>
+                  )}
+                </h2>
                 <p className="text-sm font-semibold text-purple-600 mt-0.5">
                   {protocol?.builder?.name || protocol?.builder?.handle || 'Unknown Developer'}
                 </p>
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                   <span className="text-xs text-gray-400 font-medium capitalize">{protocol?.category}</span>
-                  {protocol?.verified && (
-                    <span className="flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
-                      <ShieldCheck size={9} /> Verified
-                    </span>
-                  )}
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${sec.color}`}>
-                    {sec.icon} {sec.label}
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${protocol?.isTestnet ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-blue-700 bg-blue-50 border-blue-200'}`}>
+                    {protocol?.isTestnet ? '🧪 Testnet' : '🌐 Mainnet'}
                   </span>
                 </div>
               </div>
@@ -441,8 +476,8 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                   icon={<Star size={10} className="text-yellow-400 fill-yellow-400" />}
                 />
                 <StatPill
-                  label="Security"
-                  value={sec.label.split(' ')[0]}
+                  label="Network"
+                  value={protocol?.isTestnet ? 'Testnet' : 'Mainnet'}
                 />
                 <StatPill
                   label="Launches"
@@ -550,7 +585,35 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                     <ExternalLink size={11} className="ml-auto text-gray-300 group-hover:text-purple-400 shrink-0" />
                   </a>
                 )}
+                {protocol?.builder?.discord && (
+                  <a href={protocol.builder.discord.startsWith('http') ? protocol.builder.discord : `https://discord.gg/${protocol.builder.discord}`} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-2 py-2.5 text-sm text-gray-600 hover:text-purple-600 transition-colors group">
+                    <MessageCircle size={14} className="text-gray-400 group-hover:text-purple-500" />
+                    <span>Discord</span>
+                    <ExternalLink size={11} className="ml-auto text-gray-300 group-hover:text-purple-400 shrink-0" />
+                  </a>
+                )}
+                {protocol?.builder?.telegram && (
+                  <a href={protocol.builder.telegram.startsWith('http') ? protocol.builder.telegram : `https://t.me/${protocol.builder.telegram.replace(/^@/, '')}`} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-2 py-2.5 text-sm text-gray-600 hover:text-purple-600 transition-colors group">
+                    <Send size={14} className="text-gray-400 group-hover:text-purple-500" />
+                    <span>Telegram</span>
+                    <ExternalLink size={11} className="ml-auto text-gray-300 group-hover:text-purple-400 shrink-0" />
+                  </a>
+                )}
               </div>
+            </div>
+
+            {/* ══ GITHUB DEV PULSE ══ */}
+            {protocol?.githubRepo && (
+              <div className="px-5 mb-5 border-t border-gray-100 pt-5">
+                <DevPulse githubRepo={protocol.githubRepo} githubCommits={protocol.githubCommits} />
+              </div>
+            )}
+
+            {/* ══ SENTIMENT METER ══ */}
+            <div className="border-t border-gray-100">
+              <SentimentMeter toolId={protocol?.id} initialSentiment={protocol?.sentiment} />
             </div>
 
             {/* ══ ON-CHAIN METRICS GRID ══ */}
@@ -640,12 +703,17 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                         <div key={review._id} className="border-t border-gray-50 pt-4 first:border-0 first:pt-0">
                           <div className="flex items-start gap-3">
                             {/* Avatar */}
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shrink-0">
-                              {review.user?.name?.[0]?.toUpperCase() || 'U'}
-                            </div>
+                            <ReviewAvatar user={review.user} isZKVerified={review.isZKVerified} />
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-bold text-gray-900">{review.user?.name || 'Anonymous'}</span>
+                              <div className="flex items-center justify-between flex-wrap gap-2">
+                                <span className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                                  {review.user?.name || 'Anonymous'}
+                                  {review.isZKVerified && (
+                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-sm">
+                                      ZK-Proof Verified 🛡️
+                                    </span>
+                                  )}
+                                </span>
                               </div>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <StarRow score={review.score} size={11} />
@@ -653,6 +721,14 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
                               </div>
                               {review.comment && (
                                 <p className="text-sm text-gray-600 leading-relaxed mt-1.5">{review.comment}</p>
+                              )}
+                              {review.isZKVerified && (
+                                <button 
+                                  onClick={() => setInspectReview(review)}
+                                  className="mt-2 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-purple-600 hover:text-purple-500 transition-colors bg-purple-50 hover:bg-purple-100/80 px-2.5 py-1 rounded-lg border border-purple-100"
+                                >
+                                  Inspect ZK Proof <ChevronRight size={10} />
+                                </button>
                               )}
                               {/* Developer reply */}
                               {review.developerReply && (
@@ -687,8 +763,140 @@ export default function MetricsPanel({ protocol, isOpen, onClose }) {
         onClose={() => setShowRatingModal(false)}
         onRatingSubmitted={(newAvg) => {
           setShowRatingModal(false);
+          fetchReviews(); // Refetch reviews immediately to show the new verified ZK rating!
         }}
       />
+    )}
+    {inspectReview && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-white border border-gray-150 rounded-3xl max-w-lg w-full p-8 relative overflow-y-auto max-h-[85vh] text-left shadow-2xl"
+        >
+          <button
+            onClick={() => setInspectReview(null)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors"
+          >
+            <X size={20} />
+          </button>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600">
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-gray-900 leading-tight">ZK Proof Certificate</h3>
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mt-0.5">On-Chain Identity Verified</p>
+            </div>
+          </div>
+
+          <div className="space-y-5">
+            {/* Header info */}
+            <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+              <div className="flex items-center gap-1.5 text-xs font-black text-emerald-600 uppercase tracking-widest mb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Verification Status: Success
+              </div>
+              <p className="text-xs text-emerald-800 leading-relaxed font-semibold">
+                This review is cryptographically proven to be authored by a real Ethereum wallet that has interacted with the protocol's official smart contracts. The author's identity is completely verified and shielded using Zero-Knowledge zk-SNARKs.
+              </p>
+            </div>
+
+            {/* Nullifier Hash */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nullifier Hash (Double-Vote Prevention)</p>
+              <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-150 rounded-xl">
+                <code className="text-xs text-gray-800 font-mono truncate flex-1 font-bold">{inspectReview.nullifierHash}</code>
+              </div>
+            </div>
+
+            {/* Signed message */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Signed Message Plaintext</p>
+              <pre className="p-3 bg-gray-50 border border-gray-155 rounded-xl text-xs text-gray-700 font-mono whitespace-pre-wrap leading-relaxed font-semibold">
+                {inspectReview.signedMessage}
+              </pre>
+            </div>
+
+            {/* Hex Signature */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cryptographic Wallet Signature (Gasless)</p>
+              <div className="p-3 bg-gray-50 border border-gray-155 rounded-xl">
+                <code className="text-[10px] text-gray-600 font-mono break-all leading-normal block font-bold">{inspectReview.signature}</code>
+              </div>
+            </div>
+
+            {/* Zama FHE Encrypted Score */}
+            {inspectReview.fheCiphertext && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-pulse" /> Zama FHE Encrypted Score
+                </p>
+                <div className="p-4 bg-fuchsia-500/5 border border-fuchsia-500/20 rounded-xl space-y-2">
+                  <p className="text-[10px] text-fuchsia-700 font-semibold leading-relaxed">
+                    The rating score has been encrypted using Zama's Fully Homomorphic Encryption (TFHE-rs) scheme. The encrypted ciphertext can be aggregated on-chain without ever revealing individual scores.
+                  </p>
+                  <div className="flex items-center gap-2 p-2.5 bg-fuchsia-50 border border-fuchsia-100 rounded-lg">
+                    <code className="text-[10px] text-fuchsia-800 font-mono truncate flex-1 font-bold">{inspectReview.fheCiphertext}</code>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 0G Labs Decentralized Storage */}
+            {inspectReview.ogLabsTxHash && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" /> 0G Labs Storage Transaction
+                </p>
+                <div className="p-4 bg-cyan-500/5 border border-cyan-500/20 rounded-xl space-y-2">
+                  <p className="text-[10px] text-cyan-700 font-semibold leading-relaxed">
+                    The proof certificate and encrypted score are permanently stored on the 0G decentralized storage network for tamper-proof auditability.
+                  </p>
+                  <div className="flex items-center gap-2 p-2.5 bg-cyan-50 border border-cyan-100 rounded-lg">
+                    <code className="text-[10px] text-cyan-800 font-mono truncate flex-1 font-bold">{inspectReview.ogLabsTxHash}</code>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ZK Groth16 Parameters */}
+            {inspectReview.zkProof && (
+              <div className="space-y-2 border-t border-gray-100 pt-4">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <Activity size={10} className="text-purple-500 animate-pulse" /> ZK-SNARK Witness Parameters (Groth16 Curves)
+                </p>
+                <div className="grid grid-cols-1 gap-2 text-[10px] font-mono text-gray-400">
+                  <div className="p-3 bg-gray-50 border border-gray-155 rounded-xl space-y-1.5 text-gray-700 shadow-sm">
+                    <p className="font-bold text-purple-600 uppercase tracking-wider text-[8px]">pi_a (G1 Curve Point)</p>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">X: {inspectReview.zkProof?.proof?.pi_a?.[0]}</div>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">Y: {inspectReview.zkProof?.proof?.pi_a?.[1]}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-155 rounded-xl space-y-1.5 text-gray-700 shadow-sm">
+                    <p className="font-bold text-purple-600 uppercase tracking-wider text-[8px]">pi_b (G2 Curve Ext Point)</p>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">X.0: {inspectReview.zkProof?.proof?.pi_b?.[0]?.[0]}</div>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">Y.0: {inspectReview.zkProof?.proof?.pi_b?.[1]?.[0]}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-155 rounded-xl space-y-1.5 text-gray-700 shadow-sm">
+                    <p className="font-bold text-purple-600 uppercase tracking-wider text-[8px]">pi_c (G1 Curve Point)</p>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">X: {inspectReview.zkProof?.proof?.pi_c?.[0]}</div>
+                    <div className="truncate text-gray-800 font-mono text-[11px]">Y: {inspectReview.zkProof?.proof?.pi_c?.[1]}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setInspectReview(null)}
+            className="w-full mt-6 py-3.5 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all text-sm"
+          >
+            Close Certificate
+          </button>
+        </motion.div>
+      </div>
     )}
     </>
   );

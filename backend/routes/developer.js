@@ -357,6 +357,46 @@ router.put('/profile', protect, async (req, res) => {
 });
 
 /* ────────────────────────────────────────────────────────
+   PUT /api/developer/apps/:id
+   Allow developers to update their claimed/submitted apps
+──────────────────────────────────────────────────────── */
+router.put('/apps/:id', protect, async (req, res) => {
+    try {
+        const tool = await Tool.findById(req.params.id);
+        if (!tool) return res.status(404).json({ success: false, error: 'Tool not found' });
+
+        const isClaimer = tool.developerClaimedBy && String(tool.developerClaimedBy) === String(req.user.id);
+        const isSubmitter = tool.submitter && String(tool.submitter) === String(req.user.id);
+        const isAdmin = req.user.role === 'admin';
+        if (!isClaimer && !isSubmitter && !isAdmin) {
+            return res.status(403).json({ success: false, error: 'You are not authorized to update this tool' });
+        }
+
+        // Whitelist of allowed fields
+        const { description, url, airdropUrl, isTestnet, builder } = req.body;
+
+        if (description !== undefined) tool.description = description;
+        if (url !== undefined) tool.url = url;
+        if (airdropUrl !== undefined) tool.airdropUrl = airdropUrl;
+        if (isTestnet !== undefined) tool.isTestnet = isTestnet;
+
+        // Update nested builder fields
+        if (builder) {
+            if (!tool.builder) tool.builder = {};
+            if (builder.discord !== undefined) tool.builder.discord = builder.discord;
+            if (builder.telegram !== undefined) tool.builder.telegram = builder.telegram;
+            if (builder.twitter !== undefined) tool.builder.twitter = builder.twitter;
+            if (builder.github !== undefined) tool.builder.github = builder.github;
+        }
+
+        await tool.save();
+        res.json({ success: true, tool });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/* ────────────────────────────────────────────────────────
    Admin: GET /api/developer/pending-claims
    List all pending claims for admin review
 ──────────────────────────────────────────────────────── */

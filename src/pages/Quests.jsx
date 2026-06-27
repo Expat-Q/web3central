@@ -93,6 +93,9 @@ export default function Quests() {
       const data = await res.json();
       
       if (data.success) {
+        const quest = quests.find(q => (q._id || q.id) === qId);
+        const isDaily = quest?.type === 'daily-streak';
+
         const updatedUser = { 
           ...user, 
           diamonds: data.diamonds, 
@@ -100,7 +103,9 @@ export default function Quests() {
           rank: data.rank,
           streak: data.streak,
           lastDailyClaim: data.lastDailyClaim || user.lastDailyClaim,
-          completedQuests: [...(user.completedQuests || []), qId]
+          completedQuests: isDaily 
+            ? (user.completedQuests || []) 
+            : [...(user.completedQuests || []), qId]
         };
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));

@@ -60,14 +60,17 @@ const AppCard = ({ tool, onOpen }) => {
   const rating = tool.averageRating || tool.rating || 0;
   return (
     <div
-      className="flex flex-col gap-2 cursor-pointer group w-40 shrink-0"
+      className="flex flex-col gap-2 cursor-pointer group w-32 shrink-0"
       onClick={() => onOpen(tool)}
     >
-      <div className="w-40 h-40 rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm group-hover:shadow-md group-hover:border-purple-100 transition-all">
+      <div className="w-32 h-32 rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm group-hover:shadow-md group-hover:border-purple-100 transition-all">
         <ToolLogo tool={tool} className="w-full h-full object-contain p-2" />
       </div>
       <div className="space-y-0.5 px-0.5">
-        <p className="text-[13px] font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">{tool.name}</p>
+        <p className="text-[13px] font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors flex items-center gap-1">
+          {tool.name}
+          {tool.verified && <ShieldCheck size={11} className="text-emerald-500 shrink-0" />}
+        </p>
         <p className="text-[11px] text-gray-400 capitalize truncate">{tool.category}</p>
         {rating > 0 && (
           <div className="flex items-center gap-1">
@@ -161,6 +164,181 @@ const TopChartsSection = ({ tools, onOpen }) => {
         })}
       </div>
     </section>
+  );
+};
+
+const UrlSafetyScanner = () => {
+  const [scanVal, setScanVal] = useState("");
+  const [scanStatus, setScanStatus] = useState("idle"); // idle, scanning, verified, phishing, web2, unlisted
+  const [scanData, setScanData] = useState(null);
+  const [scanInputDomain, setScanInputDomain] = useState("");
+
+  const triggerScan = async () => {
+    let val = scanVal.trim().toLowerCase();
+    if (!val) return;
+
+    // Extract hostname from URL
+    try {
+      if (val.includes("://")) {
+        val = new URL(val).hostname;
+      } else {
+        const parts = val.split("/");
+        val = parts[0];
+      }
+    } catch (e) {}
+
+    const domain = val.replace(/^www\./, "");
+    setScanInputDomain(domain);
+    setScanStatus("scanning");
+
+    try {
+      const API_BASE = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
+      const response = await fetch(`${API_BASE}/tools/verify-domain?domain=${domain}`);
+      const data = await response.json();
+
+      if (data.success && data.status) {
+        if (data.status === "verified") {
+          setScanData(data);
+          setScanStatus("verified");
+        } else if (data.status === "phishing") {
+          setScanData(data);
+          setScanStatus("phishing");
+        } else {
+          checkWeb2Fallback(domain);
+        }
+      } else {
+        checkWeb2Fallback(domain);
+      }
+    } catch (err) {
+      checkWeb2Fallback(domain);
+    }
+  };
+
+  const checkWeb2Fallback = (domain) => {
+    const recognizedWeb2 = [
+      "google.com", "github.com", "twitter.com", "x.com", "discord.com",
+      "vercel.app", "youtube.com", "medium.com", "coingecko.com", "defillama.com",
+      "wikipedia.org", "openai.com", "microsoft.com", "apple.com"
+    ];
+    const isWeb2Safe = recognizedWeb2.some(w2 => domain === w2 || domain.endsWith(`.${w2}`));
+    if (isWeb2Safe) {
+      setScanStatus("web2");
+    } else {
+      setScanStatus("unlisted");
+    }
+  };
+
+  return (
+    <div className="w-full h-auto lg:h-[280px] rounded-[2rem] bg-slate-900 border border-slate-800 p-6 text-white relative overflow-hidden shadow-2xl flex flex-col justify-between">
+      {/* Background glow */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+      
+      <div className="space-y-3 z-10">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+          <h3 className="text-xs font-black tracking-widest uppercase text-purple-400">Threat Scanner</h3>
+        </div>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          Verify if any URL is indexed in Web3Central or is a verified safe Web2 portal.
+        </p>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={scanVal}
+            onChange={(e) => setScanVal(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && triggerScan()}
+            placeholder="Enter URL (e.g. curve.fi)..."
+            className="flex-1 bg-black/40 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-600 outline-none focus:border-purple-500/50 focus:bg-black/60 transition-all font-medium"
+          />
+          <button
+            onClick={triggerScan}
+            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition-all hover:scale-[1.02] shadow-lg shadow-purple-900/20 active:scale-95 shrink-0"
+          >
+            Scan
+          </button>
+        </div>
+      </div>
+
+      {/* Result Display area */}
+      <div className="mt-4 flex-1 flex flex-col justify-end z-10 min-h-[100px]">
+        {scanStatus === "idle" && (
+          <div className="text-center py-4 border border-dashed border-slate-800/80 rounded-2xl bg-slate-950/20">
+            <p className="text-[11px] font-semibold text-slate-600">Waiting for URL scan input...</p>
+          </div>
+        )}
+
+        {scanStatus === "scanning" && (
+          <div className="flex flex-col items-center justify-center py-4 gap-2 border border-slate-800 rounded-2xl bg-slate-950/30">
+            <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-[11px] font-semibold text-purple-400 animate-pulse">Running telemetry check...</p>
+          </div>
+        )}
+
+        {scanStatus === "verified" && scanData && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 border border-emerald-900/40 rounded-2xl bg-emerald-950/10 flex flex-col gap-1.5"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-black tracking-widest text-emerald-400 uppercase">🛡️ Verified Safe</span>
+              {scanData.rating && (
+                <div className="flex items-center gap-0.5 text-amber-400 text-[10px] font-bold">
+                  ★ {Number(scanData.rating).toFixed(1)}
+                </div>
+              )}
+            </div>
+            <h4 className="text-sm font-black text-white">{scanData.appName}</h4>
+            <p className="text-[10px] text-slate-400 truncate">
+              Verified Registry URL: <a href={scanData.officialUrl} target="_blank" rel="noreferrer" className="text-emerald-400 font-bold hover:underline">{scanData.officialUrl.replace(/^https?:\/\//, '')}</a>
+            </p>
+          </motion.div>
+        )}
+
+        {scanStatus === "phishing" && scanData && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 border border-red-950/60 rounded-2xl bg-red-950/20 flex flex-col gap-1.5 animate-pulse-slow"
+          >
+            <span className="text-[9px] font-black tracking-widest text-red-500 uppercase">🚨 Phishing Warning</span>
+            <h4 className="text-xs font-bold text-white leading-tight">Mimic Clone of {scanData.appName}!</h4>
+            <p className="text-[9px] text-slate-400">
+              Connecting wallet here is extremely unsafe. Correct URL: <a href={scanData.officialUrl} target="_blank" rel="noreferrer" className="text-red-400 font-bold hover:underline break-all">{scanData.officialUrl.replace(/^https?:\/\//, '')}</a>
+            </p>
+          </motion.div>
+        )}
+
+        {scanStatus === "web2" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 border border-blue-900/40 rounded-2xl bg-blue-950/10 flex flex-col gap-1"
+          >
+            <span className="text-[9px] font-black tracking-widest text-blue-400 uppercase">🌐 Recognized Web2 Service</span>
+            <h4 className="text-xs font-bold text-white truncate">{scanInputDomain}</h4>
+            <p className="text-[9px] text-slate-400 leading-tight">
+              Highly recognized, authentic Web2 service. Unlisted in DeFi directory, but safe to visit.
+            </p>
+          </motion.div>
+        )}
+
+        {scanStatus === "unlisted" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 border border-slate-800 rounded-2xl bg-slate-950/30 flex flex-col gap-1"
+          >
+            <span className="text-[9px] font-black tracking-widest text-slate-500 uppercase">⚪ Unlisted Website</span>
+            <h4 className="text-xs font-bold text-white truncate">{scanInputDomain}</h4>
+            <p className="text-[9px] text-slate-400 leading-tight">
+              Not indexed in our database. Proceed with absolute caution and double-check signatures.
+            </p>
+          </motion.div>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -500,82 +678,6 @@ export default function Home() {
             onOpen={openTool}
           />
 
-          {/*  Builder Spotlight Carousel  */}
-          {spotlightList.length > 0 && (
-            <section className="my-8">
-              <SectionHeader
-                icon={Users}
-                iconColor="text-fuchsia-500"
-                title="Builder Spotlight"
-                subtitle="Meet the architects behind your favorite dApps"
-              />
-              <div className="w-full rounded-[2rem] bg-white border border-gray-100 shadow-sm overflow-hidden relative">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={spotlightIndex}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -30 }}
-                    transition={{ duration: 0.45 }}
-                    className="p-6 sm:p-8 flex flex-col md:flex-row gap-8"
-                  >
-                    <div className="flex-1 space-y-4">
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={spotlight.xProfileImageUrl || "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"}
-                          alt={spotlight.name}
-                          className="w-16 h-16 rounded-full border-2 border-fuchsia-100 object-cover"
-                        />
-                        <div>
-                          <h3 className="text-xl font-black text-gray-900">{spotlight.name}</h3>
-                          <p className="text-sm font-bold text-fuchsia-600">{spotlight.role}</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed max-w-2xl">
-                        {spotlight.description}
-                      </p>
-                      {spotlight.twitter && (
-                        <a href={spotlight.twitter} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition-colors">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                          Follow on X
-                        </a>
-                      )}
-                    </div>
-
-                    {spotlight.featuredTools?.length > 0 && (
-                      <div className="md:w-72 shrink-0 space-y-3">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Built by {spotlight.name}</p>
-                        {spotlight.featuredTools.map((ft, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
-                            <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-black text-sm text-gray-900 shadow-sm shrink-0">
-                              {ft.initial}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-bold text-gray-900 truncate">{ft.name}</p>
-                              <p className="text-xs text-gray-500 truncate">{ft.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-
-                {/* Carousel dot indicators */}
-                {spotlightList.length > 1 && (
-                  <div className="flex items-center justify-center gap-2 pb-5">
-                    {spotlightList.map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => { setSpotlightIndex(idx); setSpotlight(spotlightList[idx]); }}
-                        className={`h-1.5 rounded-full transition-all ${spotlightIndex === idx ? 'w-6 bg-fuchsia-500' : 'w-1.5 bg-gray-200'}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
 
           {/*  New Arrivals */}
           <CategorySection
@@ -673,6 +775,83 @@ export default function Home() {
               ))}
             </div>
           </section>
+
+          {/*  Builder Spotlight Carousel  */}
+          {spotlightList.length > 0 && (
+            <section className="my-8">
+              <SectionHeader
+                icon={Users}
+                iconColor="text-fuchsia-500"
+                title="Builder Spotlight"
+                subtitle="Meet the architects behind your favorite dApps"
+              />
+              <div className="w-full rounded-[2rem] bg-white border border-gray-100 shadow-sm overflow-hidden relative">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={spotlightIndex}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -30 }}
+                    transition={{ duration: 0.45 }}
+                    className="p-6 sm:p-8 flex flex-col md:flex-row gap-8"
+                  >
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={spotlight.xProfileImageUrl || "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"}
+                          alt={spotlight.name}
+                          className="w-16 h-16 rounded-full border-2 border-fuchsia-100 object-cover"
+                        />
+                        <div>
+                          <h3 className="text-xl font-black text-gray-900">{spotlight.name}</h3>
+                          <p className="text-sm font-bold text-fuchsia-600">{spotlight.role}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed max-w-2xl">
+                        {spotlight.description}
+                      </p>
+                      {spotlight.twitter && (
+                        <a href={spotlight.twitter} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition-colors">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                          Follow on X
+                        </a>
+                      )}
+                    </div>
+
+                    {spotlight.featuredTools?.length > 0 && (
+                      <div className="md:w-72 shrink-0 space-y-3">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Built by {spotlight.name}</p>
+                        {spotlight.featuredTools.map((ft, i) => (
+                          <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
+                            <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-black text-sm text-gray-900 shadow-sm shrink-0">
+                              {ft.initial}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold text-gray-900 truncate">{ft.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{ft.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Carousel dot indicators */}
+                {spotlightList.length > 1 && (
+                  <div className="flex items-center justify-center gap-2 pb-5">
+                    {spotlightList.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => { setSpotlightIndex(idx); setSpotlight(spotlightList[idx]); }}
+                        className={`h-1.5 rounded-full transition-all ${spotlightIndex === idx ? 'w-6 bg-fuchsia-500' : 'w-1.5 bg-gray-200'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {/*  Latest News */}
           {newsFeed.length > 0 && (

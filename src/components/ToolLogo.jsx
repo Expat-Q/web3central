@@ -36,14 +36,18 @@ export default function ToolLogo({
   const sources = useMemo(() => {
     const domain = tool?.url ? getDomain(tool.url) : null;
     const twitterHandle = extractTwitterHandle(tool?.twitter || tool?.builder?.twitter || tool?.builder?.handle);
+    const unavatarUrl = twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}` : null;
 
     const list = [
       tool?.logoUrl,
       tool?.logo,
-      twitterHandle ? `https://unavatar.io/twitter/${twitterHandle}?fallback=false` : null,
-      domain ? `https://logo.clearbit.com/${domain}?size=128` : null,
+      unavatarUrl,
       domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=128` : null,
-    ].filter(Boolean);
+    ].filter((src) => {
+      if (!src) return false;
+      const str = String(src).toLowerCase();
+      return !str.includes('clearbit.com');
+    });
 
     return [...new Set(list)];
   }, [tool]);

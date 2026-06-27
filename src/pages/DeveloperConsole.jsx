@@ -58,24 +58,15 @@ function DevLoginGate() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(
-        `${window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api"}/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        }
-      );
-      const data = await res.json();
-      if (!data.success) {
-        setError(data.message || "Invalid email or password.");
+      // Use AuthContext login to keep global auth state in sync
+      const res = await login({ email, password });
+      if (!res.success) {
+        setError(res.message || "Invalid email or password.");
         setLoading(false);
         return;
       }
-      // Write token before navigating so DeveloperConsole reads it immediately
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      window.location.href = "/developer";
+      // Navigate via React router instead of hard reload
+      navigate("/developer");
     } catch {
       setError("Login failed. Check your connection and try again.");
       setLoading(false);

@@ -28,6 +28,33 @@ const RatingSchema = new mongoose.Schema({
     developerRepliedAt: {
         type: Date,
         default: null
+    },
+    isZKVerified: {
+        type: Boolean,
+        default: false
+    },
+    anonymousName: {
+        type: String
+    },
+    nullifierHash: {
+        type: String,
+        sparse: true
+    },
+    zkProof: {
+        proof: mongoose.Schema.Types.Mixed,
+        publicInputs: mongoose.Schema.Types.Mixed
+    },
+    signedMessage: {
+        type: String
+    },
+    signature: {
+        type: String
+    },
+    fheCiphertext: {
+        type: String
+    },
+    ogLabsTxHash: {
+        type: String
     }
 });
 

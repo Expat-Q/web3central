@@ -64,13 +64,6 @@
       "fullCoverage": 0,
       "partialCoverage": 10,
       "missing": 0
-    },
-    "vibeCoding": {
-      "total": 4,
-      "tokenized": 0,
-      "fullCoverage": 0,
-      "partialCoverage": 4,
-      "missing": 0
     }
   },
   "rows": [
@@ -1191,54 +1184,6 @@
         "fdv"
       ],
       "metricCount": 3
-    },
-    {
-      "id": "lancaquiz",
-      "name": "Lanca Quiz by @adedir",
-      "category": "vibeCoding",
-      "policyGroup": "community",
-      "geckoId": null,
-      "hasToken": false,
-      "selectedMetrics": [
-        "monthlyUsers"
-      ],
-      "metricCount": 1
-    },
-    {
-      "id": "sentientquiz",
-      "name": "Sentient AGI Quiz App",
-      "category": "vibeCoding",
-      "policyGroup": "community",
-      "geckoId": null,
-      "hasToken": false,
-      "selectedMetrics": [
-        "monthlyUsers"
-      ],
-      "metricCount": 1
-    },
-    {
-      "id": "wardenquiz",
-      "name": "Warden Protocol Quiz App",
-      "category": "vibeCoding",
-      "policyGroup": "community",
-      "geckoId": null,
-      "hasToken": false,
-      "selectedMetrics": [
-        "monthlyUsers"
-      ],
-      "metricCount": 1
-    },
-    {
-      "id": "wardencounter",
-      "name": "Warden protocol WM Counter",
-      "category": "vibeCoding",
-      "policyGroup": "community",
-      "geckoId": null,
-      "hasToken": false,
-      "selectedMetrics": [
-        "monthlyUsers"
-      ],
-      "metricCount": 1
     },
     {
       "id": "drift",

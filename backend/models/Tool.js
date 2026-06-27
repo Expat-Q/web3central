@@ -30,7 +30,9 @@ const ToolSchema = new mongoose.Schema({
         name: { type: String, required: true },
         handle: String,
         twitter: String,
-        github: String
+        github: String,
+        discord: String,
+        telegram: String
     },
     submitter: {
         type: mongoose.Schema.Types.ObjectId,
@@ -100,6 +102,11 @@ const ToolSchema = new mongoose.Schema({
         enum: ['none', 'upcoming', 'active', 'ended'],
         default: 'none'
     },
+    isTestnet: {
+        type: Boolean,
+        default: false
+    },
+    airdropUrl: String,
     securityLevel: {
         type: String,
         enum: ['unaudited', 'community', 'audited', 'verified'],
@@ -113,6 +120,20 @@ const ToolSchema = new mongoose.Schema({
     developerClaimPending: {
         type: Boolean,
         default: false
+    },
+    sentiment: {
+        bullish: [{ type: String }],
+        bearish: [{ type: String }],
+        lastUpdated: { type: Date, default: Date.now }
+    },
+    contractAddresses: [{
+        chain: String,
+        address: String
+    }],
+    githubRepo: String,
+    githubCommits: {
+        count30d: { type: Number, default: 0 },
+        lastUpdated: Date
     }
 });
 

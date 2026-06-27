@@ -8,6 +8,26 @@ import { MetricsProvider } from "./context/MetricsContext";
 import ClaudeBot from "./components/ClaudeBot";
 // import { Analytics } from "@vercel/analytics/react";
 
+import '@rainbow-me/rainbowkit/styles.css';
+import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { WagmiProvider, http } from 'wagmi';
+import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+
+const config = getDefaultConfig({
+  appName: 'Web3Central',
+  projectId: '3fcc6b14d4919618b774906e347683b9', 
+  chains: [mainnet, polygon, optimism, arbitrum, base],
+  transports: {
+    [mainnet.id]: http('https://cloudflare-eth.com'),
+    [polygon.id]: http(),
+    [optimism.id]: http(),
+    [arbitrum.id]: http(),
+    [base.id]: http()
+  }
+});
+const queryClient = new QueryClient();
+
 // Scroll to top on every route change
 const ScrollToTop = () => {
   const { pathname, search } = useLocation();
@@ -41,6 +61,7 @@ import Leaderboard from "./pages/Leaderboard";
 
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import OAuthCallback from "./pages/auth/OAuthCallback";
 import Academy from "./pages/Academy";
 import LessonDetail from "./pages/LessonDetail";
@@ -59,7 +80,7 @@ import Airdrops from "./pages/Airdrops";
 
 const ConditionalFooter = () => {
   const location = useLocation();
-  const hideFooter = ["/login", "/signup", "/oauth/callback"].includes(location.pathname)
+  const hideFooter = ["/login", "/signup", "/oauth/callback", "/forgot-password"].includes(location.pathname)
     || location.pathname.startsWith("/developer");
   return !hideFooter ? <Footer /> : null;
 };
@@ -78,7 +99,7 @@ const ConditionalBot = () => {
 
 // Pages that should NOT show the sidebar
 const NO_SIDEBAR_ROUTES = [
-  "/login", "/signup", "/oauth/callback", "/admin",
+  "/login", "/signup", "/oauth/callback", "/admin", "/forgot-password"
 ];
 
 const AppLayout = () => {
@@ -163,6 +184,7 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
     <Route path="/leaderboard" element={<Leaderboard />} />
     <Route path="/signup" element={<Signup />} />
     <Route path="/login" element={<Login />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
     <Route path="/oauth/callback" element={<OAuthCallback />} />
     <Route path="/news" element={<News />} />
     <Route path="/news/:slug" element={<NewsArticle />} />
@@ -188,14 +210,20 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
 
 function App() {
   return (
-    <MetricsProvider>
-      <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <AppLayout />
-        </Router>
-      </AuthProvider>
-    </MetricsProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
+          <MetricsProvider>
+            <AuthProvider>
+              <Router>
+                <ScrollToTop />
+                <AppLayout />
+              </Router>
+            </AuthProvider>
+          </MetricsProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 

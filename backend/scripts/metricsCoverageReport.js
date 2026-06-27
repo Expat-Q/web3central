@@ -29,7 +29,6 @@ const CATEGORY_ALIASES = {
   rwa: 'rwa',
   l2: 'l2',
   onchainautonomy: 'onchain',
-  vibecoding: 'community',
 };
 
 const CATEGORY_METRIC_POLICY = {

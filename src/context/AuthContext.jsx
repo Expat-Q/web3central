@@ -139,6 +139,43 @@ export const AuthProvider = ({ children }) => {
         }
     }, [handleAuthResponse]);
 
+    const forgotPassword = useCallback(async (userData) => {
+        if (!mountedRef.current) return { success: false };
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+            });
+
+            const data = await handleAuthResponse(response);
+
+            if (!mountedRef.current) return { success: false };
+
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                setUser(data.user);
+                return { success: true };
+            } else {
+                setError(data.message || 'Password reset failed');
+                return { success: false, message: data.message };
+            }
+        } catch (err) {
+            if (!mountedRef.current) return { success: false };
+
+            const message = getUserFriendlyMessage(err);
+            setError(message);
+            return { success: false, message };
+        } finally {
+            if (mountedRef.current) setLoading(false);
+        }
+    }, [handleAuthResponse]);
+
     const oauthLogin = useCallback((provider) => {
         window.location.href = `${API_BASE_URL}/auth/${provider}`;
     }, []);
@@ -163,6 +200,7 @@ export const AuthProvider = ({ children }) => {
                 error,
                 register,
                 login,
+                forgotPassword,
                 oauthLogin,
                 logout,
                 clearError

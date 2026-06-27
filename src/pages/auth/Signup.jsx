@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
@@ -17,6 +17,7 @@ export default function Signup() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { register, oauthLogin } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,7 +39,8 @@ export default function Signup() {
         });
 
         if (res.success) {
-            navigate('/');
+            const params = new URLSearchParams(location.search);
+            navigate(params.get('redirect') || '/');
         } else {
             setError(res.message);
         }
@@ -202,7 +204,7 @@ export default function Signup() {
                             <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                             </svg>
-                            X (Twitter)
+                            X
                         </button>
                     </div>
 

@@ -96,7 +96,9 @@ const allowedOrigins = process.env.FRONTEND_URL
   : [
     'http://localhost:3000',
     'https://web3central.vercel.app',
-    'https://web3central-4ye286qqp-expatqs-projects.vercel.app'
+    'https://web3central-4ye286qqp-expatqs-projects.vercel.app',
+    'https://web3central.pro',
+    'https://www.web3central.pro'
   ];
 
 app.use(cors({
@@ -106,7 +108,8 @@ app.use(cors({
 
     // Check if origin matches allowed list or is a vercel.app subdomain
     const isAllowed = allowedOrigins.indexOf(origin) !== -1 ||
-      origin.endsWith('.vercel.app');
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.web3central.pro');
 
     if (isAllowed) {
       return callback(null, true);

@@ -138,7 +138,7 @@ passport.use(new GoogleStrategy({
 passport.use(new DiscordStrategy({
     clientID: process.env.DISCORD_CLIENT_ID || 'placeholder_discord_id',
     clientSecret: process.env.DISCORD_CLIENT_SECRET || 'placeholder_discord_secret',
-    callbackURL: '/api/auth/discord/callback',
+    callbackURL: process.env.DISCORD_CALLBACK_URL || getAbsoluteCallback('/api/auth/discord/callback'),
     proxy: true,
     scope: ['identify', 'email']
 }, async (accessToken, refreshToken, profile, done) => {
@@ -160,7 +160,7 @@ passport.use(new DiscordStrategy({
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY || 'placeholder_twitter_key',
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET || 'placeholder_twitter_secret',
-    callbackURL: '/api/auth/twitter/callback',
+    callbackURL: process.env.TWITTER_CALLBACK_URL || getAbsoluteCallback('/api/auth/twitter/callback'),
     proxy: true,
     includeEmail: true
 }, async (token, tokenSecret, profile, done) => {

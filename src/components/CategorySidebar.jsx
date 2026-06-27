@@ -23,8 +23,8 @@ const CATEGORIES = [
   { id: "bounty-hub",  label: "Bounty Hub",  icon: Target,         path: "/apps/bounty-hub",  color: "text-indigo-600"  },
   { id: "bridges",     label: "Bridges",     icon: Share2,         path: "/apps/bridges",     color: "text-blue-600"    },
   { id: "cex",         label: "CEX",         icon: Coins,          path: "/apps/cex",         color: "text-yellow-600"  },
-  { id: "community",   label: "Community",   icon: Users,          path: "/apps/community",   color: "text-teal-600"    },
-  { id: "dao",         label: "DAOs & Governance", icon: Building, path: "/apps/dao",         color: "text-purple-600"  },
+  { id: "community",   label: "Onchain Tools", icon: Users,          path: "/apps/community",   color: "text-teal-600"    },
+  { id: "dao",         label: "DAO",         icon: Building, path: "/apps/dao",         color: "text-purple-600"  },
   { id: "defi",        label: "DeFi",        icon: Landmark,       path: "/apps/defi",        color: "text-emerald-600" },
   { id: "depin",       label: "DePIN",       icon: Activity,       path: "/apps/depin",       color: "text-orange-500", comingSoon: true  },
   { id: "gaming",      label: "Gaming",      icon: Gamepad2,       path: "/apps/gaming",      color: "text-green-600"   },
@@ -241,7 +241,7 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
                   {!isCollapsed && (
                     <div className="flex items-center justify-between flex-1 min-w-0">
                       <span className="truncate">{label}</span>
-                      {['ai', 'dao', 'depin', 'infra', 'payments', 'social', 'staking'].includes(id) ? (
+                      {['ai', 'depin', 'infra', 'payments', 'social', 'staking'].includes(id) ? (
                         <span className="ml-1 text-[8px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-1 rounded uppercase tracking-tighter shrink-0">Soon</span>
                       ) : null}
                     </div>

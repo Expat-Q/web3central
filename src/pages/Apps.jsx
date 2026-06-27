@@ -148,24 +148,10 @@ export default function Apps() {
           const target = allTools.find(t => (t._id || t.id) === location.state.openToolId);
           if (target) {
             setSelectedMetricsProtocol({
+              ...target,
               id: target.id || target._id,
               slug: target.llamaSlug || target.slug || target.id,
-              name: target.name,
-              description: target.description,
-              logoUrl: target.logoUrl,
-              logo: target.logo,
-              url: target.url,
-              twitter: target.twitter,
-              builder: target.builder,
-              category: target.category,
-              verified: target.verified,
-              metrics: target.metrics,
-              geckoId: target.geckoId,
-              monthlyUsers: target.monthlyUsers,
-              reviews: target.reviews,
               rating: target.averageRating || target.rating,
-              ratingCount: target.ratingCount,
-              popularWith: target.popularWith,
             });
           }
         }
@@ -323,24 +309,10 @@ export default function Apps() {
                         <ProtocolCard
                           tool={tool}
                           onOpenDetails={(app) => setSelectedMetricsProtocol({
+                            ...app,
                             id: app.id || app._id,
                             slug: app.llamaSlug || app.slug || app.id,
-                            name: app.name,
-                            description: app.description,
-                            logoUrl: app.logoUrl,
-                            logo: app.logo,
-                            url: app.url,
-                            twitter: app.twitter,
-                            builder: app.builder,
-                            category: app.category,
-                            verified: app.verified,
-                            metrics: app.metrics,
-                            geckoId: app.geckoId,
-                            monthlyUsers: app.monthlyUsers,
-                            reviews: app.reviews,
                             rating: app.averageRating || app.rating,
-                            ratingCount: app.ratingCount,
-                            popularWith: app.popularWith,
                           })}
                         />
                       </div>

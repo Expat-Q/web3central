@@ -85,7 +85,7 @@ router.post('/:id/complete', protect, async (req, res) => {
         const User = require('../models/User');
         const user = await User.findById(req.user.id);
 
-        if (user.completedQuests.includes(quest.id)) {
+        if (quest.type !== 'daily-streak' && user.completedQuests.includes(quest.id)) {
             return res.status(400).json({ success: false, error: 'Quest already completed' });
         }
 
@@ -147,7 +147,8 @@ router.post('/:id/complete', protect, async (req, res) => {
             diamonds: user.diamonds,
             totalXP: user.totalXP,
             rank: user.rank,
-            streak: user.streak
+            streak: user.streak,
+            lastDailyClaim: user.lastDailyClaim
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });

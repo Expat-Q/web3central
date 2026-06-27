@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, Star, MousePointerClick, MessageSquare, Plus, Twitter, ChevronRight } from "lucide-react";
+import { ArrowUpRight, Star, MousePointerClick, MessageSquare, Plus, Twitter, ChevronRight, Pencil } from "lucide-react";
 import ToolLogo from "../../components/ToolLogo";
 import { Link } from "react-router-dom";
 import ClaimAppModal from "./ClaimAppModal";
+import EditAppModal from "./EditAppModal";
 
 const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
 
@@ -10,6 +11,7 @@ export default function MyApps({ profile }) {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [claimTarget, setClaimTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
 
   useEffect(() => {
     fetch(`${API}/developer/dashboard`, {
@@ -120,7 +122,13 @@ export default function MyApps({ profile }) {
 
               {/* Actions */}
               <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-50">
-                <Link to="/developer/reviews" className="text-xs font-bold text-gray-600 hover:text-purple-700 transition-colors flex items-center gap-1">
+                <button
+                  onClick={() => setEditTarget(tool)}
+                  className="text-xs font-bold text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-1"
+                >
+                  <Pencil size={11} /> Edit Details
+                </button>
+                <Link to="/developer/reviews" className="text-xs font-bold text-gray-600 hover:text-purple-700 transition-colors flex items-center gap-1 ml-4">
                   Manage Reviews <ChevronRight size={11} />
                 </Link>
               </div>
@@ -131,6 +139,17 @@ export default function MyApps({ profile }) {
 
       {claimTarget && (
         <ClaimAppModal onClose={() => setClaimTarget(null)} />
+      )}
+
+      {editTarget && (
+        <EditAppModal
+          tool={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSaved={(updatedTool) => {
+            setTools(prev => prev.map(t => t._id === updatedTool._id ? { ...t, ...updatedTool } : t));
+            setEditTarget(null);
+          }}
+        />
       )}
     </div>
   );

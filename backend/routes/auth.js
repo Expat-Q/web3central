@@ -26,7 +26,7 @@ const registerSchema = {
 
 const loginSchema = {
     body: {
-        email: ['required', 'email'],
+        email: ['required', { type: 'string', minLength: 1 }],
         password: ['required', { type: 'string', minLength: 1 }]
     }
 };
@@ -191,8 +191,14 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Check for user
-        const user = await User.findOne({ email }).select('+password');
+        const input = String(email || '').trim();
+        // Check for user by email (case-insensitive) OR username (case-insensitive)
+        const user = await User.findOne({
+            $or: [
+                { email: input.toLowerCase() },
+                { name: { $regex: new RegExp('^' + input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') } }
+            ]
+        }).select('+password');
 
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -332,6 +338,38 @@ router.get('/leaderboard', async (req, res) => {
         }));
 
         res.status(200).json({ success: true, leaderboard });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Simplified Password Reset (Direct Reset)
+// @route   POST /api/auth/forgot-password
+// @access  Public
+router.post('/forgot-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Please provide email and new password' });
+    }
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+    }
+
+    try {
+        const user = await User.findOne({ email: email.toLowerCase() });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No user registered with this email address' });
+        }
+
+        // Update password and save (pre-save hook will hash it)
+        user.password = newPassword;
+        await user.save();
+
+        // Automatically log user in by issuing token
+        sendTokenResponse(user, 200, res);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

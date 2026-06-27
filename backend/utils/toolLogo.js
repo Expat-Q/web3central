@@ -26,19 +26,19 @@ const deriveToolLogo = (tool = {}) => {
     return { logoUrl: tool.logo, logoSource: 'stored-logo' };
   }
 
-  const twitterHandle = extractTwitterHandle(tool.twitter || tool?.builder?.twitter || tool?.builder?.handle);
-  if (twitterHandle) {
-    return {
-      logoUrl: `https://unavatar.io/twitter/${twitterHandle}?fallback=false`,
-      logoSource: 'unavatar-twitter'
-    };
-  }
-
   const domain = getDomain(tool.url || '');
   if (domain) {
     return {
-      logoUrl: `https://logo.clearbit.com/${domain}?size=128`,
-      logoSource: 'clearbit-domain'
+      logoUrl: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+      logoSource: 'google-favicon'
+    };
+  }
+
+  const twitterHandle = extractTwitterHandle(tool.twitter || tool?.builder?.twitter || tool?.builder?.handle);
+  if (twitterHandle) {
+    return {
+      logoUrl: `https://unavatar.io/twitter/${twitterHandle}`,
+      logoSource: 'unavatar-twitter'
     };
   }
 

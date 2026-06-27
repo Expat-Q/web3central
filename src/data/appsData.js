@@ -2305,58 +2305,47 @@ module.exports = {
       monthlyUsers: "11,000+",
       popularWith: [
         "Content creators",
-        "Web3 publishers"
-      ],
-      narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "AI-powered content tools for Web3 creators"
-    }
-  ],
-  vibeCoding: [
-    {
-      id: "wardencounter",
-      name: "Warden protocol WM Counter",
-      url: "https://warden-counter.vercel.app/",
-      description: "Discover how many times you've said WM. The warden protocol CT slang",
-      category: "vibeCoding",
+category: "communityTools",
       tags: [
-        "Fun",
-        "Meme",
-        "Counter"
+        "Developer",
+        "Debugging",
+        "Simulation"
       ],
       builder: {
-        name: "Community Builder",
-        handle: "@community_builder",
-        twitter: "",
-        github: ""
+        name: "Tenderly Team",
+        handle: "@TenderlyApp",
+        twitter: "https://twitter.com/TenderlyApp",
+        github: "https://github.com/tenderly"
       },
       status: "active",
       verified: true,
-      trending: false,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
       recentlyAdded: false,
-      monthlyUsers: "5,000+",
+      monthlyUsers: "50,000+",
       popularWith: [
-        "Meme enthusiasts",
-        "Warden protocol fans"
+        "Smart contract devs",
+        "Debuggers"
       ],
       narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "Meme-based engagement tools in Web3"
+      narrativeDescription: "Developer tooling for smart contract simulation"
     },
     {
-      id: "lancaquiz",
-      name: "Lanca Quiz by @adedir",
-      url: "https://concero-lanca-quiz.vercel.app",
-      description: "Web3 quiz platform designed for community engagement.",
-      category: "vibeCoding",
+      id: "assetrecovery",
+      name: "Undrained Asset Recovery from a compromised wallet",
+      url: "https://github.com/zunxbt/asset-recovery-tool",
+      description: "Helps users recover assets from compromised wallets.",
+      category: "communityTools",
       tags: [
-        "Fun",
-        "Education",
-        "Quiz"
+        "Community Built",
+        "Security",
+        "Recovery"
       ],
       builder: {
-        name: "Adedir",
-        handle: "@adedir",
-        twitter: "https://twitter.com/adedir",
-        github: "https://github.com/adedir"
+        name: "ZunxBT",
+        handle: "@zunxbt",
+        twitter: "https://twitter.com/zunxbt",
+        github: "https://github.com/zunxbt"
       },
       status: "active",
       verified: true,
@@ -2364,69 +2353,157 @@ module.exports = {
       recentlyAdded: false,
       monthlyUsers: "7,000+",
       popularWith: [
-        "Quiz takers",
-        "Community learners"
+        "Compromised wallet users",
+        "Asset recovery"
       ],
       narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "Gamified learning platforms for Web3 education"
+      narrativeDescription: "Asset recovery tools for compromised wallets"
     },
     {
-      id: "wardenquiz",
-      name: "Warden Protocol Quiz App",
-      url: "https://warden-quiz.vercel.app/",
-      description: "Gamified learning experience built by @ExpatQ3. Test your knowlege about Warden Protocol, automation, and onchain coordination through interactive quizzes.",
-      category: "vibeCoding",
+      id: "web3toolkits",
+      name: "Web3 Toolkits by 0xMoei",
+      url: "https://0xmoei.xyz/toolkit",
+      description: "Utility suite for builders and explorers in Web3.",
+      category: "communityTools",
       tags: [
-        "Fun",
-        "Education",
-        "Gamification"
+        "Community Built",
+        "Utilities",
+        "Builder"
       ],
       builder: {
-        name: "ExpatQ3",
-        handle: "@ExpatQ3",
-        twitter: "https://twitter.com/ExpatQ3",
-        github: "https://github.com/expatq3"
-      },
-      status: "active",
-      verified: true,
-      trending: false,
-      recentlyAdded: false,
-      monthlyUsers: "8,000+",
-      popularWith: [
-        "Warden protocol learners",
-        "Gamification fans"
-      ],
-      narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "Protocol-specific quiz apps for onchain learning"
-    },
-    {
-      id: "sentientquiz",
-      name: "Sentient AGI Quiz App",
-      url: "https://sentient-quiz-umber.vercel.app/",
-      description: "Gamified learning experience built by @ExpatQ3. Test your knowlege about @sentientAGI open-source AGI system, automation, and onchain coordination through interactive quizzes.",
-      category: "vibeCoding",
-      tags: [
-        "Fun",
-        "Education",
-        "Gamification"
-      ],
-      builder: {
-        name: "ExpatQ3",
-        handle: "@ExpatQ3",
-        twitter: "https://twitter.com/ExpatQ3",
-        github: "https://github.com/expatq3"
+        name: "0xMoei",
+        handle: "@0xMoei",
+        twitter: "https://twitter.com/0xMoei",
+        github: "https://github.com/0xMoei"
       },
       status: "active",
       verified: true,
       trending: false,
       recentlyAdded: true,
-      monthlyUsers: "6,000+",
+      monthlyUsers: "9,000+",
       popularWith: [
-        "AGI enthusiasts",
-        "AI learners"
+        "Web3 builders",
+        "Toolkit users"
       ],
       narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "AI and AGI learning platforms in Web3"
+      narrativeDescription: "Utility toolkits for Web3 builders and explorers"
+    },
+    {
+      id: "gomtu",
+      name: "Gomtu",
+      url: "https://gomtu.xyz",
+      description: "Decentralized social engagement and community coordination tool.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Social",
+        "Coordination"
+      ],
+      builder: {
+        name: "Gomtu Team",
+        handle: "@gomtu",
+        twitter: "https://twitter.com/gomtu",
+        github: "https://github.com/gomtu"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "6,000+",
+      popularWith: [
+        "Community coordinators",
+        "Social engagers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Decentralized social engagement platforms"
+    },
+    {
+      id: "lunarstrategy",
+      name: "Lunar Strategy",
+      url: "https://lunarstrategy.com",
+      description: "Marketing and growth agency for Web3 and blockchain startups.",
+      category: "communityTools",
+      tags: [
+        "Marketing",
+        "Growth",
+        "Agency"
+      ],
+      builder: {
+        name: "Lunar Strategy Team",
+        handle: "@lunarstrategy",
+        twitter: "https://twitter.com/lunarstrategy",
+        github: ""
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Web3 startups",
+        "Growth hackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Marketing and growth agencies for Web3 startups"
+    },
+    {
+      id: "kaitoradar",
+      name: "Kaito Radar",
+      url: "https://chromewebstore.google.com/detail/kaito-radar/ipghckihdimmbgfcpgnjekfljdoahlba?hl=en-US&utm_source=ext_sidebar",
+      description: "Data dashboard tracking trends and narratives in crypto.",
+      category: "communityTools",
+      tags: [
+        "Analytics",
+        "Dashboard",
+        "Trends"
+      ],
+      builder: {
+        name: "Kaito Team",
+        handle: "@kaito_ai",
+        twitter: "https://twitter.com/kaito_ai",
+        github: "https://github.com/kaito"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "20,000+",
+      popularWith: [
+        "Trend watchers",
+        "Narrative trackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Data dashboards for tracking crypto trends and narratives"
+    },
+    {
+      id: "blixeditor",
+      name: "Blix Editor",
+      url: "https://blix.so",
+      description: "AI-powered content and publishing tool for Web3 creators.",
+      category: "communityTools",
+      tags: [
+        "Content",
+        "AI",
+        "Publishing"
+      ],
+      builder: {
+        name: "Blix Team",
+        handle: "@blix_so",
+        twitter: "https://twitter.com/blix_so",
+        github: "https://github.com/blix"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "11,000+",
+      popularWith: [
+        "Content creators",
+        "Web3 publishers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "AI-powered content tools for Web3 creators"
     }
   ],
   predictions: [

@@ -41,22 +41,15 @@ export default function DevRegister({ onComplete }) {
     setLoginLoading(true);
     setLoginError("");
     try {
-      const res = await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPw })
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setLoginError(data.message || "Invalid email or password.");
+      // Use AuthContext login to keep global auth state in sync
+      const res = await login({ email: loginEmail, password: loginPw });
+      if (!res.success) {
+        setLoginError(res.message || "Invalid email or password.");
         setLoginLoading(false);
         return;
       }
-      // Set token + user in localStorage BEFORE navigating so DeveloperConsole can read it immediately
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      // Hard navigate to flush React state cleanly
-      window.location.href = "/developer";
+      // Navigate via React router instead of hard reload
+      navigate("/developer");
     } catch {
       setLoginError("Login failed. Please check your connection and try again.");
       setLoginLoading(false);
