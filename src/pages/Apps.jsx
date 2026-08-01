@@ -77,29 +77,29 @@ const ProtocolCard = ({ tool, onOpenDetails }) => {
   );
 };
 
-/* ── Category Section Definitions ── */
+/* ── Category Section Definitions (Alphabetical Order) ── */
 const SECTIONS = [
-  { key: "trading",     label: "Trading & DEXs",       dbKeys: ["dex", "perps", "trading"],               comingSoon: false },
-  { key: "defi",        label: "DeFi",                 dbKeys: ["defi"],                                  comingSoon: false },
-  { key: "bridges",     label: "Bridges",              dbKeys: ["interoperability", "bridges", "bridge"], comingSoon: false },
-  { key: "wallets",     label: "Wallets",              dbKeys: ["wallets", "wallet"],                     comingSoon: false },
-  { key: "security",    label: "Security",             dbKeys: ["security"],                              comingSoon: false },
+  { key: "airdrops",    label: "Airdrops",             dbKeys: ["airdrops"],                              comingSoon: false },
   { key: "analytics",   label: "Analytics",            dbKeys: ["analytics"],                             comingSoon: false },
-  { key: "nft",         label: "NFTs",                 dbKeys: ["nft"],                                   comingSoon: false },
-  { key: "gaming",      label: "Gaming",               dbKeys: ["gaming"],                                comingSoon: false },
-  { key: "rwa",         label: "RWA",                  dbKeys: ["rwa"],                                   comingSoon: false },
-  { key: "cex",         label: "CEX",                  dbKeys: ["cex"],                                   comingSoon: false },
-  { key: "privacy",     label: "Privacy",              dbKeys: ["privacy"],                               comingSoon: false },
-  { key: "predictions", label: "Predictions",          dbKeys: ["predictions"],                           comingSoon: false },
   { key: "ai",          label: "Artificial Intelligence", dbKeys: ["ai"],                                comingSoon: false },
+  { key: "bridges",     label: "Bridges",              dbKeys: ["interoperability", "bridges", "bridge"], comingSoon: false },
+  { key: "cex",         label: "CEX",                  dbKeys: ["cex"],                                   comingSoon: false },
   { key: "dao",         label: "DAOs & Governance",    dbKeys: ["dao"],                                   comingSoon: false },
+  { key: "defi",        label: "DeFi",                 dbKeys: ["defi"],                                  comingSoon: false },
+  { key: "depin",       label: "DePIN",                dbKeys: ["depin"],                                 comingSoon: false },
+  { key: "gaming",      label: "Gaming",               dbKeys: ["gaming"],                                comingSoon: false },
+  { key: "infofi",      label: "InfoFi",               dbKeys: ["infofi"],                                comingSoon: false },
   { key: "infra",       label: "Infra & Dev Tools",    dbKeys: ["infra"],                                 comingSoon: false },
+  { key: "nft",         label: "NFTs",                 dbKeys: ["nft"],                                   comingSoon: false },
+  { key: "community",   label: "Onchain Tools",        dbKeys: ["communityTools", "community", "bountyHub", "bounty-hub"], comingSoon: false },
+  { key: "payments",    label: "Payments",             dbKeys: ["payments"],                              comingSoon: false },
+  { key: "predictions", label: "Predictions",          dbKeys: ["predictions"],                           comingSoon: false },
+  { key: "privacy",     label: "Privacy",              dbKeys: ["privacy"],                               comingSoon: false },
+  { key: "rwa",         label: "RWA",                  dbKeys: ["rwa"],                                   comingSoon: false },
+  { key: "security",    label: "Security",             dbKeys: ["security"],                              comingSoon: false },
   { key: "social",      label: "Social & DeSoc",       dbKeys: ["social"],                                comingSoon: false },
   { key: "staking",     label: "Staking & Yield",      dbKeys: ["staking"],                               comingSoon: false },
-  { key: "community",   label: "Onchain Tools",        dbKeys: ["communityTools", "community", "bountyHub", "bounty-hub"], comingSoon: false },
-  { key: "airdrops",    label: "Airdrops",             dbKeys: ["airdrops"],                              comingSoon: false },
-  { key: "depin",       label: "DePIN",                dbKeys: ["depin"],                                 comingSoon: false },
-  { key: "payments",    label: "Payments",             dbKeys: ["payments"],                              comingSoon: false },
+  { key: "trading",     label: "Trading & DEXs",       dbKeys: ["dex", "perps", "trading"],               comingSoon: false },
 ];
 
 /* ── Coming Soon Mini Card ── */

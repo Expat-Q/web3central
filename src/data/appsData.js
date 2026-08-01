@@ -1439,6 +1439,81 @@ module.exports = {
       narrativeDescription: "AI-powered research tools transforming Web3 information discovery"
     },
     {
+      id: "rally",
+      name: "Rally",
+      url: "http://app.rally.fun",
+      description: "The Future of Decentralized Marketing. Powered by @GenLayer",
+      category: "infofi",
+      tags: [
+        "Marketing",
+        "InfoFi",
+        "Protocol"
+      ],
+      builder: {
+        name: "Rally Team",
+        handle: "@RallyOnChain",
+        twitter: "https://x.com/RallyOnChain"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      popularWith: [
+        "Marketers",
+        "DeFi users"
+      ]
+    },
+    {
+      id: "airaa-hq",
+      name: "Airaa HQ 🌸",
+      url: "https://airaa.xyz/campaigns/bounties",
+      description: "A unified distribution platform for brands to go viral.",
+      category: "infofi",
+      tags: [
+        "Distribution",
+        "Bounties",
+        "InfoFi"
+      ],
+      builder: {
+        name: "Airaa Team",
+        handle: "@AiraaAgent",
+        twitter: "https://x.com/AiraaAgent"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      popularWith: [
+        "Creators",
+        "Brands"
+      ]
+    },
+    {
+      id: "stitch3",
+      name: "Stitch3",
+      url: "https://stitch3.ai",
+      description: "We map creator ecosystems. Connecting real projects with real creators. Built on bittensor by @Bitcast_Network",
+      category: "infofi",
+      tags: [
+        "Creator Mapping",
+        "Bittensor",
+        "InfoFi"
+      ],
+      builder: {
+        name: "Stitch3 Team",
+        handle: "@Stitch3_ai",
+        twitter: "https://x.com/Stitch3_ai"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      popularWith: [
+        "Creators",
+        "AI Builders"
+      ]
+    },
+    {
       id: "wallchain",
       name: "Wallchain",
       url: "https://quacks.app/?ref=ExpatQ3",
@@ -1524,35 +1599,6 @@ module.exports = {
       ],
       narrative: "Attention & InfoFi Layer",
       narrativeDescription: "Community-driven alpha sharing platforms emerging"
-    },
-    {
-      id: "galxe",
-      name: "Galxe Starboard",
-      url: "https://galxe.com",
-      description: "Web3 social and quest-based analytics for communities.",
-      category: "infofi",
-      tags: [
-        "Social",
-        "Quest",
-        "Protocol"
-      ],
-      builder: {
-        name: "Galxe Team",
-        handle: "@Galxe",
-        twitter: "https://twitter.com/Galxe",
-        github: "https://github.com/galxe"
-      },
-      status: "active",
-      verified: true,
-      trending: false,
-      recentlyAdded: false,
-      monthlyUsers: "35,000+",
-      popularWith: [
-        "Community builders",
-        "Quest participants"
-      ],
-      narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "Quest-based community engagement platforms growing"
     },
     {
       id: "cookie",
@@ -3083,6 +3129,24 @@ category: "communityTools",
   ]
 ,
   analytics: [
+    {
+      "id": "coinstudy",
+      "name": "Coin Study",
+      "url": "https://coinstudy.xyz",
+      "description": "Comprehensive crypto research, token study, and market analytics suite.",
+      "category": "analytics",
+      "tags": [
+        "Analytics",
+        "Research"
+      ],
+      "builder": {
+        "name": "Coin Study",
+        "handle": "@coinstudy"
+      },
+      "status": "active",
+      "verified": true,
+      "trending": true
+    },
     {
       "id": "defillama",
       "name": "DefiLlama",
