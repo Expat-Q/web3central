@@ -13,6 +13,31 @@ module.exports = {
   },
   interoperability: [
     {
+      id: "jumper",
+      name: "Jumper",
+      url: "https://jumper.xyz",
+      description: "Get your money moving.",
+      category: "bridges",
+      tags: [
+        "Bridge",
+        "Interoperability",
+        "Cross-Chain"
+      ],
+      builder: {
+        name: "Jumper Exchange",
+        handle: "@jumperapp",
+        twitter: "https://x.com/jumperapp"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true,
+      popularWith: [
+        "Multi-chain traders",
+        "Bridge users"
+      ]
+    },
+    {
       id: "layerzero",
       name: "LayerZero",
       url: "https://layerzero.network",

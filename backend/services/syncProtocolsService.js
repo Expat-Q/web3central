@@ -73,6 +73,27 @@ async function syncStaticProtocolsToDb() {
       );
     }
 
+    // 4. Ensure Jumper is in bridges
+    await Tool.updateOne(
+      { id: 'jumper' },
+      {
+        $set: {
+          id: 'jumper',
+          name: 'Jumper',
+          url: 'https://jumper.xyz',
+          description: 'Get your money moving.',
+          category: 'bridges',
+          tags: ['Bridge', 'Interoperability', 'Cross-Chain'],
+          builder: { name: 'Jumper Exchange', handle: '@jumperapp', twitter: 'https://x.com/jumperapp' },
+          status: 'active',
+          verified: true,
+          trending: true,
+          recentlyAdded: true
+        }
+      },
+      { upsert: true }
+    );
+
     // 4. Sync all other categories from appsData.js
     for (const [catKey, tools] of Object.entries(appsData)) {
       if (!Array.isArray(tools)) continue;
