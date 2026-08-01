@@ -2315,43 +2315,43 @@ module.exports = {
         github: "https://github.com/kaito"
       },
       status: "active",
-      verified: true,
-      trending: true,
-      trendingReason: "Trending this week",
-      recentlyAdded: false,
-      monthlyUsers: "20,000+",
-      popularWith: [
-        "Trend watchers",
-        "Narrative trackers"
-      ],
-      narrative: "Attention & InfoFi Layer",
-      narrativeDescription: "Data dashboards for tracking crypto trends and narratives"
+narrativeDescription: "Whale tracking tools for market analysis"
     },
     {
-      id: "blixeditor",
-      name: "Blix Editor",
-      url: "https://blix.so",
-      description: "AI-powered content and publishing tool for Web3 creators.",
+      id: "revokedelegation",
+      name: "Revoke Delegation Tool by @zun2025",
+      url: "https://x.com/Zun2025/status/1958437433508274411",
+      description: "Revoke smart contract approvals to secure your wallet.",
       category: "communityTools",
       tags: [
-        "Content",
-        "AI",
-        "Publishing"
+        "Community Built",
+        "Security",
+        "Wallet"
       ],
       builder: {
-        name: "Blix Team",
-        handle: "@blix_so",
-        twitter: "https://twitter.com/blix_so",
-        github: "https://github.com/blix"
+        name: "Zun2025",
+        handle: "@zun2025",
+        twitter: "https://twitter.com/zun2025",
+        github: "https://github.com/zun2025"
       },
       status: "active",
       verified: true,
       trending: false,
       recentlyAdded: false,
-      monthlyUsers: "11,000+",
+      monthlyUsers: "10,000+",
       popularWith: [
-        "Content creators",
-category: "communityTools",
+        "Wallet security",
+        "Approval managers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Approval revocation tools for wallet security"
+    },
+    {
+      id: "tenderly",
+      name: "Tenderly",
+      url: "https://tenderly.co",
+      description: "If you are experimenting with any calldata and not sure about the outcome because the event will happen in the future, you can force Tenderly in such a way that it gives you the result as if it is happening in the future.",
+      category: "communityTools",
       tags: [
         "Developer",
         "Debugging",
@@ -2523,6 +2523,35 @@ category: "communityTools",
       narrativeDescription: "Data dashboards for tracking crypto trends and narratives"
     },
     {
+      id: "revoke-app",
+      name: "Revoke Tool",
+      url: "https://revoke.cash",
+      description: "Revoke smart contract approvals to secure your wallet.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Security",
+        "Wallet"
+      ],
+      builder: {
+        name: "Rosco Kalis",
+        handle: "@RoscoKalis",
+        twitter: "https://twitter.com/RoscoKalis",
+        github: "https://github.com/rkalis"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "100,000+",
+      popularWith: [
+        "Wallet security",
+        "Approval managers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Approval revocation tools for wallet security"
+    },
+    {
       id: "blixeditor",
       name: "Blix Editor",
       url: "https://blix.so",
@@ -2550,6 +2579,182 @@ category: "communityTools",
       ],
       narrative: "Attention & InfoFi Layer",
       narrativeDescription: "AI-powered content tools for Web3 creators"
+    },
+    {
+      id: "tenderly",
+      name: "Tenderly",
+      url: "https://tenderly.co",
+      description: "Web3 developer platform for smart contract monitoring, testing, and debugging.",
+      category: "communityTools",
+      tags: [
+        "Developer",
+        "Debugging",
+        "Simulation"
+      ],
+      builder: {
+        name: "Tenderly Team",
+        handle: "@TenderlyApp",
+        twitter: "https://twitter.com/TenderlyApp",
+        github: "https://github.com/tenderly"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Most bookmarked this week",
+      recentlyAdded: false,
+      monthlyUsers: "50,000+",
+      popularWith: [
+        "Smart contract devs",
+        "Debuggers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Developer tooling for smart contract simulation"
+    },
+    {
+      id: "assetrecovery",
+      name: "Undrained Asset Recovery from a compromised wallet",
+      url: "https://github.com/zunxbt/asset-recovery-tool",
+      description: "Helps users recover assets from compromised wallets.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Security",
+        "Recovery"
+      ],
+      builder: {
+        name: "ZunxBT",
+        handle: "@zunxbt",
+        twitter: "https://twitter.com/zunxbt",
+        github: "https://github.com/zunxbt"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "7,000+",
+      popularWith: [
+        "Compromised wallet users",
+        "Asset recovery"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Asset recovery tools for compromised wallets"
+    },
+    {
+      id: "web3toolkits",
+      name: "Web3 Toolkits by 0xMoei",
+      url: "https://0xmoei.xyz/toolkit",
+      description: "Utility suite for builders and explorers in Web3.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Utilities",
+        "Builder"
+      ],
+      builder: {
+        name: "0xMoei",
+        handle: "@0xMoei",
+        twitter: "https://twitter.com/0xMoei",
+        github: "https://github.com/0xMoei"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: true,
+      monthlyUsers: "9,000+",
+      popularWith: [
+        "Web3 builders",
+        "Toolkit users"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Utility toolkits for Web3 builders and explorers"
+    },
+    {
+      id: "gomtu",
+      name: "Gomtu",
+      url: "https://gomtu.xyz",
+      description: "Decentralized social engagement and community coordination tool.",
+      category: "communityTools",
+      tags: [
+        "Community Built",
+        "Social",
+        "Coordination"
+      ],
+      builder: {
+        name: "Gomtu Team",
+        handle: "@gomtu",
+        twitter: "https://twitter.com/gomtu",
+        github: "https://github.com/gomtu"
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "6,000+",
+      popularWith: [
+        "Community coordinators",
+        "Social engagers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Decentralized social engagement platforms"
+    },
+    {
+      id: "lunarstrategy",
+      name: "Lunar Strategy",
+      url: "https://lunarstrategy.com",
+      description: "Marketing and growth agency for Web3 and blockchain startups.",
+      category: "communityTools",
+      tags: [
+        "Marketing",
+        "Growth",
+        "Agency"
+      ],
+      builder: {
+        name: "Lunar Strategy Team",
+        handle: "@lunarstrategy",
+        twitter: "https://twitter.com/lunarstrategy",
+        github: ""
+      },
+      status: "active",
+      verified: true,
+      trending: false,
+      recentlyAdded: false,
+      monthlyUsers: "15,000+",
+      popularWith: [
+        "Web3 startups",
+        "Growth hackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Marketing and growth agencies for Web3 startups"
+    },
+    {
+      id: "kaitoradar",
+      name: "Kaito Radar",
+      url: "https://chromewebstore.google.com/detail/kaito-radar/ipghckihdimmbgfcpgnjekfljdoahlba?hl=en-US&utm_source=ext_sidebar",
+      description: "Data dashboard tracking trends and narratives in crypto.",
+      category: "communityTools",
+      tags: [
+        "Analytics",
+        "Dashboard",
+        "Trends"
+      ],
+      builder: {
+        name: "Kaito Team",
+        handle: "@kaito_ai",
+        twitter: "https://twitter.com/kaito_ai",
+        github: "https://github.com/kaito"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      trendingReason: "Trending this week",
+      recentlyAdded: false,
+      monthlyUsers: "20,000+",
+      popularWith: [
+        "Trend watchers",
+        "Narrative trackers"
+      ],
+      narrative: "Attention & InfoFi Layer",
+      narrativeDescription: "Data dashboards for tracking crypto trends and narratives"
     }
   ],
   predictions: [
