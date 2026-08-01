@@ -150,6 +150,14 @@ export default function Admin() {
     } catch (err) { alert(err.message); }
   };
 
+  const handleDeleteProtocol = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to permanently delete protocol "${name}"?`)) return;
+    try {
+      await deleteTool(id);
+      loadData();
+    } catch (err) { alert(err.message || 'Failed to delete protocol'); }
+  };
+
   const handleUpdateNews = async (e) => {
     e.preventDefault();
     try {
@@ -417,83 +425,85 @@ export default function Admin() {
                 {/* Categories Breakdown */}
                 {inventoryData?.categories ? (
                   <div className="space-y-4">
-                    {Object.entries(inventoryData.categories).map(([catKey, items]) => {
-                      const filteredItems = items.filter(item => 
-                        !inventorySearch || item.name.toLowerCase().includes(inventorySearch.toLowerCase())
-                      );
+                    {Object.entries(inventoryData.categories)
+                      .filter(([catKey]) => !['onchainautonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding'].includes(catKey.toLowerCase()))
+                      .map(([catKey, items]) => {
+                        const filteredItems = items.filter(item => 
+                          !inventorySearch || item.name.toLowerCase().includes(inventorySearch.toLowerCase())
+                        );
 
-                      if (inventorySearch && filteredItems.length === 0) return null;
-                      const isExpanded = expandedCat === catKey || !!inventorySearch;
+                        if (inventorySearch && filteredItems.length === 0) return null;
+                        const isExpanded = expandedCat === catKey || !!inventorySearch;
 
-                      return (
-                        <div key={catKey} className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden transition-all">
-                          <div 
-                            onClick={() => setExpandedCat(isExpanded && !inventorySearch ? null : catKey)}
-                            className="p-5 flex items-center justify-between cursor-pointer bg-slate-50/60 hover:bg-slate-100/60 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-3 py-1 rounded-lg">
-                                {catKey}
-                              </span>
-                              <span className="text-xs font-bold text-slate-700">
-                                {items.length} Protocol{items.length !== 1 ? 's' : ''}
-                              </span>
+                        return (
+                          <div key={catKey} className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden transition-all">
+                            <div 
+                              onClick={() => setExpandedCat(isExpanded && !inventorySearch ? null : catKey)}
+                              className="p-5 flex items-center justify-between cursor-pointer bg-slate-50/60 hover:bg-slate-100/60 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-3 py-1 rounded-lg">
+                                  {catKey}
+                                </span>
+                                <span className="text-xs font-bold text-slate-700">
+                                  {items.length} Protocol{items.length !== 1 ? 's' : ''}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
+                                  {items.filter(i => i.verified).length} Verified
+                                </span>
+                                {isExpanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
+                              </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
-                                {items.filter(i => i.verified).length} Verified
-                              </span>
-                              {isExpanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
-                            </div>
+                            {isExpanded && (
+                              <div className="divide-y divide-slate-100 p-3 sm:p-4">
+                                {filteredItems.map((item) => (
+                                  <div key={item._id || item.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 rounded-2xl transition-colors">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div className="w-10 h-10 rounded-xl border border-slate-200 bg-white p-1 overflow-hidden shrink-0 shadow-sm">
+                                        <img src={item.logoUrl} alt={item.name} className="w-full h-full object-contain" onError={(e) => { e.target.src = '/logo.jpg'; }} />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <h4 className="font-bold text-sm text-slate-900 truncate">{item.name}</h4>
+                                          {item.verified && (
+                                            <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-100 flex items-center gap-1">
+                                              <ShieldCheck size={10} /> Verified
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium mt-0.5 flex-wrap">
+                                          <span>Rating: <strong className="text-slate-800">★ {item.rating ? item.rating.toFixed(1) : '—'}</strong></span>
+                                          {item.chains?.length > 0 && <span>Chains: <strong className="text-purple-600">{item.chains.slice(0, 3).join(', ')}</strong></span>}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                        item.status === 'active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
+                                      }`}>
+                                        {item.status}
+                                      </span>
+
+                                      <a href={item.url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
+                                        <ExternalLink size={14} />
+                                      </a>
+
+                                      <button onClick={() => handleDeleteProtocol(item._id || item.id, item.name)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" title="Delete protocol">
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
-
-                          {isExpanded && (
-                            <div className="divide-y divide-slate-100 p-3 sm:p-4">
-                              {filteredItems.map((item) => (
-                                <div key={item._id || item.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 rounded-2xl transition-colors">
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-xl border border-slate-200 bg-white p-1 overflow-hidden shrink-0 shadow-sm">
-                                      <img src={item.logoUrl} alt={item.name} className="w-full h-full object-contain" onError={(e) => { e.target.src = '/logo.jpg'; }} />
-                                    </div>
-                                    <div className="min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <h4 className="font-bold text-sm text-slate-900 truncate">{item.name}</h4>
-                                        {item.verified && (
-                                          <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-100 flex items-center gap-1">
-                                            <ShieldCheck size={10} /> Verified
-                                          </span>
-                                        )}
-                                      </div>
-                                      <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium mt-0.5 flex-wrap">
-                                        <span>Rating: <strong className="text-slate-800">★ {item.rating ? item.rating.toFixed(1) : '—'}</strong></span>
-                                        {item.chains?.length > 0 && <span>Chains: <strong className="text-purple-600">{item.chains.slice(0, 3).join(', ')}</strong></span>}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2 shrink-0">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                      item.status === 'active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
-                                    }`}>
-                                      {item.status}
-                                    </span>
-
-                                    <a href={item.url} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
-                                      <ExternalLink size={14} />
-                                    </a>
-
-                                    <button onClick={() => handleDeleteNews(item._id, item.name)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" title="Delete protocol">
-                                      <Trash2 size={14} />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 ) : (
                   <EmptyState text="Loading protocol inventory..." />

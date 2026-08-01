@@ -88,8 +88,9 @@ export const updateTool = async (category, id, toolData) => {
   return apiClient.put(`/tools/${category}/${id}`, toolData, { auth: true });
 };
 
-export const deleteTool = async (category, toolId) => {
-  return apiClient.delete(`/tools/${category}/${toolId}`, { auth: true });
+export const deleteTool = async (arg1, arg2) => {
+  const toolId = arg2 || arg1;
+  return apiClient.delete(`/tools/${toolId}`, { auth: true });
 };
 
 export const reviewTool = async (category, toolId, actionData) => {
