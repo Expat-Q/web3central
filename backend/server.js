@@ -173,14 +173,17 @@ if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../build');
   if (fs.existsSync(buildPath)) {
     app.use(express.static(buildPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(buildPath, 'index.html'));
+    app.use((req, res, next) => {
+      if (!req.path.startsWith('/api')) {
+        return res.sendFile(path.join(buildPath, 'index.html'));
+      }
+      next();
     });
   }
 }
 
-// 404 handler for unknown API routes
-app.use('/api/*', notFoundHandler);
+// 404 handler for unknown API routes (app.use('/api') matches any unhandled /api/* request in Express)
+app.use('/api', notFoundHandler);
 
 // --------------- Global Error Handler ---------------
 app.use((err, req, res, next) => {
