@@ -21,6 +21,7 @@ const PARENT_MAP = {
     'allbridge': { parent: 'parent#allbridge', slugs: ['allbridge-core', 'allbridge-classic'] },
     'meson': { parent: null, slugs: ['meson'] },
     'polyhedra': { parent: null, slugs: ['polyhedra-network'] },
+    'jumper': { parent: null, slugs: ['jumper-exchange'] },
 
     // --- DEX (Spot) ---
     'uniswap': { parent: 'parent#uniswap', slugs: null },

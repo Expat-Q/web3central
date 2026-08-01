@@ -18,6 +18,7 @@ module.exports = {
       url: "https://jumper.xyz",
       description: "Get your money moving.",
       category: "bridges",
+      llamaSlug: "jumper-exchange",
       tags: [
         "Bridge",
         "Interoperability",
