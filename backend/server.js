@@ -208,16 +208,19 @@ const { startCronJobs } = require('./services/cronService');
 startCronJobs();
 
 // Initial Sync on Boot
+const { syncStaticProtocolsToDb } = require('./services/syncProtocolsService');
 setTimeout(async () => {
   try {
+    logger.info('Starting initial DB protocols sync');
+    await syncStaticProtocolsToDb();
     logger.info('Starting initial DeFiLlama sync');
     await fetchLlamaData();
-    logger.info('Initial DeFiLlama sync completed');
+    logger.info('Initial sync completed');
   } catch (err) {
-    logger.error('Initial DeFiLlama sync failed', { error: err });
+    logger.error('Initial sync failed', { error: err });
     incrementError('transaction');
   }
-}, 5000);
+}, 3000);
 
 // Start server only if running directly
 if (require.main === module) {

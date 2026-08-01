@@ -251,7 +251,10 @@ export default function Apps() {
         <div className="space-y-12">
           {SECTIONS
             .filter(section => {
-              if (activeFilter === "All") return !section.comingSoon;
+              const tools = getToolsForSection(section);
+              if (activeFilter === "All") {
+                return !section.comingSoon && tools.length > 0;
+              }
               return section.key === activeFilter;
             })
             .map(section => {
