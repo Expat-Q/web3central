@@ -15,11 +15,12 @@ async function syncStaticProtocolsToDb() {
       { upsert: true }
     );
 
-    // 2. Remove Galxe Starboard from infofi
+    // 2. Remove Galxe Starboard from infofi & delete deprecated categories
     await Tool.updateOne(
       { id: 'galxe', category: 'infofi' },
       { $set: { category: 'community' } }
     );
+    await Tool.deleteMany({ category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding'] } });
 
     // 3. Ensure Rally, Airaa HQ, and Stitch3 are in infofi
     const infofiTools = [

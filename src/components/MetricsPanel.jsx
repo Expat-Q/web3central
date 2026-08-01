@@ -45,7 +45,7 @@ const CATEGORY_ALIASES = {
   communitytools: 'community', community: 'community',
   security: 'security', analytics: 'analytics', infofi: 'analytics', researchfiles: 'analytics',
   wallets: 'wallets', wallet: 'wallets', nft: 'nft', defi: 'defi',
-  staking: 'staking', rwa: 'rwa', l2: 'l2', onchainautonomy: 'onchain',
+  staking: 'staking', rwa: 'rwa', l2: 'l2',
 };
 
 const CATEGORY_METRIC_POLICY = {

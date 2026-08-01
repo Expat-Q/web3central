@@ -121,9 +121,9 @@ const heroImages = {
   perps: '/images/heroes/hero-perps.png',
   web3Chat: '/images/heroes/hero-perps.png',
   interoperability: '/images/heroes/hero-interoperability.png',
-  infofi: '/images/heroes/hero-onchain-autonomy.png',
+  infofi: '/images/heroes/hero-community-tools.png',
   communityTools: '/images/heroes/hero-community-tools.png',
-  bountyHub: '/images/heroes/hero-onchain-autonomy.png',
+  bountyHub: '/images/heroes/hero-community-tools.png',
 };
 
 export default function CategoryPage({ categoryKey: propCategoryKey, title: propTitle, description: propDescription }) {

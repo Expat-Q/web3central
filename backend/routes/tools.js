@@ -562,8 +562,6 @@ const CATEGORY_ALIASES = {
   interoperability:['interoperability'],
   communityTools:  ['communityTools'],
   bountyHub:       ['bountyHub'],
-  onchainAutonomy: ['onchainAutonomy', 'onchain-autonomy'],
-  'onchain-autonomy': ['onchainAutonomy', 'onchain-autonomy'],
 };
 
 // GET tools by category

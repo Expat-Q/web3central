@@ -70,11 +70,6 @@ import News from "./pages/News";
 import NewsArticle from "./pages/NewsArticle";
 import CommunityFeed from "./pages/CommunityFeed";
 
-import Dex from "./pages/apps/Dex";
-import Interoperability from "./pages/apps/Interoperability";
-import CommunityTools from "./pages/apps/CommunityTools";
-import Web3Chat from "./pages/apps/Web3Chat";
-import BountyHub from "./pages/apps/BountyHub";
 import CategoryPage from "./pages/apps/CategoryPage";
 import Airdrops from "./pages/Airdrops";
 
@@ -189,12 +184,6 @@ const AppRoutes = ({ sidebarOpen, setSidebarOpen }) => (
     <Route path="/news" element={<News />} />
     <Route path="/news/:slug" element={<NewsArticle />} />
     <Route path="/community" element={<CommunityFeed />} />
-    {/* Legacy category routes */}
-    <Route path="/apps/dex" element={<Dex />} />
-    <Route path="/apps/interoperability" element={<Interoperability />} />
-    <Route path="/apps/community-tools" element={<CommunityTools />} />
-    <Route path="/apps/perps" element={<Web3Chat />} />
-    <Route path="/apps/bounty-hub" element={<BountyHub />} />
     <Route path="/apps/airdrops" element={<Airdrops />} />
     {/* Dynamic category routes */}
     <Route path="/apps/:categoryKey" element={<CategoryPage />} />
