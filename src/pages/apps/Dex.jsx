@@ -5,7 +5,7 @@ export default function Dex() {
   return (
     <CategoryPage
       title="Decentralized Exchanges (DEX)"
-      description="Trade tokens seamlessly on the top decentralized exchanges powered by Web3."
+      description="Spot automated market makers, concentrated liquidity pools, and peer-to-peer token swap protocols across Ethereum, Solana, Arbitrum, Base, and major EVM networks."
       categoryKey="dex"
     />
   );

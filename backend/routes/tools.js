@@ -68,6 +68,76 @@ router.put('/review/:id', protect, admin, async (req, res) => {
   }
 });
 
+// ─── Token Market Data (CoinGecko top coins for Token Analysis table) ───
+// In-memory cache to avoid hitting rate limits
+let tokenMarketCache = { data: null, ts: 0 };
+const TOKEN_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// @desc    Get top coins market data (CMC-style token analysis)
+// @route   GET /api/tools/token-market
+// @access  Public
+router.get('/token-market', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = Math.min(parseInt(req.query.per_page) || 100, 250);
+    const cacheKey = `${page}-${perPage}`;
+
+    // Return cached data if fresh
+    if (tokenMarketCache.data && tokenMarketCache.key === cacheKey && (Date.now() - tokenMarketCache.ts) < TOKEN_CACHE_TTL) {
+      return res.json({ success: true, data: tokenMarketCache.data, cached: true });
+    }
+
+    const axios = require('axios');
+    const { data } = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+      params: {
+        vs_currency: 'usd',
+        order: 'market_cap_desc',
+        per_page: perPage,
+        page: page,
+        sparkline: false,
+        price_change_percentage: '1h,24h,7d'
+      },
+      timeout: 15000
+    });
+
+    const coins = data.map((coin, idx) => ({
+      rank: (page - 1) * perPage + idx + 1,
+      id: coin.id,
+      name: coin.name,
+      symbol: coin.symbol?.toUpperCase(),
+      image: coin.image,
+      price: coin.current_price,
+      priceChange1h: coin.price_change_percentage_1h_in_currency,
+      priceChange24h: coin.price_change_percentage_24h_in_currency,
+      priceChange7d: coin.price_change_percentage_7d_in_currency,
+      marketCap: coin.market_cap,
+      volume24h: coin.total_volume,
+      circulatingSupply: coin.circulating_supply,
+      totalSupply: coin.total_supply,
+      maxSupply: coin.max_supply,
+      ath: coin.ath,
+      athChangePercentage: coin.ath_change_percentage,
+      athDate: coin.ath_date,
+      marketCapRank: coin.market_cap_rank,
+      sentimentUpPercentage: coin.sentiment_votes_up_percentage != null
+        ? Math.round(coin.sentiment_votes_up_percentage)
+        : (coin.price_change_percentage_24h_in_currency != null
+            ? Math.max(15, Math.min(95, Math.round(50 + Number(coin.price_change_percentage_24h_in_currency) * 3.5)))
+            : 70)
+    }));
+
+    tokenMarketCache = { data: coins, ts: Date.now(), key: cacheKey };
+    res.json({ success: true, data: coins });
+  } catch (err) {
+    console.error('Token market fetch error:', err.message);
+    // Return stale cache if available
+    if (tokenMarketCache.data) {
+      return res.json({ success: true, data: tokenMarketCache.data, cached: true, stale: true });
+    }
+    res.status(500).json({ success: false, error: 'Failed to fetch token market data' });
+  }
+});
+
 // @desc    Vote bull or bear sentiment on a tool
 // @route   POST /api/tools/:id/vote
 // @access  Public
@@ -88,6 +158,12 @@ router.post('/:id/vote', async (req, res) => {
 
     // Initialize sentiment if missing
     if (!tool.sentiment) tool.sentiment = { bullish: [], bearish: [] };
+    if (!Array.isArray(tool.sentiment.bullish)) tool.sentiment.bullish = [];
+    if (!Array.isArray(tool.sentiment.bearish)) tool.sentiment.bearish = [];
+
+    // Ensure clean unique voter IDs
+    tool.sentiment.bullish = Array.from(new Set(tool.sentiment.bullish));
+    tool.sentiment.bearish = Array.from(new Set(tool.sentiment.bearish));
 
     // Check if user already voted in either direction
     const alreadyBull = tool.sentiment.bullish.includes(voterId);
@@ -100,7 +176,7 @@ router.post('/:id/vote', async (req, res) => {
       } else {
         // Remove from bear if switching, then add to bull
         tool.sentiment.bearish = tool.sentiment.bearish.filter(v => v !== voterId);
-        tool.sentiment.bullish.push(voterId);
+        tool.sentiment.bullish = Array.from(new Set([...tool.sentiment.bullish, voterId]));
       }
     } else {
       if (alreadyBear) {
@@ -109,7 +185,7 @@ router.post('/:id/vote', async (req, res) => {
       } else {
         // Remove from bull if switching, then add to bear
         tool.sentiment.bullish = tool.sentiment.bullish.filter(v => v !== voterId);
-        tool.sentiment.bearish.push(voterId);
+        tool.sentiment.bearish = Array.from(new Set([...tool.sentiment.bearish, voterId]));
       }
     }
 
@@ -166,7 +242,9 @@ router.get('/search', async (req, res) => {
     const { q = '' } = req.query;
     if (!q.trim()) return res.json([]);
 
-    const regex = new RegExp(q.trim(), 'i');
+    // Escape special regex characters to prevent ReDoS
+    const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'i');
     const tools = await Tool.find({
       status: { $ne: 'rejected' },
       $or: [
@@ -408,29 +486,28 @@ router.put('/:id/claim/approve', protect, admin, async (req, res) => {
   }
 });
 
-// GET all tools
-// When returning all tools, we need to reconstruct the category-based object structure
-// expected by the frontend (e.g. { category1: [tools], category2: [tools] })
+// GET all tools with pagination
 router.get('/', async (req, res) => {
   try {
-    const tools = (await Tool.find({})).map(decorateToolWithLogo);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(parseInt(req.query.limit) || 500, 500);
+    const skip = (page - 1) * limit;
+
+    const [tools, total] = await Promise.all([
+      Tool.find({}).skip(skip).limit(limit).lean(),
+      Tool.countDocuments()
+    ]);
+    const decorated = tools.map(decorateToolWithLogo);
 
     // Group tools by category
-    const toolsByCategory = tools.reduce((acc, tool) => {
+    const toolsByCategory = decorated.reduce((acc, tool) => {
       const category = tool.category;
-      if (!acc[category]) {
-        acc[category] = [];
-      }
+      if (!acc[category]) acc[category] = [];
       acc[category].push(tool);
       return acc;
     }, {});
 
-    // We also need to include the tooltipExplanations from the original appsData.js
-    // Since this is static config, we can import it from the source file or store in DB.
-    // Ideally it should be in DB, but for now let's grab it from the file to handle legacy structure
-    // or just return the categorized tools if frontend handles missing explanations gracefully.
-    // Better: let's include it.
-    let responseData = { ...toolsByCategory };
+    let responseData = { ...toolsByCategory, _meta: { total, page, limit } };
 
     try {
       const appsData = require('../../src/data/appsData');
@@ -438,7 +515,7 @@ router.get('/', async (req, res) => {
         responseData.tooltipExplanations = appsData.tooltipExplanations;
       }
     } catch (e) {
-      console.warn("Could not load tooltipExplanations from appsData.js");
+      // Static config not available server-side
     }
 
     res.json(responseData);
@@ -644,14 +721,9 @@ router.post('/submit', protect, async (req, res) => {
   }
 });
 
-// POST a new tool (Admin creation)
-router.post('/:category', async (req, res) => {
-  // Simple admin-key gate (matches Admin page password)
-  const adminKey = req.headers['x-admin-key'];
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '213478';
-  if (adminKey !== ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+// POST a new tool (Admin creation via JWT)
+// @access  Private/Admin
+router.post('/:category', protect, admin, async (req, res) => {
   try {
     const category = req.params.category;
     const toolData = req.body;
@@ -696,7 +768,8 @@ router.post('/:category', async (req, res) => {
 });
 
 // PUT review a submitted tool
-router.put('/:category/:id/review', protect, async (req, res) => {
+// @access  Private/Admin
+router.put('/:category/:id/review', protect, admin, async (req, res) => {
   try {
     const { category, id } = req.params;
     const { action, reason } = req.body; // action: 'accept' or 'reject'
@@ -779,10 +852,11 @@ router.put('/:category/:id/review', protect, async (req, res) => {
 });
 
 // PUT (update) a tool
+// @access  Private (admin or tool owner)
 router.put('/:category/:id', protect, async (req, res) => {
   try {
     const { category, id } = req.params;
-    const updateData = req.body;
+    const rawData = req.body;
 
     const existingTool = await Tool.findOne({ id });
     if (!existingTool) {
@@ -793,9 +867,19 @@ router.put('/:category/:id', protect, async (req, res) => {
     const isAdmin = req.user.role === 'admin';
     const isDeveloper = (existingTool.developerClaimedBy && String(existingTool.developerClaimedBy) === String(req.user.id)) ||
                         (existingTool.submitter && String(existingTool.submitter) === String(req.user.id));
-                        
+
     if (!isAdmin && !isDeveloper) {
       return res.status(403).json({ error: 'You are not authorized to update this tool' });
+    }
+
+    // Whitelist allowed fields — prevent mass assignment of verified, status, submitter, etc.
+    const ADMIN_FIELDS = ['status', 'verified', 'verificationTier', 'featured', 'weeklyTrendScore', 'tags', 'metrics', 'logoUrl', 'logoSource'];
+    const DEV_FIELDS = ['name', 'description', 'url', 'airdropUrl', 'auditLink', 'isTestnet', 'builder', 'contractAddresses', 'githubRepo'];
+    const allowedFields = isAdmin ? [...DEV_FIELDS, ...ADMIN_FIELDS] : DEV_FIELDS;
+
+    const updateData = {};
+    for (const field of allowedFields) {
+      if (rawData[field] !== undefined) updateData[field] = rawData[field];
     }
 
     // Pre-fetch commits if githubRepo was changed or added
@@ -827,11 +911,8 @@ router.put('/:category/:id', protect, async (req, res) => {
       updateData.logoSource = derivedLogo.logoSource;
     }
 
-    // Prevent changing ID via update if that breaks references, generally safer to ignore ID update
-    // But here we rely on ID.
-
     const updatedTool = await Tool.findOneAndUpdate(
-      { id: id }, // Find by custom ID
+      { id },
       updateData,
       { new: true, runValidators: true }
     );
@@ -844,7 +925,8 @@ router.put('/:category/:id', protect, async (req, res) => {
 });
 
 // DELETE a tool
-router.delete('/:category/:id', protect, async (req, res) => {
+// @access  Private/Admin
+router.delete('/:category/:id', protect, admin, async (req, res) => {
   try {
     const { id } = req.params;
 

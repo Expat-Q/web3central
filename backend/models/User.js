@@ -45,6 +45,14 @@ const UserSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    country: {
+        type: String,
+        default: 'United States'
+    },
+    countryCode: {
+        type: String,
+        default: 'US'
+    },
     bio: {
         type: String,
         default: ''
@@ -88,6 +96,14 @@ const UserSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    passwordResetToken: {
+        type: String,
+        select: false
+    },
+    passwordResetExpire: {
+        type: Date,
+        select: false
     }
 });
 

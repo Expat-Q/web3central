@@ -78,6 +78,7 @@ const ToolSchema = new mongoose.Schema({
         mcap: Number,
         fdv: Number,
         tokenPrice: Number,
+        tokenSymbol: String,
         volume24h: Number,
         staking: Number,
         pool2: Number,

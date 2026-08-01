@@ -86,34 +86,34 @@ const scaleIn = {
 
 const CATEGORY_META = {
   // --- Live categories ---
-  trading:     { title: 'Trading',           desc: 'DEX and perpetual trading protocols', color: 'purple',  comingSoon: false },
-  bridges:     { title: 'Bridges',            desc: 'Cross-chain asset transfers and messaging', color: 'blue',    comingSoon: false },
-  defi:        { title: 'DeFi',               desc: 'Lending, yield, and stablecoins',   color: 'emerald', comingSoon: false },
-  rwa:         { title: 'Real World Assets',  desc: 'Tokenized real-world assets',        color: 'amber',   comingSoon: false  },
-  security:    { title: 'Security',           desc: 'Wallet protection and scam prevention', color: 'red',     comingSoon: false },
-  analytics:   { title: 'Analytics',          desc: 'Onchain data and portfolio tracking', color: 'cyan',    comingSoon: false },
-  wallets:     { title: 'Wallets',            desc: 'Wallet tools and infrastructure',    color: 'slate',   comingSoon: false },
-  cex:         { title: 'Centralized Exchanges', desc: 'Fiat on-ramps and multi-asset trading venues', color: 'yellow' },
-  gaming:      { title: 'Gaming',             desc: 'Onchain games and GameFi protocols', color: 'green',   comingSoon: false },
-  privacy:     { title: 'Privacy',            desc: 'Private transactions and ZK tools', color: 'gray',    comingSoon: false  },
-  predictions: { title: 'Prediction Markets', desc: 'Bet on real-world outcome events',   color: 'orange',  comingSoon: false  },
-  community:   { title: 'Onchain Tools',      desc: 'On-chain utilities, explorers & developer tools', color: 'teal',    comingSoon: false },
-  infra:       { title: 'Infra & Dev Tools',  desc: 'RPCs, Node providers, and SDKs',    color: 'slate',   comingSoon: true  },
-  ai:          { title: 'Artificial Intelligence', desc: 'Agentic protocols and decentralized compute', color: 'indigo', comingSoon: true  },
-  social:      { title: 'Social & DeSoc',     desc: 'Social graphs and messaging',        color: 'blue',    comingSoon: true  },
-  dao:         { title: 'DAO',                desc: 'Voting and organizational management', color: 'purple',  comingSoon: false },
-  depin:       { title: 'DePIN',              desc: 'Decentralized Physical Infrastructure', color: 'orange',  comingSoon: true  },
-  staking:     { title: 'Staking & Yield',    desc: 'LSTs and yield-bearing protocols',   color: 'yellow',  comingSoon: true  },
-  payments:    { title: 'Payments',           desc: 'Remittance and invoicing tools',      color: 'emerald', comingSoon: true  },
-  airdrops:    { title: 'Airdrops',           desc: 'Projects with active or upcoming rewards', color: 'yellow', comingSoon: false },
-  'bounty-hub': { title: 'Bounty Hub',         desc: 'Earn rewards for completing tasks',  color: 'indigo',  comingSoon: false },
+  trading:     { title: 'Trading & DEXs',          desc: 'Spot automated market makers, orderbook exchanges, and high-leverage perpetual futures protocols across major L1s and L2s.', color: 'purple',  comingSoon: false },
+  bridges:     { title: 'Bridges & Interoperability', desc: 'Cross-chain bridging protocols, arbitrary messaging layers, and liquidity routers powering multi-chain asset transfers.', color: 'blue',    comingSoon: false },
+  defi:        { title: 'Decentralized Finance (DeFi)', desc: 'Non-custodial lending markets, algorithmic money markets, yield optimizers, and decentralized stablecoin issuers.', color: 'emerald', comingSoon: false },
+  rwa:         { title: 'Real World Assets (RWA)', desc: 'Tokenized US Treasury bills, institutional credit pools, real estate syndicates, and private equity protocol infrastructure.', color: 'amber',   comingSoon: false  },
+  security:    { title: 'Security & Audits',        desc: 'Smart contract audit platforms, real-time transaction simulation engines, approval revoking utilities, and bug bounty hubs.', color: 'red',     comingSoon: false },
+  analytics:   { title: 'Analytics & Intelligence', desc: 'On-chain portfolio tracking, whale movement monitors, DEX liquidity analytics, and blockchain intelligence dashboards.', color: 'cyan',    comingSoon: false },
+  wallets:     { title: 'Wallets & Infrastructure', desc: 'Self-custodial Web3 wallets, multi-signature vaults, passkey smart accounts, and account abstraction infrastructure.', color: 'slate',   comingSoon: false },
+  cex:         { title: 'Centralized Exchanges (CEX)', desc: 'Global fiat gateways, spot trading venues, proof-of-reserves exchanges, and institutional custody platforms.', color: 'yellow', comingSoon: false },
+  gaming:      { title: 'Web3 Gaming & GameFi',     desc: 'Play-and-earn games, metaverse virtual worlds, fully on-chain gaming engines, and gaming guild ecosystems.', color: 'green',   comingSoon: false },
+  privacy:     { title: 'Privacy & Zero-Knowledge', desc: 'Zero-knowledge proof systems, confidential smart contracts, private transaction networks, and stealth address tools.', color: 'gray',    comingSoon: false  },
+  predictions: { title: 'Prediction Markets & InfoFi', desc: 'Decentralized prediction markets, outcome betting pools, social attention indexes, and sentiment trading protocols.', color: 'orange',  comingSoon: false  },
+  community:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, block explorers, RPC endpoint providers, and open-source infrastructure tools.', color: 'teal',    comingSoon: false },
+  infra:       { title: 'Infra & Dev Tools',        desc: 'RPC infrastructure, node providers, indexers, and developer SDKs for Web3 applications.', color: 'slate',   comingSoon: true  },
+  ai:          { title: 'AI & Autonomous Agents',   desc: 'Decentralized AI inference networks, autonomous AI agent frameworks, sentiment engines, and compute markets.', color: 'indigo', comingSoon: true  },
+  social:      { title: 'Social & DeSoc',           desc: 'Decentralized social graphs, token-gated community hubs, Web3 messaging protocols, and identity systems.', color: 'blue',    comingSoon: true  },
+  dao:         { title: 'DAO & Governance',         desc: 'Decentralized governance frameworks, multi-sig proposal voting portals, and treasury management platforms.', color: 'purple',  comingSoon: false },
+  depin:       { title: 'DePIN',                    desc: 'Decentralized Physical Infrastructure Networks including storage, wireless, and compute resources.', color: 'orange',  comingSoon: true  },
+  staking:     { title: 'Staking & Liquid Staking', desc: 'Liquid staking tokens (LSTs), liquid restaking protocols (LRTs), validator pools, and yield strategies.', color: 'yellow',  comingSoon: true  },
+  payments:    { title: 'Payments & Settlement',    desc: 'Crypto payroll, cross-border remittance, merchant payment gateways, and invoicing platforms.', color: 'emerald', comingSoon: true  },
+  airdrops:    { title: 'Airdrops & Reward Hubs',   desc: 'Verified reward campaigns, testnet incentive programs, and active ecosystem points initiatives.', color: 'yellow', comingSoon: false },
+  'bounty-hub': { title: 'Bounty Hub & Freelance',   desc: 'Developer bounties, security audit contests, design challenges, and freelance Web3 task marketplaces.', color: 'indigo',  comingSoon: false },
   // --- Legacy support ---
-  dex:              { title: 'DEX',                    desc: 'Decentralized exchanges',           color: 'purple',  comingSoon: false },
-  perps:            { title: 'Perpetuals',             desc: 'Derivatives and perpetual trading', color: 'purple',  comingSoon: false },
-  interoperability: { title: 'Interoperability',       desc: 'Cross-chain protocols',             color: 'blue',    comingSoon: false },
-  infofi:           { title: 'InfoFi',                 desc: 'Research, analytics, and intelligence', color: 'purple',  comingSoon: false },
-  bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 contributions', color: 'amber',   comingSoon: false },
-  communityTools:   { title: 'Community Tools',        desc: 'DAO and coordination tools',         color: 'teal',    comingSoon: false },
+  dex:              { title: 'DEX',                    desc: 'Decentralized exchanges and automated market maker pools.', color: 'purple',  comingSoon: false },
+  perps:            { title: 'Perpetuals',             desc: 'Derivatives platforms and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
+  interoperability: { title: 'Interoperability',       desc: 'Cross-chain communication protocols and multi-chain bridges.', color: 'blue',    comingSoon: false },
+  infofi:           { title: 'InfoFi',                 desc: 'On-chain research, sentiment analytics, and information markets.', color: 'purple',  comingSoon: false },
+  bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 development and security contributions.', color: 'amber',   comingSoon: false },
+  communityTools:   { title: 'Community Tools',        desc: 'DAO coordination, token-gating, and community utility tools.', color: 'teal',    comingSoon: false },
 };
 
 const heroImages = {
@@ -346,12 +346,12 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
             slug: app.llamaSlug || app.slug || app.id,
             rating: app.averageRating || app.rating,
           })}
-          className="bg-white border border-gray-100 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-200 hover:shadow-md transition-all h-full cursor-pointer"
+          className="bg-white border-2 border-gray-200 rounded-[1.25rem] p-4 flex flex-col hover:border-purple-300 hover:shadow-lg transition-all h-full cursor-pointer"
         >
           {/* Top row: Logo and Bookmark */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex gap-2.5">
-              <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border border-gray-100 p-1 relative flex-shrink-0">
+              <div className="w-[50px] h-[50px] bg-white rounded-[14px] shadow-sm border-2 border-gray-200 p-1 relative flex-shrink-0">
                 <ToolLogo tool={app} />
 
               </div>
@@ -625,23 +625,38 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
   return (
     <div className="bg-white min-h-screen text-gray-900">
 
-      {/* ── Section 1: Header ── */}
-      <div className="pt-4 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link to="/apps" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+      {/* ── Section 1: Category Header (Left-aligned description right under heading) ── */}
+      <div className="pt-6 pb-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-gray-100 mb-6">
+          <div className="flex items-start gap-3.5 max-w-4xl">
+            <Link to="/apps" className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors mt-0.5 shrink-0">
               <ChevronLeft size={18} />
             </Link>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 leading-none">{title}</h1>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {isFiltered ? filteredData.length : data.length} protocol{(isFiltered ? filteredData.length : data.length) !== 1 ? 's' : ''}
-                {selectedChain !== 'All' && <span className="ml-1 text-purple-500 font-bold">on {selectedChain}</span>}
+            <div className="space-y-2 text-left">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 leading-none">{title}</h1>
+              <p className="text-sm sm:text-base text-gray-600 font-medium leading-relaxed">
+                {description}
               </p>
+              
+              {/* Left-aligned Stat Pills */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <div className="inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-100">
+                  <span className="w-2 h-2 rounded-full bg-purple-500" />
+                  <span><strong className="text-purple-900 font-black">{data.length}</strong> Active Protocols</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">
+                  <ShieldCheck size={13} className="text-emerald-500" />
+                  <span><strong className="text-emerald-900 font-black">{data.filter(t => t.verified).length}</strong> Verified</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                  <Share2 size={12} className="text-blue-500" />
+                  <span><strong className="text-blue-900 font-black">{new Set(data.flatMap(t => t.metrics?.chains || [])).size || 1}</strong> Supported Chains</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <ChainFilter />
             {/* Bench bar — inline on desktop */}
             {bench.length > 0 && (

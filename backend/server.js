@@ -96,19 +96,16 @@ const allowedOrigins = process.env.FRONTEND_URL
   : [
     'http://localhost:3000',
     'https://web3central.vercel.app',
-    'https://web3central-4ye286qqp-expatqs-projects.vercel.app',
     'https://web3central.pro',
     'https://www.web3central.pro'
   ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (server-to-server, curl, mobile apps)
+    // Allow requests with no origin (server-to-server, mobile apps)
     if (!origin) return callback(null, true);
 
-    // Check if origin matches allowed list or is a vercel.app subdomain
-    const isAllowed = allowedOrigins.indexOf(origin) !== -1 ||
-      origin.endsWith('.vercel.app') ||
+    const isAllowed = allowedOrigins.map(o => o.trim()).includes(origin) ||
       origin.endsWith('.web3central.pro');
 
     if (isAllowed) {
@@ -131,25 +128,15 @@ app.use(requestLogger);
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Backend is live',
+    status: 'ok',
     version: '1.0.4',
     timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV,
-    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    correlationId: req.correlationId,
-    chatProviderChain: 'openai>grok>offline-fallback',
-    release: process.env.RENDER_GIT_COMMIT || process.env.VERCEL_GIT_COMMIT_SHA || 'local',
-    chatConfig: {
-      openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
-      grokConfigured: Boolean(process.env.GROK_API_KEY),
-      openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      openaiModels: process.env.OPENAI_MODELS || null,
-      chatDebug: process.env.CHAT_DEBUG === 'true'
-    }
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
-app.get('/api/metrics', (req, res) => {
+const { protect: protectAuth, admin: adminAuth } = require('./middleware/auth');
+app.get('/api/metrics', protectAuth, adminAuth, (req, res) => {
   const metrics = getMetricsSummary();
   res.json({
     success: true,
@@ -186,14 +173,14 @@ if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../build');
   if (fs.existsSync(buildPath)) {
     app.use(express.static(buildPath));
-    app.get('{*path}', (req, res) => {
+    app.get('*', (req, res) => {
       res.sendFile(path.join(buildPath, 'index.html'));
     });
   }
 }
 
 // 404 handler for unknown API routes
-app.use('/api/{*path}', notFoundHandler);
+app.use('/api/*', notFoundHandler);
 
 // --------------- Global Error Handler ---------------
 app.use((err, req, res, next) => {

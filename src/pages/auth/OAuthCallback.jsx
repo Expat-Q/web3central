@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
 
 export default function OAuthCallback() {
@@ -9,39 +8,40 @@ export default function OAuthCallback() {
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
-        const token = urlParams.get('token');
+        const code = urlParams.get('code');
 
-        if (token) {
-            // Save the token to use for the /me verification
-            localStorage.setItem('token', token);
-
-            // Fetch user profile using the token
-            const API_BASE_URL = window.location.hostname === 'localhost'
-                ? 'http://localhost:5000/api'
-                : '/api';
-
-            fetch(`${API_BASE_URL}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                        // Reload the page to reset AuthContext state and load the user natively
-                        window.location.href = '/';
-                    } else {
-                        console.error('Failed to fetch user after OAuth');
-                        navigate('/login?error=OAuth_User_Fetch_Failed');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    navigate('/login?error=OAuth_Server_Error');
-                });
-        } else {
-            console.error('No token found in OAuth callback URL');
+        if (!code) {
             navigate('/login?error=OAuth_Token_Missing');
+            return;
         }
+
+        // Clean the code from the URL immediately so it's not in browser history
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:5000/api'
+            : '/api';
+
+        // Exchange the one-time code for a JWT — code never stays in URL or history
+        fetch(`${API_BASE_URL}/auth/oauth/exchange`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Hard navigate to reset AuthContext state
+                    window.location.href = '/';
+                } else {
+                    navigate('/login?error=OAuth_Exchange_Failed');
+                }
+            })
+            .catch(() => {
+                navigate('/login?error=OAuth_Server_Error');
+            });
     }, [location, navigate]);
 
     return (

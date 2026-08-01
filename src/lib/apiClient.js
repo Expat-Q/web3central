@@ -16,9 +16,9 @@ class ApiClient {
   }
 
   getAdminHeaders() {
-    const isUnlocked = sessionStorage.getItem('admin_unlocked') === 'true';
-    // Match the ADMIN_KEY used in the gate: 213478
-    return isUnlocked ? { 'x-admin-key': '213478' } : {};
+    // Admin authorization is handled via the JWT Bearer token (role: admin)
+    // Do not send static shared keys from the frontend bundle
+    return {};
   }
 
   createAbortController(requestKey) {

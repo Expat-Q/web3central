@@ -36,10 +36,8 @@ exports.protect = async (req, res, next) => {
 
 exports.admin = (req, res, next) => {
     const log = req.log || require('../lib/logger').logger;
-    const adminKey = req.headers['x-admin-key'];
-    const expectedKey = process.env.ADMIN_KEY || '213478';
 
-    if ((req.user && req.user.role === 'admin') || adminKey === expectedKey) {
+    if (req.user && req.user.role === 'admin') {
         next();
     } else {
         incrementError('auth');

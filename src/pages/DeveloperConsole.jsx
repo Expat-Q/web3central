@@ -18,7 +18,9 @@ import ReviewManagement from "./developer/ReviewManagement";
 import PublishApp from "./developer/PublishApp";
 import DevSettings from "./developer/DevSettings";
 
-const API = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
+const API = process.env.NODE_ENV === "production"
+  ? "/api"
+  : (process.env.REACT_APP_API_URL || "http://localhost:5000/api");
 
 const TIER_BADGE = {
   basic:    { label: "Basic",    color: "bg-gray-100 text-gray-600 border-gray-200" },

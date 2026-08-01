@@ -100,11 +100,12 @@ export const createTool = async (category, toolData) => {
   const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? '/api'
     : (process.env.REACT_APP_API_URL || 'http://localhost:5000/api');
+  const token = localStorage.getItem('token');
   const response = await fetch(`${API_BASE_URL}/tools/${category}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-admin-key': sessionStorage.getItem('admin_unlocked') === 'true' ? '213478' : ''
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     },
     body: JSON.stringify(toolData)
   });
@@ -287,4 +288,16 @@ export const createCourse = async (courseData) => {
 
 export const fetchAirdrops = async () => {
   return apiClient.get('/airdrops');
+};
+
+export const fetchAdminUserList = async () => {
+  return apiClient.get('/stats/users', { auth: true });
+};
+
+export const fetchVisitorTrafficRates = async () => {
+  return apiClient.get('/stats/traffic', { auth: true });
+};
+
+export const fetchProtocolInventory = async () => {
+  return apiClient.get('/stats/inventory', { auth: true });
 };

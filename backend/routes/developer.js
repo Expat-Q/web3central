@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const DeveloperProfile = require('../models/DeveloperProfile');
 const Tool = require('../models/Tool');
 const Rating = require('../models/Rating');
-const { protect } = require('../middleware/auth');
+const { protect, admin } = require('../middleware/auth');
 
 /* ────────────────────────────────────────────────────────
    HELPERS
@@ -400,10 +400,8 @@ router.put('/apps/:id', protect, async (req, res) => {
    Admin: GET /api/developer/pending-claims
    List all pending claims for admin review
 ──────────────────────────────────────────────────────── */
-router.get('/pending-claims', protect, async (req, res) => {
+router.get('/pending-claims', protect, admin, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-
         const profiles = await DeveloperProfile.find({
             'pendingClaims.status': 'pending'
         }).populate('user', 'name email').lean();
@@ -423,10 +421,8 @@ router.get('/pending-claims', protect, async (req, res) => {
 /* ────────────────────────────────────────────────────────
    Admin: POST /api/developer/pending-claims/:claimId/approve
 ──────────────────────────────────────────────────────── */
-router.post('/pending-claims/:claimId/approve', protect, async (req, res) => {
+router.post('/pending-claims/:claimId/approve', protect, admin, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-
         const { profileId } = req.body;
         const profile = await DeveloperProfile.findById(profileId);
         if (!profile) return res.status(404).json({ error: 'Profile not found' });
@@ -461,10 +457,8 @@ router.post('/pending-claims/:claimId/approve', protect, async (req, res) => {
 });
 
 // Admin: POST /api/developer/pending-claims/:claimId/reject
-router.post('/pending-claims/:claimId/reject', protect, async (req, res) => {
+router.post('/pending-claims/:claimId/reject', protect, admin, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-
         const { profileId } = req.body;
         const profile = await DeveloperProfile.findById(profileId);
         if (!profile) return res.status(404).json({ error: 'Profile not found' });

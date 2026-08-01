@@ -9,14 +9,14 @@ const Tool = require('../models/Tool');
  */
 const PARENT_MAP = {
     // --- Interoperability / Bridges ---
-    'layerzero': { parent: null, slugs: ['layerzero'] },
+    'layerzero': { parent: 'parent#layerzero', slugs: null },
     'axelar': { parent: null, slugs: ['axelar'] },
-    'stargate': { parent: 'parent#stargate', slugs: null },
+    'stargate': { parent: 'parent#stargate-finance', slugs: null },
     'debridge': { parent: null, slugs: ['debridge'] },
     'connext': { parent: null, slugs: ['connext'] },
     'hop': { parent: null, slugs: ['hop-protocol'] },
     'across': { parent: null, slugs: ['across'] },
-    'synapse': { parent: null, slugs: ['synapse'] },
+    'synapse': { parent: 'parent#synapse', slugs: ['synapse-cross-chain-bridge'] },
     'orbiter': { parent: null, slugs: ['orbiter-finance'] },
     'allbridge': { parent: 'parent#allbridge', slugs: ['allbridge-core', 'allbridge-classic'] },
     'meson': { parent: null, slugs: ['meson'] },
@@ -28,7 +28,7 @@ const PARENT_MAP = {
     'sushi': { parent: 'parent#sushiswap', slugs: ['sushiswap'] },
     'curve': { parent: 'parent#curve-finance', slugs: null },
     'balancer': { parent: 'parent#balancer', slugs: null },
-    '1inch': { parent: null, slugs: ['1inch'] },
+    '1inch': { parent: 'parent#1inch', slugs: null },
     'cowswap': { parent: null, slugs: ['cowswap'] },
     'jupiter': { parent: 'parent#jupiter', slugs: null },
     'raydium': { parent: 'parent#raydium', slugs: null },
@@ -73,7 +73,7 @@ const PARENT_MAP = {
 
     // --- Lending / Markets ---
     'aave': { parent: 'parent#aave', slugs: null },
-    'compound': { parent: 'parent#compound', slugs: null },
+    'compound': { parent: 'parent#compound-finance', slugs: null },
     'maker': { parent: 'parent#makerdao', slugs: null },
     'spark': { parent: 'parent#spark', slugs: null },
     'morpho': { parent: 'parent#morpho', slugs: ['morpho-blue', 'morpho-optimizer'] },
@@ -100,7 +100,7 @@ const PARENT_MAP = {
 
     // --- Synthetics / Assets ---
     'synthetix': { parent: 'parent#synthetix', slugs: null },
-    'ethena': { parent: null, slugs: ['ethena'] },
+    'ethena': { parent: 'parent#ethena', slugs: null },
     'frax': { parent: 'parent#frax-finance', slugs: ['frax-swap', 'frax-ether', 'fraxlend'] },
 };
 
@@ -177,14 +177,28 @@ const GECKO_MAP = {
     'puffer': 'puffer-finance',
     'swell': 'swell-network',
 
-    // --- Yield ---
-    'pendle': 'pendle',
-    'instadapp': 'instadapp',
-
     // --- Synthetics ---
     'synthetix': 'synthetix-network-token',
     'ethena': 'ethena',
     'frax': 'frax-share',
+
+    // --- Gaming ---
+    'axie-infinity': 'axie-infinity',
+    'the-sandbox': 'the-sandbox',
+    'decentraland': 'decentraland',
+    'illuvium': 'illuvium',
+    'gods-unchained': 'gods-unchained',
+    'star-atlas': 'star-atlas',
+    'sorare': 'sorare',
+    'splinterlands': 'splinterlands',
+    'parallel': 'prime-2',
+    'pixels': 'pixels',
+    'big-time': 'big-time',
+    'guild-of-guardians': 'guild-of-guardians',
+    'aurory': 'aurory',
+    'blocklords': 'blocklords',
+    'cornucopias': 'cornucopias',
+    'treasure': 'magic',
 };
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -208,11 +222,14 @@ const fetchTokenPrices = async (geckoIds) => {
                     `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${batch.join(',')}`,
                     { timeout: 15000 }
                 );
-                for (const coin of data) {
+                 for (const coin of data) {
                     prices.set(coin.id, {
                         price: coin.current_price || 0,
                         mcap: coin.market_cap || 0,
                         fdv: coin.fully_diluted_valuation || 0,
+                        symbol: coin.symbol?.toUpperCase() || '',
+                        change24h: coin.price_change_percentage_24h || 0,
+                        volume24h: coin.total_volume || 0
                     });
                 }
                 break; // success
@@ -225,6 +242,35 @@ const fetchTokenPrices = async (geckoIds) => {
                 await delay(isRateLimit ? 5000 : 2000);
             }
         }
+
+        // Fallback to DeFiLlama Coins API for any missing prices in this batch
+        const missingFromBatch = batch.filter(id => !prices.has(id));
+        if (missingFromBatch.length > 0) {
+            try {
+                console.log(`Fallback: fetching token prices from DeFiLlama Coins API for: ${missingFromBatch.join(', ')}`);
+                const formattedIds = missingFromBatch.map(id => `coingecko:${id}`);
+                const { data: llamaCoinsData } = await axios.get(
+                    `https://coins.llama.fi/prices/current/${formattedIds.join(',')}`,
+                    { timeout: 15000 }
+                );
+                if (llamaCoinsData && llamaCoinsData.coins) {
+                    for (const id of missingFromBatch) {
+                        const coinInfo = llamaCoinsData.coins[`coingecko:${id}`];
+                        if (coinInfo) {
+                            prices.set(id, {
+                                price: coinInfo.price || 0,
+                                mcap: prices.get(id)?.mcap || 0,
+                                fdv: prices.get(id)?.fdv || 0,
+                                symbol: coinInfo.symbol?.toUpperCase() || ''
+                            });
+                        }
+                    }
+                }
+            } catch (llamaErr) {
+                console.warn(`Fallback DeFiLlama coins fetch failed:`, llamaErr.message);
+            }
+        }
+
         // Always delay 2s between normal batches
         if (i + batchSize < geckoIds.length) {
             await delay(2000);
@@ -302,6 +348,9 @@ const findAndAggregate = (tool, protocols) => {
     const allChains = new Set();
     let largestTvl = 0;
 
+    // Collect all unique slugs for detail fetching
+    const allSlugs = [];
+
     for (const p of matchedProtocols) {
         tvl += (p.tvl || 0);
         staking += (p.staking || 0);
@@ -314,6 +363,7 @@ const findAndAggregate = (tool, protocols) => {
             change7d = p.change_7d || 0;
         }
         for (const c of (p.chains || [])) allChains.add(c);
+        if (p.slug) allSlugs.push(p.slug);
     }
 
     return {
@@ -325,9 +375,40 @@ const findAndAggregate = (tool, protocols) => {
         change1d,
         change7d,
         chains: [...allChains],
+        allSlugs,
         parentId: config ? config.parent : matchedProtocols[0]?.parentProtocol,
         primarySlug: matchedProtocols[0]?.slug
     };
+};
+
+/**
+ * Fetch detailed chain support from /protocol/{slug} detail endpoints.
+ * The detail endpoint returns chainTvls which is much more comprehensive
+ * than the chains array from the /protocols list.
+ * Returns a Map of slug -> Set of chain names.
+ */
+const fetchDetailChains = async (slugs) => {
+    const chainMap = new Map();
+    if (!slugs.length) return chainMap;
+
+    // Batch in groups of 15 with small delays to avoid rate limits
+    const batchSize = 15;
+    for (let i = 0; i < slugs.length; i += batchSize) {
+        const batch = slugs.slice(i, i + batchSize);
+        const promises = batch.map(async (slug) => {
+            try {
+                const { data } = await axios.get(`https://api.llama.fi/protocol/${slug}`, { timeout: 5000 });
+                const NON_CHAIN_KEYS = new Set(['staking', 'pool2', 'borrowed', 'offers', 'vesting', 'treasury', 'doublecounted', 'masterchef']);
+                const chains = Object.keys(data.chainTvls || {}).filter(k => !k.includes('-') && !NON_CHAIN_KEYS.has(k.toLowerCase()));
+                chainMap.set(slug, new Set(chains));
+            } catch (e) {
+                // Silently skip — we still have the list data
+            }
+        });
+        await Promise.all(promises);
+        if (i + batchSize < slugs.length) await delay(200);
+    }
+    return chainMap;
 };
 
 const fetchLlamaData = async () => {
@@ -369,6 +450,60 @@ const fetchLlamaData = async () => {
         const tokenData = await fetchTokenPrices([...geckoIdsToFetch]);
         console.log(`Token data fetched for ${tokenData.size} coins`);
 
+        // Fallback to CoinMarketCap API for any missing token data
+        try {
+            const { fetchCMCQuotes, CMC_SYMBOL_MAP } = require('./cmcService');
+            const cmcSymbolsToFetch = [];
+            for (const { tool, geckoId } of matchedPairs) {
+                const coinData = geckoId ? tokenData.get(geckoId) : null;
+                if (!coinData || !coinData.price) {
+                    const cmcSymbol = CMC_SYMBOL_MAP[tool.id];
+                    if (cmcSymbol) {
+                        cmcSymbolsToFetch.push(cmcSymbol);
+                    }
+                }
+            }
+
+            if (cmcSymbolsToFetch.length > 0) {
+                console.log(`CMC Fallback triggered for ${cmcSymbolsToFetch.length} symbols`);
+                const cmcQuotes = await fetchCMCQuotes(cmcSymbolsToFetch);
+                if (cmcQuotes.size > 0) {
+                    for (const { tool, geckoId } of matchedPairs) {
+                        const coinData = geckoId ? tokenData.get(geckoId) : null;
+                        if (!coinData || !coinData.price) {
+                            const cmcSymbol = CMC_SYMBOL_MAP[tool.id];
+                            const quote = cmcSymbol ? cmcQuotes.get(cmcSymbol) : null;
+                            if (quote) {
+                                console.log(`CMC Fallback success for ${tool.id} (${cmcSymbol}): price = ${quote.price}`);
+                                tokenData.set(geckoId || tool.id, {
+                                    price: quote.price,
+                                    mcap: quote.mcap,
+                                    fdv: quote.fdv,
+                                    symbol: cmcSymbol
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (cmcErr) {
+            console.warn(`CoinMarketCap fallback flow encountered error:`, cmcErr.message);
+        }
+        // 5b. Fetch detailed chain data from /protocol/{slug} for richer chain coverage
+        // Only fetch PRIMARY slug for tools with very sparse chain data (0-2 chains)
+        // to avoid slow API calls (the detail endpoint returns huge historical JSON)
+        const sparseChainSlugs = new Set();
+        for (const { tool, result } of matchedPairs) {
+            const existingChains = tool.metrics?.chains?.length || 0;
+            const llamaChains = (result.chains || []).length;
+            if (Math.max(existingChains, llamaChains) < 3 && result.primarySlug) {
+                sparseChainSlugs.add(result.primarySlug);
+            }
+        }
+        console.log(`Fetching detail chain data for ${sparseChainSlugs.size} sparse-chain protocols...`);
+        const detailChainMap = await fetchDetailChains([...sparseChainSlugs]);
+        console.log(`Detail chain data fetched for ${detailChainMap.size} protocols`);
+
         // 6. Build bulk update operations
         const bulkOps = [];
         for (const { tool, result, geckoId } of matchedPairs) {
@@ -386,27 +521,42 @@ const fetchLlamaData = async () => {
                 volume24h = dexVolumes.get(result.primarySlug) || 0;
             }
             if (!volume24h) {
-                volume24h = dexVolumes.get(tool.name.toLowerCase()) || 0;
+                volume24h = dexVolumes.get(tool.name.toLowerCase()) || coinData?.volume24h || 0;
+            }
+
+            // Merge chains: DeFiLlama list + detail endpoint + existing DB chains
+            const mergedChains = new Set(result.chains || []);
+            // Add chains from detail endpoints (much richer)
+            for (const slug of (result.allSlugs || [])) {
+                const detailChains = detailChainMap.get(slug);
+                if (detailChains) {
+                    for (const c of detailChains) mergedChains.add(c);
+                }
+            }
+            // Preserve any existing manually-curated chains from the DB
+            for (const c of (tool.metrics?.chains || [])) {
+                mergedChains.add(c);
             }
 
             const metrics = {
                 tvl: result.tvl,
                 tvlChange1h: result.change1h,
-                tvlChange24h: result.change1d,
+                tvlChange24h: result.change1d || coinData?.change24h || 0,
                 tvlChange7d: result.change7d,
                 mcap: mcap,
                 fdv: fdv,
                 tokenPrice: tokenPrice,
+                tokenSymbol: coinData?.symbol || '',
                 volume24h: volume24h,
                 staking: result.staking,
                 pool2: result.pool2,
-                chains: result.chains,
+                chains: [...mergedChains],
                 lastUpdated: new Date()
             };
 
             bulkOps.push({
                 updateOne: {
-                    filter: { _id: tool._id },
+                    filter: { id: tool.id },
                     update: {
                         $set: {
                             metrics: metrics,

@@ -4,8 +4,8 @@ import CategoryPage from "./CategoryPage";
 export default function Interoperability() {
   return (
     <CategoryPage
-      title="Interoperability Bridges"
-      description="Connecting the multi-chain world discover top protocols enabling seamless blockchain communication."
+      title="Bridges & Interoperability"
+      description="Cross-chain bridging protocols, arbitrary messaging networks, asset swap routers, and multi-chain liquidity layers connecting EVM, Solana, Cosmos, and Layer 2 ecosystems."
       categoryKey="interoperability"
     />
   );

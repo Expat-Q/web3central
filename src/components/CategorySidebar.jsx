@@ -5,14 +5,13 @@ import {
   ArrowLeftRight, Landmark, Share2, Wallet, ShieldCheck,
   BarChart3, Image, Gamepad2, Users, Building, Coins, Lock,
   Activity, X, ChevronRight, ChevronLeft, LayoutGrid, Code2,
-  Scale, HelpCircle, User as UserIcon, Target, Trophy, Bookmark
+  Scale, HelpCircle, User as UserIcon, Target, Trophy, Bookmark, Gift
 } from "lucide-react";
 import logo from "../assets/logo.jpg";
 
 const QUICK_LINKS = [
-  { id: "for-you",   label: "For You",      icon: Home,       color: "text-purple-600" },
-  { id: "trending",  label: "Trending",     icon: TrendingUp, color: "text-orange-500" },
-  { id: "top-rated", label: "Top Rated",    icon: Star,       color: "text-yellow-500" },
+  { id: "for-you",   label: "Apps",         icon: Home,       color: "text-purple-600" },
+  { id: "top-rated", label: "Top Charts",   icon: Star,       color: "text-yellow-500" },
   { id: "all",       label: "All Apps",     icon: LayoutGrid, color: "text-blue-500", path: "/apps"   },
 ];
 
@@ -28,6 +27,7 @@ const CATEGORIES = [
   { id: "defi",        label: "DeFi",        icon: Landmark,       path: "/apps/defi",        color: "text-emerald-600" },
   { id: "depin",       label: "DePIN",       icon: Activity,       path: "/apps/depin",       color: "text-orange-500", comingSoon: true  },
   { id: "gaming",      label: "Gaming",      icon: Gamepad2,       path: "/apps/gaming",      color: "text-green-600"   },
+  { id: "infofi",      label: "InfoFi",      icon: Activity,       path: "/apps/infofi",      color: "text-indigo-500"  },
   { id: "infra",       label: "Infra & Dev Tools", icon: Code2,    path: "/apps/infra",       color: "text-slate-500"   },
   { id: "nft",         label: "NFT",         icon: Image,          path: "/apps/nft",         color: "text-pink-600"    },
   { id: "payments",    label: "Payments",    icon: Wallet,         path: "/apps/payments",    color: "text-emerald-500", comingSoon: true },
@@ -42,6 +42,7 @@ const CATEGORIES = [
 ].sort((a, b) => a.label.localeCompare(b.label) || a.label.length - b.label.length);
 
 const NAV_LINKS = [
+  { label: "Airdrops",          icon: Gift,          path: "/apps/airdrops"    },
   { label: "News",              icon: Newspaper,     path: "/news"             },
   { label: "Community Feed",    icon: Users,         path: "/community"        },
   { label: "Academy",           icon: GraduationCap, path: "/academy"          },
@@ -216,40 +217,6 @@ export default function CategorySidebar({ activeSection, onSelect, isOpen, onClo
             ))}
           </div>
 
-          {/* Categories */}
-          <div className={isCollapsed ? "space-y-0.5" : "px-3"}>
-            {!isCollapsed && (
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] px-3 mb-1">Categories</p>
-            )}
-            <div className="space-y-0.5">
-              {CATEGORIES.map(({ id, label, icon: Icon, path, color }) => (
-                <button
-                  key={id}
-                  onClick={() => handleCategoryNav(path, id)}
-                  title={isCollapsed ? label : undefined}
-                  className={`w-full flex items-center rounded-xl text-sm font-medium transition-all text-left group
-                    ${isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2"}
-                    ${activeSection === id
-                      ? "bg-purple-50 text-purple-700"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
-                    }`}
-                >
-                  <Icon
-                    size={15}
-                    className={activeSection === id ? "text-purple-600 shrink-0" : `${color} opacity-60 group-hover:opacity-100 shrink-0`}
-                  />
-                  {!isCollapsed && (
-                    <div className="flex items-center justify-between flex-1 min-w-0">
-                      <span className="truncate">{label}</span>
-                      {['ai', 'depin', 'infra', 'payments', 'social', 'staking'].includes(id) ? (
-                        <span className="ml-1 text-[8px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-1 rounded uppercase tracking-tighter shrink-0">Soon</span>
-                      ) : null}
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Divider */}
           {!isCollapsed && <div className="mx-4 border-t border-gray-100" />}

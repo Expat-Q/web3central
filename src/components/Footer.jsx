@@ -20,8 +20,24 @@ export default function Footer() {
           >
             <FaTwitter size={18} />
           </a>
-          <a href="#" className="hover:text-purple-600 transition-colors"><FaDiscord size={18} /></a>
-          <a href="#" className="hover:text-purple-600 transition-colors"><FaTelegramPlane size={18} /></a>
+          <a
+            href="https://discord.gg/web3central"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Web3Central Discord"
+            className="hover:text-purple-600 transition-colors"
+          >
+            <FaDiscord size={18} />
+          </a>
+          <a
+            href="https://t.me/web3central"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Web3Central Telegram"
+            className="hover:text-purple-600 transition-colors"
+          >
+            <FaTelegramPlane size={18} />
+          </a>
         </div>
       </div>
     </footer>

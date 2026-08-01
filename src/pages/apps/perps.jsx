@@ -4,9 +4,9 @@ import CategoryPage from "./CategoryPage";
 export default function Perps() {
   return (
     <CategoryPage
-      title="Perpetual Exchanges"
-      description="Trade on decentralized perpetual futures with deep liquidity and low latency."
-      categoryKey="web3Chat"
+      title="Perpetual Futures & Derivatives"
+      description="On-chain perpetual futures, decentralized orderbooks, synth leverage pools, and margin trading venues offering up to 100x leverage with self-custodial execution."
+      categoryKey="perps"
     />
   );
 }

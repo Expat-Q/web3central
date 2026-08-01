@@ -5,16 +5,7 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const { normalizeLearningProgressMap, serializeLearningProgress } = require('../utils/learningProgress');
-const fs = require('fs');
-const path = require('path');
 
-// Universal trace for ALL auth routes
-router.use((req, res, next) => {
-    const logPath = path.join(__dirname, '../oauth_trace.txt');
-    const logEntry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
-    fs.appendFileSync(logPath, logEntry);
-    next();
-});
 
 const registerSchema = {
     body: {
@@ -102,10 +93,7 @@ const passport = require('passport');
 // @desc    OAuth - Initiate Google Login
 // @route   GET /api/auth/google
 // @access  Public
-router.get('/google', (req, res, next) => {
-    console.log('[DEBUG OAuth] Initiation route hit: /api/auth/google');
-    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-});
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // @desc    OAuth - Google Callback
 // @route   GET /api/auth/google/callback
@@ -118,23 +106,17 @@ router.get('/google/callback', (req, res, next) => {
             : 'http://localhost:3000';
 
         if (err) {
-            console.error('[DEBUG OAuth] Strategy-level error in callback:', err);
             return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
         }
 
-        // Passport called done(null, false, info) — authentication was rejected
         if (!user) {
-            console.warn('[DEBUG OAuth] Authentication failed, user not found. Info:', info);
             if (info && info.message === 'ACCOUNT_EXISTS_USE_PASSWORD') {
-                // This email is already registered via email/password
-                console.log('[DEBUG OAuth] Redirecting to login with account_exists error');
                 return res.redirect(`${frontendUrl}/login?error=account_exists`);
             }
             return res.redirect(`${frontendUrl}/login?error=Google_Auth_Failed`);
         }
 
         req.user = user;
-        console.log('[DEBUG OAuth] Authentication successful for user:', user.email);
         handleOAuthSuccess(req, res);
     })(req, res, next);
 });
@@ -167,22 +149,61 @@ router.get('/twitter/callback',
     }
 );
 
-// Helper function to issue JWT and redirect to frontend
+// In-memory store for short-lived OAuth exchange codes (TTL: 60s)
+// For multi-instance deployments, replace with Redis.
+const oauthExchangeCodes = new Map();
+
+// Helper function: issue a short-lived code, redirect to frontend with it
 const handleOAuthSuccess = (req, res) => {
-    // Create JWT token specifically for the frontend to consume
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '30d'
     });
 
-    // We can't use sendTokenResponse here because we need to perform an HTTP redirect
-    // back to the frontend React app domain, passing the token in the query string or fragment.
+    // Generate a one-time code (expires in 60 seconds)
+    const crypto = require('crypto');
+    const code = crypto.randomBytes(32).toString('hex');
+    oauthExchangeCodes.set(code, { token, expiresAt: Date.now() + 60_000 });
+
+    // Clean up expired codes
+    for (const [k, v] of oauthExchangeCodes) {
+        if (v.expiresAt < Date.now()) oauthExchangeCodes.delete(k);
+    }
+
     const frontendUrl = process.env.FRONTEND_URL
-        ? process.env.FRONTEND_URL.split(',')[0] // Use first allowed frontend
+        ? process.env.FRONTEND_URL.split(',')[0]
         : 'http://localhost:3000';
 
-    // Redirect to a specific frontend route that will capture this token and save it to localStorage
-    res.redirect(`${frontendUrl}/oauth/callback?token=${token}`);
+    // Redirect with a short-lived CODE, not the JWT itself
+    res.redirect(`${frontendUrl}/oauth/callback?code=${code}`);
 };
+
+// @desc    Exchange OAuth code for JWT (one-time use, 60s TTL)
+// @route   POST /api/auth/oauth/exchange
+// @access  Public
+router.post('/oauth/exchange', async (req, res) => {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ success: false, message: 'Code is required' });
+
+    const entry = oauthExchangeCodes.get(code);
+    if (!entry) return res.status(401).json({ success: false, message: 'Invalid or expired code' });
+    if (entry.expiresAt < Date.now()) {
+        oauthExchangeCodes.delete(code);
+        return res.status(401).json({ success: false, message: 'Code expired' });
+    }
+
+    // One-time use: delete immediately after retrieval
+    oauthExchangeCodes.delete(code);
+
+    // Verify the stored JWT is still valid and fetch user
+    try {
+        const decoded = jwt.verify(entry.token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(401).json({ success: false, message: 'User not found' });
+        res.json({ success: true, token: entry.token, user: serializeUser(user) });
+    } catch {
+        return res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+});
 
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -343,32 +364,110 @@ router.get('/leaderboard', async (req, res) => {
     }
 });
 
-// @desc    Simplified Password Reset (Direct Reset)
+// @desc    Request password reset email
 // @route   POST /api/auth/forgot-password
 // @access  Public
 router.post('/forgot-password', async (req, res) => {
-    const { email, newPassword } = req.body;
+    const { email } = req.body;
 
-    if (!email || !newPassword) {
-        return res.status(400).json({ success: false, message: 'Please provide email and new password' });
-    }
-
-    if (newPassword.length < 6) {
-        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Please provide your email address' });
     }
 
     try {
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordResetToken +passwordResetExpire');
 
+        // Always return success to prevent email enumeration
         if (!user) {
-            return res.status(404).json({ success: false, message: 'No user registered with this email address' });
+            return res.status(200).json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
         }
 
-        // Update password and save (pre-save hook will hash it)
+        // Generate secure random token
+        const crypto = require('crypto');
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        user.passwordResetToken = hashedToken;
+        user.passwordResetExpire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const frontendUrl = process.env.FRONTEND_URL
+            ? process.env.FRONTEND_URL.split(',')[0]
+            : 'http://localhost:3000';
+        const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+
+        // Send email if SMTP is configured
+        if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+            try {
+                const nodemailer = require('nodemailer');
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                });
+                await transporter.sendMail({
+                    from: `"Web3Central" <${process.env.SMTP_USER}>`,
+                    to: user.email,
+                    subject: 'Password Reset Request — Web3Central',
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <h2>Password Reset</h2>
+                            <p>You requested a password reset for your Web3Central account.</p>
+                            <p>Click the button below to reset your password. This link expires in <strong>15 minutes</strong>.</p>
+                            <div style="margin: 24px 0; text-align: center;">
+                                <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Reset Password</a>
+                            </div>
+                            <p style="color: #64748b; font-size: 14px;">If you didn't request this, ignore this email — your password won't change.</p>
+                            <p style="color: #64748b; font-size: 12px;">Link expires: ${new Date(Date.now() + 15 * 60 * 1000).toUTCString()}</p>
+                        </div>
+                    `
+                });
+            } catch (emailErr) {
+                // Reset the token if email fails so user can try again
+                user.passwordResetToken = undefined;
+                user.passwordResetExpire = undefined;
+                await user.save({ validateBeforeSave: false });
+                return res.status(500).json({ success: false, message: 'Email could not be sent. Please try again.' });
+            }
+        }
+
+        res.status(200).json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// @desc    Complete password reset using token from email
+// @route   POST /api/auth/reset-password
+// @access  Public
+router.post('/reset-password', async (req, res) => {
+    const { email, token, newPassword } = req.body;
+
+    if (!email || !token || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Email, token, and new password are required' });
+    }
+    if (newPassword.length < 6) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    }
+
+    try {
+        const crypto = require('crypto');
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            email: email.toLowerCase(),
+            passwordResetToken: hashedToken,
+            passwordResetExpire: { $gt: new Date() }
+        }).select('+passwordResetToken +passwordResetExpire');
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired reset link. Please request a new one.' });
+        }
+
         user.password = newPassword;
+        user.passwordResetToken = undefined;
+        user.passwordResetExpire = undefined;
         await user.save();
 
-        // Automatically log user in by issuing token
         sendTokenResponse(user, 200, res);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
