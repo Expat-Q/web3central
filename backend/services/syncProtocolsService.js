@@ -83,7 +83,7 @@ async function syncStaticProtocolsToDb() {
           url: 'https://jumper.xyz',
           description: 'Get your money moving.',
           category: 'bridges',
-          llamaSlug: 'jumper-exchange',
+          llamaSlug: 'jumper-(li.fi-powered)',
           tags: ['Bridge', 'Interoperability', 'Cross-Chain'],
           builder: { name: 'Jumper Exchange', handle: '@jumperapp', twitter: 'https://x.com/jumperapp' },
           status: 'active',

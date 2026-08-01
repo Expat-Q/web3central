@@ -87,6 +87,25 @@ router.delete('/:id', protect, admin, async (req, res) => {
   }
 });
 
+// @desc    Delete a protocol by category and ID or slug ID
+// @route   DELETE /api/tools/:category/:id
+// @access  Private (Admin)
+router.delete('/:category/:id', protect, admin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let tool = await Tool.findByIdAndDelete(id).catch(() => null);
+    if (!tool) {
+      tool = await Tool.findOneAndDelete({ id: id });
+    }
+    if (!tool) {
+      return res.status(404).json({ success: false, error: 'Protocol not found' });
+    }
+    res.json({ success: true, message: 'Protocol deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ─── Token Market Data (CoinGecko top coins for Token Analysis table) ───
 // In-memory cache to avoid hitting rate limits
 let tokenMarketCache = { data: null, ts: 0 };
