@@ -25,7 +25,19 @@ const startCronJobs = () => {
         }
     });
 
-    console.log('Background cron jobs started (Sync set for top of every hour, GitHub sync at 3am daily).');
+    // Self-ping keep-alive every 10 minutes to prevent Render idle sleep
+    cron.schedule('*/10 * * * *', async () => {
+        const targetUrl = process.env.RENDER_EXTERNAL_URL || 'https://web3central.onrender.com';
+        try {
+            const axios = require('axios');
+            await axios.get(`${targetUrl}/api/stats/overview`, { timeout: 10000 });
+            console.log(`Keep-alive self-ping sent to ${targetUrl}`);
+        } catch (err) {
+            console.warn('Keep-alive ping error:', err.message);
+        }
+    });
+
+    console.log('Background cron jobs started (Sync top of every hour, GitHub sync at 3am daily, Keep-alive ping every 10m).');
 };
 
 module.exports = { startCronJobs };
