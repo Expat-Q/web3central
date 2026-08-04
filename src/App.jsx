@@ -48,30 +48,37 @@ const ScrollToTop = () => {
 };
 
 import Home from "./pages/Home";
-import About from "./pages/About";
-import Support from "./pages/Support";
 import Apps from "./pages/Apps";
-import DeveloperConsole from "./pages/DeveloperConsole";
-import DevRegister from "./pages/developer/DevRegister";
-import ToolComparison from "./pages/ToolComparison";
-import Admin from "./pages/Admin";
-import Quests from "./pages/Quests";
-import Bookmarks from "./pages/Bookmarks";
-import Leaderboard from "./pages/Leaderboard";
-
-import Signup from "./pages/auth/Signup";
-import Login from "./pages/auth/Login";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import OAuthCallback from "./pages/auth/OAuthCallback";
-import Academy from "./pages/Academy";
-import LessonDetail from "./pages/LessonDetail";
-import Profile from "./pages/Profile";
-import News from "./pages/News";
-import NewsArticle from "./pages/NewsArticle";
-import CommunityFeed from "./pages/CommunityFeed";
-
 import CategoryPage from "./pages/apps/CategoryPage";
-import Airdrops from "./pages/Airdrops";
+
+// Lazy-loaded secondary routes for optimal bundle size & fast initial page loads
+const About = React.lazy(() => import("./pages/About"));
+const Support = React.lazy(() => import("./pages/Support"));
+const DeveloperConsole = React.lazy(() => import("./pages/DeveloperConsole"));
+const DevRegister = React.lazy(() => import("./pages/developer/DevRegister"));
+const ToolComparison = React.lazy(() => import("./pages/ToolComparison"));
+const Admin = React.lazy(() => import("./pages/Admin"));
+const Quests = React.lazy(() => import("./pages/Quests"));
+const Bookmarks = React.lazy(() => import("./pages/Bookmarks"));
+const Leaderboard = React.lazy(() => import("./pages/Leaderboard"));
+const Signup = React.lazy(() => import("./pages/auth/Signup"));
+const Login = React.lazy(() => import("./pages/auth/Login"));
+const ForgotPassword = React.lazy(() => import("./pages/auth/ForgotPassword"));
+const OAuthCallback = React.lazy(() => import("./pages/auth/OAuthCallback"));
+const Academy = React.lazy(() => import("./pages/Academy"));
+const LessonDetail = React.lazy(() => import("./pages/LessonDetail"));
+const Profile = React.lazy(() => import("./pages/Profile"));
+const News = React.lazy(() => import("./pages/News"));
+const NewsArticle = React.lazy(() => import("./pages/NewsArticle"));
+const CommunityFeed = React.lazy(() => import("./pages/CommunityFeed"));
+const Airdrops = React.lazy(() => import("./pages/Airdrops"));
+
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white py-12">
+    <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mb-3" />
+    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading...</span>
+  </div>
+);
 
 const ConditionalFooter = () => {
   const location = useLocation();
@@ -119,7 +126,9 @@ const AppLayout = () => {
         <ConditionalNavbar setSidebarOpen={setSidebarOpen} />
         {/* <Analytics /> */}
         <main className="flex-grow">
-          <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <React.Suspense fallback={<PageLoader />}>
+            <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          </React.Suspense>
         </main>
         <ConditionalFooter />
         <ConditionalBot />
@@ -147,7 +156,9 @@ const AppLayout = () => {
           {/* Spacer for fixed navbar */}
           <div className="h-16" />
           <main className="flex-grow">
-            <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <React.Suspense fallback={<PageLoader />}>
+              <AppRoutes sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            </React.Suspense>
           </main>
           <ConditionalFooter />
         </div>

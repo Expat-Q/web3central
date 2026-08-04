@@ -48,7 +48,11 @@ const ttsRouter = require('./routes/tts');
 // Connect to Database
 connectDB();
 
+const compression = require('compression');
 const app = express();
+
+// Enable Gzip/Brotli compression for all API responses and static assets
+app.use(compression());
 
 // Trust reverse proxy (required for Render/Vercel to ensure correct 'https' protocol in OAuth redirects)
 app.set('trust proxy', 1);
