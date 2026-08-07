@@ -2091,6 +2091,27 @@ module.exports = {
   ],
   communityTools: [
     {
+      id: "waypoint",
+      name: "Waypoint",
+      url: "https://waypoint.tools/",
+      description: "Discover NFTs early.",
+      category: "communityTools",
+      tags: [
+        "NFT Discovery",
+        "Early Alpha",
+        "Onchain Tools"
+      ],
+      builder: {
+        name: "Web3Central",
+        handle: "@_web3central",
+        twitter: "https://x.com/_web3central"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true
+    },
+    {
       id: "mintgo",
       name: "MintGo",
       url: "https://mintgo.fun/",
@@ -3552,27 +3573,6 @@ narrativeDescription: "Whale tracking tools for market analysis"
   ]
 ,
   nft: [
-    {
-      "id": "waypoint",
-      "name": "Waypoint",
-      "url": "https://waypoint.tools/",
-      "description": "Discover NFTs early.",
-      "category": "nft",
-      "tags": [
-        "NFT Discovery",
-        "Early Alpha",
-        "Onchain Tools"
-      ],
-      "builder": {
-        "name": "Web3Central",
-        "handle": "@_web3central",
-        "twitter": "https://x.com/_web3central"
-      },
-      "status": "active",
-      "verified": true,
-      "trending": true,
-      "recentlyAdded": true
-    },
     {
       "id": "opensea",
       "name": "OpenSea",

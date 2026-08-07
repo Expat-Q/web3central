@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Bell, CheckCheck, ExternalLink, Sparkles, 
-  TrendingUp, Newspaper, Layers, ShieldCheck, X
+  TrendingUp, Newspaper, Layers, ShieldCheck, X, Volume2, Globe
 } from 'lucide-react';
 
 const INITIAL_NOTIFICATIONS = [
@@ -29,11 +29,11 @@ const INITIAL_NOTIFICATIONS = [
   {
     id: 'notif-3',
     title: 'New Protocol Added: Waypoint',
-    message: 'Discover NFTs and early project mints before anyone else.',
+    message: 'Discover NFTs early. Built under Onchain Tools.',
     type: 'protocol',
-    category: 'NFT',
+    category: 'Tools',
     timestamp: '30m ago',
-    link: '/apps/nft',
+    link: '/apps/communityTools',
     read: false,
   },
   {
@@ -80,6 +80,10 @@ export default function NotificationDropdown() {
     }
   });
 
+  const [pushPermission, setPushPermission] = useState(() => {
+    return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default';
+  });
+
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -101,6 +105,42 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const requestPushPermission = async () => {
+    if (!('Notification' in window)) {
+      alert('Browser push notifications are not supported on this browser.');
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      setPushPermission(permission);
+
+      if (permission === 'granted') {
+        new Notification('🔔 Web3Central Push Alerts Enabled', {
+          body: 'You will now receive native OS alerts for new dApps, protocols, news, and market metrics even when offline!',
+          icon: '/logo.jpg',
+        });
+      } else if (permission === 'denied') {
+        alert('Push notifications blocked. Please enable notifications in your browser site permissions to receive alerts when away.');
+      }
+    } catch (err) {
+      console.error('Push permission error:', err);
+    }
+  };
+
+  const triggerSystemPushNotification = (notif) => {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`Web3Central: ${notif.title}`, {
+          body: notif.message,
+          icon: '/logo.jpg',
+        });
+      } catch (err) {
+        console.warn('System push trigger failed:', err);
+      }
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const markAllAsRead = () => {
@@ -108,7 +148,13 @@ export default function NotificationDropdown() {
   };
 
   const markAsRead = (id) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setNotifications(prev => prev.map(n => {
+      if (n.id === id) {
+        if (!n.read) triggerSystemPushNotification(n);
+        return { ...n, read: true };
+      }
+      return n;
+    }));
   };
 
   const filteredNotifications = notifications.filter(n => {
@@ -164,8 +210,8 @@ export default function NotificationDropdown() {
                 <Bell size={18} />
               </div>
               <div>
-                <h3 className="text-sm font-black text-white">Notifications</h3>
-                <p className="text-[11px] text-purple-200/80 font-medium">Real-time dApp & market updates</p>
+                <h3 className="text-sm font-black text-white">Notification Center</h3>
+                <p className="text-[11px] text-purple-200/80 font-medium">Real-time dApp & market push alerts</p>
               </div>
             </div>
 
@@ -178,6 +224,24 @@ export default function NotificationDropdown() {
               </button>
             )}
           </div>
+
+          {/* Browser Push Permission Banner */}
+          {pushPermission !== 'granted' && (
+            <div className="p-3 bg-purple-50 border-b border-purple-100 flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-purple-600 shrink-0" />
+                <span className="text-[11px] font-bold text-purple-950">
+                  Get OS Push Notifications when away
+                </span>
+              </div>
+              <button
+                onClick={requestPushPermission}
+                className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-[10px] shrink-0 transition-colors shadow-sm"
+              >
+                Enable Push
+              </button>
+            </div>
+          )}
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold overflow-x-auto">
@@ -250,13 +314,16 @@ export default function NotificationDropdown() {
           </div>
 
           {/* Footer */}
-          <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
+          <div className="p-3 bg-gray-50 border-t border-gray-100 text-center flex items-center justify-between px-4">
+            <span className="text-[10px] font-bold text-gray-400">
+              {pushPermission === 'granted' ? '🟢 Push Alerts Active' : '🔴 Push Disabled'}
+            </span>
             <Link
               to="/apps"
               onClick={() => setIsOpen(false)}
               className="text-xs font-bold text-purple-600 hover:text-purple-700 hover:underline"
             >
-              Explore All 19 Categories & Protocols →
+              Explore All Protocols →
             </Link>
           </div>
 
