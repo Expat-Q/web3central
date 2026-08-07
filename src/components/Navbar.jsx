@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 /**
- * Slim Navbar — auth actions only.
+ * Slim Navbar — auth actions & notification center.
  * Logo/branding lives in the CategorySidebar.
  */
 export default function Navbar({ setSidebarOpen }) {
@@ -31,7 +32,10 @@ export default function Navbar({ setSidebarOpen }) {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Notification Bell */}
+            <NotificationDropdown />
+
             {/* Auth — desktop */}
             <div className="hidden md:flex items-center gap-3">
               {isLoggedIn ? (

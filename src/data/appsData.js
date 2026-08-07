@@ -2091,6 +2091,27 @@ module.exports = {
   ],
   communityTools: [
     {
+      id: "mintgo",
+      name: "MintGo",
+      url: "https://mintgo.fun/",
+      description: "Recognizes contract entry points to overcome mint quantity restrictions while prioritizing fund safety by protecting users from malicious contracts.",
+      category: "communityTools",
+      tags: [
+        "Minting Engine",
+        "Contract Safety",
+        "Onchain Tools"
+      ],
+      builder: {
+        name: "Seawin",
+        handle: "@Seawin_eth",
+        twitter: "https://x.com/Seawin_eth"
+      },
+      status: "active",
+      verified: true,
+      trending: true,
+      recentlyAdded: true
+    },
+    {
       id: "antidrain",
       name: "Anti Drain Tool by @zun2025",
       url: "https://antidrain.dev",
@@ -3361,6 +3382,27 @@ narrativeDescription: "Whale tracking tools for market analysis"
 ,
   analytics: [
     {
+      "id": "purealpha",
+      "name": "PureAlpha",
+      "url": "https://purealpha.app/",
+      "description": "Find crypto projects before the crowd. Ranks who 600+ hand-picked wallets follow, curated by zac.eth (#1 trencher on ethos).",
+      "category": "analytics",
+      "tags": [
+        "Alpha Tracker",
+        "Wallet Analytics",
+        "InfoFi"
+      ],
+      "builder": {
+        "name": "zac.eth",
+        "handle": "@zacxbt",
+        "twitter": "https://x.com/zacxbt"
+      },
+      "status": "active",
+      "verified": true,
+      "trending": true,
+      "recentlyAdded": true
+    },
+    {
       "id": "coinstudy",
       "name": "Coin Study",
       "url": "https://coinstudy.xyz",
@@ -3510,6 +3552,27 @@ narrativeDescription: "Whale tracking tools for market analysis"
   ]
 ,
   nft: [
+    {
+      "id": "waypoint",
+      "name": "Waypoint",
+      "url": "https://waypoint.tools/",
+      "description": "Discover NFTs early.",
+      "category": "nft",
+      "tags": [
+        "NFT Discovery",
+        "Early Alpha",
+        "Onchain Tools"
+      ],
+      "builder": {
+        "name": "Web3Central",
+        "handle": "@_web3central",
+        "twitter": "https://x.com/_web3central"
+      },
+      "status": "active",
+      "verified": true,
+      "trending": true,
+      "recentlyAdded": true
+    },
     {
       "id": "opensea",
       "name": "OpenSea",

@@ -95,7 +95,34 @@ async function syncStaticProtocolsToDb() {
       { upsert: true }
     );
 
-    // 4. Sync all other categories from appsData.js
+    // 5. Ensure Builder Spotlight features zac.eth (@zacxbt)
+    const Spotlight = require('../models/Spotlight');
+    const zacSpotlight = {
+      name: 'zac.eth',
+      role: '#1 Trencher on Ethos & Creator of PureAlpha',
+      description: 'Discovering crypto projects before the crowd by ranking who 600+ hand-picked elite Web3 wallets follow.',
+      story: 'Zac (@zacxbt) is a renowned Web3 alpha researcher and top trencher on Ethos. He created PureAlpha to give everyday builders and traders an unfair advantage by tracking, analyzing, and ranking the real-time Twitter and onchain followings of 600+ hand-picked legendary crypto wallets.',
+      twitter: 'https://x.com/zacxbt',
+      xProfileImageUrl: 'https://unavatar.io/twitter/zacxbt',
+      featuredTools: [
+        { initial: 'PA', name: 'PureAlpha', description: 'Rank who 600+ hand-picked wallets follow' },
+        { initial: 'MG', name: 'MintGo', description: 'Smart contract minting engine & anti-drain protection' }
+      ]
+    };
+    await Spotlight.updateOne(
+      {},
+      {
+        $set: {
+          title: 'Community Builder Spotlight',
+          description: 'Highlighting elite Web3 builders and creators.',
+          builderSpotlight: zacSpotlight,
+          builderSpotlights: [zacSpotlight]
+        }
+      },
+      { upsert: true }
+    );
+
+    // 6. Sync all other categories from appsData.js
     for (const [catKey, tools] of Object.entries(appsData)) {
       if (!Array.isArray(tools)) continue;
       for (const item of tools) {
