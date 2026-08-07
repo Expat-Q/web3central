@@ -122,7 +122,58 @@ async function syncStaticProtocolsToDb() {
       { upsert: true }
     );
 
-    // 6. Sync all other categories from appsData.js
+    // 6. Force upsert new protocols MintGo, Waypoint, and PureAlpha
+    const newProtocols = [
+      {
+        id: 'mintgo',
+        name: 'MintGo',
+        url: 'https://mintgo.fun/',
+        description: 'Recognizes contract entry points to overcome mint quantity restrictions while prioritizing fund safety by protecting users from malicious contracts.',
+        category: 'communityTools',
+        tags: ['Minting Engine', 'Contract Safety', 'Onchain Tools'],
+        builder: { name: 'Seawin', handle: '@Seawin_eth', twitter: 'https://x.com/Seawin_eth' },
+        status: 'active',
+        verified: true,
+        trending: true,
+        recentlyAdded: true
+      },
+      {
+        id: 'waypoint',
+        name: 'Waypoint',
+        url: 'https://waypoint.tools/',
+        description: 'Discover NFTs early.',
+        category: 'communityTools',
+        tags: ['NFT Discovery', 'Early Alpha', 'Onchain Tools'],
+        builder: { name: 'Web3Central', handle: '@_web3central', twitter: 'https://x.com/_web3central' },
+        status: 'active',
+        verified: true,
+        trending: true,
+        recentlyAdded: true
+      },
+      {
+        id: 'purealpha',
+        name: 'PureAlpha',
+        url: 'https://purealpha.app/',
+        description: 'Find crypto projects before the crowd. Ranks who 600+ hand-picked wallets follow, curated by zac.eth (#1 trencher on ethos).',
+        category: 'analytics',
+        tags: ['Alpha Tracker', 'Wallet Analytics', 'InfoFi'],
+        builder: { name: 'zac.eth', handle: '@zacxbt', twitter: 'https://x.com/zacxbt' },
+        status: 'active',
+        verified: true,
+        trending: true,
+        recentlyAdded: true
+      }
+    ];
+
+    for (const toolData of newProtocols) {
+      await Tool.updateOne(
+        { id: toolData.id },
+        { $set: toolData },
+        { upsert: true }
+      );
+    }
+
+    // 7. Sync all other categories from appsData.js
     for (const [catKey, tools] of Object.entries(appsData)) {
       if (!Array.isArray(tools)) continue;
       for (const item of tools) {

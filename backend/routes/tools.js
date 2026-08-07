@@ -590,7 +590,7 @@ const CATEGORY_ALIASES = {
   gaming:          ['gaming'],
   privacy:         ['privacy'],
   predictions:     ['predictions'],
-  community:       ['communityTools', 'community'],
+  community:       ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
   'bounty-hub':    ['bountyHub', 'bounty-hub'],
   'rwa':           ['rwa'],
   cex:             ['cex'],
@@ -598,7 +598,9 @@ const CATEGORY_ALIASES = {
   dex:             ['dex'],
   perps:           ['perps'],
   interoperability:['interoperability'],
-  communityTools:  ['communityTools'],
+  communityTools:  ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
+  'onchain-tools': ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
+  onchainTools:    ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
   bountyHub:       ['bountyHub'],
 };
 
