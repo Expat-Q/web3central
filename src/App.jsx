@@ -93,9 +93,12 @@ const ConditionalNavbar = ({ setSidebarOpen }) => {
   return !hideNavbar ? <Navbar setSidebarOpen={setSidebarOpen} /> : null;
 };
 
+import PushNotificationPrompt from "./components/PushNotificationPrompt";
+
 const ConditionalBot = () => {
   const location = useLocation();
-  const hideBot = location.pathname.startsWith("/developer");
+  const hideBot = ["/login", "/signup", "/oauth/callback", "/forgot-password"].includes(location.pathname)
+    || location.pathname.startsWith("/developer");
   return !hideBot ? <ClaudeBot /> : null;
 };
 
@@ -107,16 +110,10 @@ const NO_SIDEBAR_ROUTES = [
 const AppLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("for-you");
+  const [activeSection, setActiveSection] = useState("");
 
-  // Close mobile sidebar on route change
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [location.pathname]);
-
-  const isDeveloper = location.pathname.startsWith("/developer");
   const hideSidebar =
-    isDeveloper ||
+    ["/login", "/signup", "/oauth/callback", "/forgot-password"].includes(location.pathname) ||
     NO_SIDEBAR_ROUTES.some((r) => location.pathname === r);
 
   if (hideSidebar) {
@@ -132,6 +129,7 @@ const AppLayout = () => {
         </main>
         <ConditionalFooter />
         <ConditionalBot />
+        <PushNotificationPrompt />
       </div>
     );
   }
@@ -165,6 +163,7 @@ const AppLayout = () => {
       </div>
 
       <ConditionalBot />
+      <PushNotificationPrompt />
     </div>
   );
 };
