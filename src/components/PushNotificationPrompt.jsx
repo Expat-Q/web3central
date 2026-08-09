@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Sparkles, ShieldCheck, Check } from 'lucide-react';
+import { requestPushPermission } from '../lib/pushNotifications';
 
 export default function PushNotificationPrompt() {
   const [isVisible, setIsVisible] = useState(false);
@@ -22,20 +23,13 @@ export default function PushNotificationPrompt() {
   }, []);
 
   const handleEnablePush = async () => {
-    if (!('Notification' in window)) return;
-
     try {
-      const permission = await Notification.requestPermission();
+      const permission = await requestPushPermission();
       if (permission === 'granted') {
         setGranted(true);
         setTimeout(() => {
           setIsVisible(false);
         }, 2000);
-
-        new Notification('🔔 Web3Central Push Alerts Active', {
-          body: 'You are now set up to receive real-time push alerts for new dApps, protocols, news, and market metrics even when away!',
-          icon: '/logo.jpg',
-        });
       } else {
         setIsVisible(false);
         localStorage.setItem('web3central_push_dismissed', 'true');

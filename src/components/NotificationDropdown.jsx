@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Bell, CheckCheck, ExternalLink, Sparkles, 
-  TrendingUp, Newspaper, Layers, ShieldCheck, X, Volume2, Globe
+  TrendingUp, Newspaper, Layers, ShieldCheck, X, Volume2, Globe, Send
 } from 'lucide-react';
+import { requestPushPermission, triggerPushNotification } from '../lib/pushNotifications';
 
 const INITIAL_NOTIFICATIONS = [
   {
@@ -105,40 +106,23 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const requestPushPermission = async () => {
-    if (!('Notification' in window)) {
-      alert('Browser push notifications are not supported on this browser.');
-      return;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      setPushPermission(permission);
-
-      if (permission === 'granted') {
-        new Notification('🔔 Web3Central Push Alerts Enabled', {
-          body: 'You will now receive native OS alerts for new dApps, protocols, news, and market metrics even when offline!',
-          icon: '/logo.jpg',
-        });
-      } else if (permission === 'denied') {
-        alert('Push notifications blocked. Please enable notifications in your browser site permissions to receive alerts when away.');
-      }
-    } catch (err) {
-      console.error('Push permission error:', err);
-    }
+  const handleEnablePush = async () => {
+    const perm = await requestPushPermission();
+    setPushPermission(perm);
   };
 
-  const triggerSystemPushNotification = (notif) => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(`Web3Central: ${notif.title}`, {
-          body: notif.message,
-          icon: '/logo.jpg',
-        });
-      } catch (err) {
-        console.warn('System push trigger failed:', err);
-      }
+  const handleSendTestPush = async () => {
+    if (pushPermission !== 'granted') {
+      const perm = await requestPushPermission();
+      setPushPermission(perm);
+      if (perm !== 'granted') return;
     }
+
+    await triggerPushNotification({
+      title: '🚀 Web3Central Live Test Alert',
+      body: 'Push notifications are working perfectly! You will receive live updates for new dApps, protocols, and market metrics.',
+      url: '/apps'
+    });
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -150,7 +134,13 @@ export default function NotificationDropdown() {
   const markAsRead = (id) => {
     setNotifications(prev => prev.map(n => {
       if (n.id === id) {
-        if (!n.read) triggerSystemPushNotification(n);
+        if (!n.read && pushPermission === 'granted') {
+          triggerPushNotification({
+            title: `Web3Central: ${n.title}`,
+            body: n.message,
+            url: n.link || '/'
+          });
+        }
         return { ...n, read: true };
       }
       return n;
@@ -225,23 +215,31 @@ export default function NotificationDropdown() {
             )}
           </div>
 
-          {/* Browser Push Permission Banner */}
-          {pushPermission !== 'granted' && (
-            <div className="p-3 bg-purple-50 border-b border-purple-100 flex items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2">
-                <Globe size={16} className="text-purple-600 shrink-0" />
-                <span className="text-[11px] font-bold text-purple-950">
-                  Get OS Push Notifications when away
-                </span>
-              </div>
+          {/* Browser Push Permission Banner & Test Action */}
+          <div className="p-3 bg-purple-50 border-b border-purple-100 flex items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <Globe size={16} className="text-purple-600 shrink-0" />
+              <span className="text-[11px] font-bold text-purple-950">
+                {pushPermission === 'granted' ? 'Native OS Push Alerts Active' : 'Get push alerts when away'}
+              </span>
+            </div>
+
+            {pushPermission === 'granted' ? (
               <button
-                onClick={requestPushPermission}
+                onClick={handleSendTestPush}
+                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] shrink-0 transition-colors shadow-sm flex items-center gap-1"
+              >
+                <Send size={10} /> Test Alert
+              </button>
+            ) : (
+              <button
+                onClick={handleEnablePush}
                 className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-[10px] shrink-0 transition-colors shadow-sm"
               >
                 Enable Push
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold overflow-x-auto">

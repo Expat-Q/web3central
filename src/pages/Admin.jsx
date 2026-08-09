@@ -67,25 +67,25 @@ export default function Admin() {
     try {
       setLoading(true);
       const [tools, claims, q, stats, spotlight, news, courses, usersRes, trafficRes, invRes] = await Promise.all([
-        fetchPendingTools(),
-        fetchPendingClaims(),
-        fetchQuests(true),
-        fetchStatsOverview(),
-        fetchCommunitySpotlight(),
-        fetchLatestNews(),
-        fetchCuratedCourses(),
-        fetchAdminUserList().catch(() => ({ users: [] })),
-        fetchVisitorTrafficRates().catch(() => null),
-        fetchProtocolInventory().catch(() => null)
+        fetchPendingTools().catch((e) => { console.warn('pending tools err', e); return { data: [] }; }),
+        fetchPendingClaims().catch((e) => { console.warn('pending claims err', e); return { claims: [] }; }),
+        fetchQuests(true).catch((e) => { console.warn('quests err', e); return { data: [] }; }),
+        fetchStatsOverview().catch((e) => { console.warn('stats overview err', e); return null; }),
+        fetchCommunitySpotlight().catch((e) => { console.warn('spotlight err', e); return null; }),
+        fetchLatestNews().catch((e) => { console.warn('news err', e); return []; }),
+        fetchCuratedCourses().catch((e) => { console.warn('courses err', e); return []; }),
+        fetchAdminUserList().catch((e) => { console.warn('users err', e); return { users: [] }; }),
+        fetchVisitorTrafficRates().catch((e) => { console.warn('traffic err', e); return null; }),
+        fetchProtocolInventory().catch((e) => { console.warn('inventory err', e); return null; })
       ]);
-      setPendingTools(tools?.data || []);
-      setPendingClaims(claims?.claims || []);
-      setQuestsList(q?.data || []);
+      setPendingTools(tools?.data || (Array.isArray(tools) ? tools : []));
+      setPendingClaims(claims?.claims || (Array.isArray(claims) ? claims : []));
+      setQuestsList(q?.data || (Array.isArray(q) ? q : []));
       setStats(stats);
       setSpotlightData(spotlight);
-      setNewsArticles(news || []);
-      setCuratedCourses(courses || []);
-      setUserList(usersRes?.users || []);
+      setNewsArticles(Array.isArray(news) ? news : news?.data || []);
+      setCuratedCourses(Array.isArray(courses) ? courses : courses?.data || []);
+      setUserList(usersRes?.users || (Array.isArray(usersRes) ? usersRes : []));
       setTrafficData(trafficRes);
       setInventoryData(invRes);
     } catch (err) {

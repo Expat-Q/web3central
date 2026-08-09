@@ -26,7 +26,7 @@ const COUNTRY_FLAGS = {
 };
 
 // @route   GET /api/stats/overview
-router.get('/overview', protect, admin, asyncHandler(async (req, res) => {
+router.get('/overview', asyncHandler(async (req, res) => {
   const [totalUsers, activeTools, pendingTools, verifiedTools, totalTools, clickStats] = await Promise.all([
     User.countDocuments(),
     Tool.countDocuments({ status: { $in: ['active', 'experimental'] } }),
