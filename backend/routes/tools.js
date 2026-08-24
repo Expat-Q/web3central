@@ -631,7 +631,9 @@ const CATEGORY_ALIASES = {
   gaming:          ['gaming'],
   privacy:         ['privacy'],
   predictions:     ['predictions'],
-  community:       ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
+  community:       ['dao', 'community', 'governance'],
+  dao:             ['dao', 'community', 'governance'],
+  governance:      ['dao', 'community', 'governance'],
   'bounty-hub':    ['bountyHub', 'bounty-hub'],
   'rwa':           ['rwa'],
   cex:             ['cex'],
@@ -639,9 +641,9 @@ const CATEGORY_ALIASES = {
   dex:             ['dex'],
   perps:           ['perps'],
   interoperability:['interoperability'],
-  communityTools:  ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
-  'onchain-tools': ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
-  onchainTools:    ['communityTools', 'community', 'onchain-tools', 'onchainTools'],
+  communityTools:  ['communityTools', 'onchain-tools', 'onchainTools'],
+  'onchain-tools': ['communityTools', 'onchain-tools', 'onchainTools'],
+  onchainTools:    ['communityTools', 'onchain-tools', 'onchainTools'],
   bountyHub:       ['bountyHub'],
 };
 

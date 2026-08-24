@@ -162,6 +162,64 @@ async function syncStaticProtocolsToDb() {
         verified: true,
         trending: true,
         recentlyAdded: true
+      },
+      {
+        id: 'snapshot',
+        name: 'Snapshot',
+        url: 'https://snapshot.org',
+        description: 'Off-chain gasless voting platform for Web3 DAOs and communities.',
+        category: 'dao',
+        tags: ['DAO', 'Voting', 'Governance', 'Gasless'],
+        builder: { name: 'Snapshot Labs', twitter: 'https://twitter.com/SnapshotLabs' },
+        status: 'active',
+        verified: true,
+        trending: true
+      },
+      {
+        id: 'tally',
+        name: 'Tally',
+        url: 'https://tally.xyz',
+        description: 'On-chain DAO governance platform for creating, voting on, and executing proposals.',
+        category: 'dao',
+        tags: ['DAO', 'Onchain Governance', 'Proposals'],
+        builder: { name: 'Tally Team', twitter: 'https://twitter.com/tallyxyz' },
+        status: 'active',
+        verified: true,
+        trending: true
+      },
+      {
+        id: 'safe-global',
+        name: 'Safe (Gnosis Safe)',
+        url: 'https://safe.global',
+        description: 'Decentralized multi-signature asset management vault for DAOs and teams.',
+        category: 'dao',
+        tags: ['Multi-sig', 'Treasury', 'Security'],
+        builder: { name: 'Safe', twitter: 'https://twitter.com/safe' },
+        status: 'active',
+        verified: true,
+        trending: true
+      },
+      {
+        id: 'aragon',
+        name: 'Aragon',
+        url: 'https://aragon.org',
+        description: 'Modular platform to build, manage, and scale decentralized autonomous organizations.',
+        category: 'dao',
+        tags: ['DAO Builder', 'Governance', 'Treasury'],
+        builder: { name: 'Aragon Project', twitter: 'https://twitter.com/AragonProject' },
+        status: 'active',
+        verified: true
+      },
+      {
+        id: 'gitcoin',
+        name: 'Gitcoin',
+        url: 'https://gitcoin.co',
+        description: 'Community-driven quadratic funding and public goods grant platform for Web3.',
+        category: 'dao',
+        tags: ['Grants', 'Public Goods', 'Quadratic Funding'],
+        builder: { name: 'Gitcoin DAO', twitter: 'https://twitter.com/gitcoin' },
+        status: 'active',
+        verified: true
       }
     ];
 

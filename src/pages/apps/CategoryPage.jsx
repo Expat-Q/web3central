@@ -97,7 +97,7 @@ const CATEGORY_META = {
   gaming:      { title: 'Web3 Gaming & GameFi',     desc: 'Play-and-earn games, metaverse virtual worlds, fully on-chain gaming engines, and gaming guild ecosystems.', color: 'green',   comingSoon: false },
   privacy:     { title: 'Privacy & Zero-Knowledge', desc: 'Zero-knowledge proof systems, confidential smart contracts, private transaction networks, and stealth address tools.', color: 'gray',    comingSoon: false  },
   predictions: { title: 'Prediction Markets & InfoFi', desc: 'Decentralized prediction markets, outcome betting pools, social attention indexes, and sentiment trading protocols.', color: 'orange',  comingSoon: false  },
-  community:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, block explorers, RPC endpoint providers, and open-source infrastructure tools.', color: 'teal',    comingSoon: false },
+  community:   { title: 'DAO & Governance',         desc: 'Decentralized governance frameworks, multi-sig proposal voting portals, and treasury management platforms.', color: 'purple',  comingSoon: false },
   infra:       { title: 'Infra & Dev Tools',        desc: 'RPC infrastructure, node providers, indexers, and developer SDKs for Web3 applications.', color: 'slate',   comingSoon: true  },
   ai:          { title: 'AI & Autonomous Agents',   desc: 'Decentralized AI inference networks, autonomous AI agent frameworks, sentiment engines, and compute markets.', color: 'indigo', comingSoon: true  },
   social:      { title: 'Social & DeSoc',           desc: 'Decentralized social graphs, token-gated community hubs, Web3 messaging protocols, and identity systems.', color: 'blue',    comingSoon: true  },
@@ -107,13 +107,14 @@ const CATEGORY_META = {
   payments:    { title: 'Payments & Settlement',    desc: 'Crypto payroll, cross-border remittance, merchant payment gateways, and invoicing platforms.', color: 'emerald', comingSoon: true  },
   airdrops:    { title: 'Airdrops & Reward Hubs',   desc: 'Verified reward campaigns, testnet incentive programs, and active ecosystem points initiatives.', color: 'yellow', comingSoon: false },
   'bounty-hub': { title: 'Bounty Hub & Freelance',   desc: 'Developer bounties, security audit contests, design challenges, and freelance Web3 task marketplaces.', color: 'indigo',  comingSoon: false },
-  // --- Legacy support ---
+  // --- Legacy & Alias support ---
   dex:              { title: 'DEX',                    desc: 'Decentralized exchanges and automated market maker pools.', color: 'purple',  comingSoon: false },
   perps:            { title: 'Perpetuals',             desc: 'Derivatives platforms and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
   interoperability: { title: 'Interoperability',       desc: 'Cross-chain communication protocols and multi-chain bridges.', color: 'blue',    comingSoon: false },
   infofi:           { title: 'InfoFi',                 desc: 'On-chain research, sentiment analytics, and information markets.', color: 'purple',  comingSoon: false },
   bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 development and security contributions.', color: 'amber',   comingSoon: false },
-  communityTools:   { title: 'Community Tools',        desc: 'DAO coordination, token-gating, and community utility tools.', color: 'teal',    comingSoon: false },
+  communityTools:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
+  'onchain-tools':  { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
 };
 
 const heroImages = {
