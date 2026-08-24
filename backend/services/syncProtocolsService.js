@@ -18,9 +18,12 @@ async function syncStaticProtocolsToDb() {
     // 2. Remove Galxe Starboard from infofi & delete deprecated categories
     await Tool.updateOne(
       { id: 'galxe', category: 'infofi' },
-      { $set: { category: 'community' } }
+      { $set: { category: 'dao' } }
     );
     await Tool.deleteMany({ category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding'] } });
+
+    // 3. Migrate legacy 'community' category protocols to 'dao' so Onchain Tools only displays developer & utility tools
+    await Tool.updateMany({ category: 'community' }, { $set: { category: 'dao' } });
 
     // 3. Ensure Rally, Airaa HQ, and Stitch3 are in infofi
     const infofiTools = [
