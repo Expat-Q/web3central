@@ -70,26 +70,48 @@ router.put('/review/:id', protect, admin, async (req, res) => {
 
 const mongoose = require('mongoose');
 
-// Helper function to find and delete a protocol by ObjectId, id, or name
+// Helper function to find and delete a protocol by ObjectId, String _id, id, or name
 const deleteProtocolHelper = async (targetId) => {
   if (!targetId) return null;
   const idStr = String(targetId).trim();
 
-  let tool = null;
+  // Construct comprehensive $or query to match _id (as ObjectId or String), id, and name
+  const orConditions = [
+    { id: idStr },
+    { name: idStr },
+    { id: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+    { name: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+  ];
+
   if (mongoose.Types.ObjectId.isValid(idStr)) {
+    orConditions.unshift({ _id: new mongoose.Types.ObjectId(idStr) });
+    orConditions.unshift({ _id: idStr });
+  } else {
+    orConditions.unshift({ _id: idStr });
+  }
+
+  const query = { $or: orConditions };
+
+  // 1. Try Mongoose findOneAndDelete
+  let tool = await Tool.findOneAndDelete(query).catch(() => null);
+
+  // 2. Try findByIdAndDelete fallback if valid ObjectId
+  if (!tool && mongoose.Types.ObjectId.isValid(idStr)) {
     tool = await Tool.findByIdAndDelete(idStr).catch(() => null);
   }
+
+  // 3. Fallback: try direct MongoDB native driver deleteOne
   if (!tool) {
-    tool = await Tool.findOneAndDelete({ id: idStr }).catch(() => null);
+    try {
+      const rawRes = await Tool.collection.deleteOne(query);
+      if (rawRes && rawRes.deletedCount > 0) {
+        tool = { _id: idStr, id: idStr, name: idStr };
+      }
+    } catch (rawErr) {
+      console.warn('Native collection deleteOne error:', rawErr.message);
+    }
   }
-  if (!tool) {
-    tool = await Tool.findOneAndDelete({
-      $or: [
-        { id: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
-        { name: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
-      ]
-    }).catch(() => null);
-  }
+
   return tool;
 };
 
