@@ -150,10 +150,19 @@ export default function Admin() {
     } catch (err) { alert(err.message); }
   };
 
-  const handleDeleteProtocol = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to permanently delete protocol "${name}"?`)) return;
+  const handleDeleteProtocol = async (item, name) => {
+    const rawId = typeof item === 'object' && item !== null ? (item._id || item.id) : item;
+    const toolId = String(rawId?.toString ? rawId.toString() : rawId).trim();
+    const toolName = name || (typeof item === 'object' ? item?.name : 'protocol');
+
+    if (!toolId) {
+      alert('Error: Could not determine protocol ID for deletion.');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to permanently delete protocol "${toolName}"?`)) return;
     try {
-      await deleteTool(id);
+      await deleteTool(toolId);
       loadData();
     } catch (err) { alert(err.message || 'Failed to delete protocol'); }
   };
@@ -493,7 +502,7 @@ export default function Admin() {
                                         <ExternalLink size={14} />
                                       </a>
 
-                                      <button onClick={() => handleDeleteProtocol(item._id || item.id, item.name)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" title="Delete protocol">
+                                      <button onClick={() => handleDeleteProtocol(item, item.name)} className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" title="Delete protocol">
                                         <Trash2 size={14} />
                                       </button>
                                     </div>

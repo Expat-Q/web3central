@@ -68,18 +68,40 @@ router.put('/review/:id', protect, admin, async (req, res) => {
   }
 });
 
+const mongoose = require('mongoose');
+
+// Helper function to find and delete a protocol by ObjectId, id, or name
+const deleteProtocolHelper = async (targetId) => {
+  if (!targetId) return null;
+  const idStr = String(targetId).trim();
+
+  let tool = null;
+  if (mongoose.Types.ObjectId.isValid(idStr)) {
+    tool = await Tool.findByIdAndDelete(idStr).catch(() => null);
+  }
+  if (!tool) {
+    tool = await Tool.findOneAndDelete({ id: idStr }).catch(() => null);
+  }
+  if (!tool) {
+    tool = await Tool.findOneAndDelete({
+      $or: [
+        { id: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+        { name: new RegExp(`^${idStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+      ]
+    }).catch(() => null);
+  }
+  return tool;
+};
+
 // @desc    Delete a protocol by MongoDB ID or slug ID
 // @route   DELETE /api/tools/:id
 // @access  Private (Admin)
 router.delete('/:id', protect, admin, async (req, res) => {
   try {
     const { id } = req.params;
-    let tool = await Tool.findByIdAndDelete(id).catch(() => null);
+    const tool = await deleteProtocolHelper(id);
     if (!tool) {
-      tool = await Tool.findOneAndDelete({ id: id });
-    }
-    if (!tool) {
-      return res.status(404).json({ success: false, error: 'Protocol not found' });
+      return res.status(404).json({ success: false, error: 'Protocol not found or already deleted' });
     }
     res.json({ success: true, message: 'Protocol deleted successfully' });
   } catch (err) {
@@ -93,12 +115,9 @@ router.delete('/:id', protect, admin, async (req, res) => {
 router.delete('/:category/:id', protect, admin, async (req, res) => {
   try {
     const { id } = req.params;
-    let tool = await Tool.findByIdAndDelete(id).catch(() => null);
+    const tool = await deleteProtocolHelper(id);
     if (!tool) {
-      tool = await Tool.findOneAndDelete({ id: id });
-    }
-    if (!tool) {
-      return res.status(404).json({ success: false, error: 'Protocol not found' });
+      return res.status(404).json({ success: false, error: 'Protocol not found or already deleted' });
     }
     res.json({ success: true, message: 'Protocol deleted successfully' });
   } catch (err) {

@@ -89,8 +89,10 @@ export const updateTool = async (category, id, toolData) => {
 };
 
 export const deleteTool = async (arg1, arg2) => {
-  const toolId = arg2 || arg1;
-  return apiClient.delete(`/tools/${toolId}`, { auth: true });
+  const raw = arg2 || arg1;
+  const toolId = String(typeof raw === 'object' && raw !== null ? (raw._id || raw.id) : raw).trim();
+  if (!toolId) throw new Error('Invalid protocol ID');
+  return apiClient.delete(`/tools/${encodeURIComponent(toolId)}`, { auth: true });
 };
 
 export const reviewTool = async (category, toolId, actionData) => {
