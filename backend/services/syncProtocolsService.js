@@ -15,15 +15,29 @@ async function syncStaticProtocolsToDb() {
       { upsert: true }
     );
 
-    // 2. Remove Galxe Starboard from infofi & delete deprecated categories
+    // 2. Database Audit & Cleanup Fixes
     await Tool.updateOne(
       { id: 'galxe', category: 'infofi' },
       { $set: { category: 'dao' } }
     );
-    await Tool.deleteMany({ category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding'] } });
 
-    // 3. Migrate legacy 'community' category protocols to 'dao' so Onchain Tools only displays developer & utility tools
+    // Delete deprecated category items (vibeCoding, onchainAutonomy) and specific duplicates
+    await Tool.deleteMany({
+      $or: [
+        { name: { $in: ['Elsa', 'Warden Protocol', 'Magic Newton', 'Sentient AGI Quiz App', 'Warden protocol WM Counter', 'Lanca Quiz by @adedir', 'Warden Protocol Quiz App'] } },
+        { category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding', 'vibeCoding'] } },
+        { _id: { $in: ['69f19b72c1682afa8607913f', '69f19b77c1682afa86079170', '69f19b78c1682afa86079175', '69f19b70c1682afa86079127'] } }
+      ]
+    });
+
+    // Fix singular category 'bridge' -> 'bridges'
+    await Tool.updateMany({ category: 'bridge' }, { $set: { category: 'bridges' } });
+
+    // Migrate legacy 'community' category protocols -> 'dao'
     await Tool.updateMany({ category: 'community' }, { $set: { category: 'dao' } });
+
+    // Fix Seneca missing URL
+    await Tool.updateOne({ id: 'seneca' }, { $set: { url: 'https://seneca.finance', status: 'active' } });
 
     // 3. Ensure Rally, Airaa HQ, and Stitch3 are in infofi
     const infofiTools = [
