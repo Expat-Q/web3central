@@ -275,6 +275,15 @@ async function syncStaticProtocolsToDb() {
       }
     }
 
+    // Final Audit Cleanup: purge deprecated categories and duplicate records permanently
+    await Tool.deleteMany({
+      $or: [
+        { category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding', 'vibeCoding'] } },
+        { name: { $in: ['Elsa', 'Warden Protocol', 'Magic Newton', 'Sentient AGI Quiz App', 'Warden protocol WM Counter', 'Lanca Quiz by @adedir', 'Warden Protocol Quiz App'] } },
+        { _id: { $in: ['69f19b72c1682afa8607913f', '69f19b77c1682afa86079170', '69f19b78c1682afa86079175', '69f19b70c1682afa86079127', '69f0057b2103c02fe24c78b6', '69f0057b2103c02fe24c78bf', '69f0057b2103c02fe24c78c1', '69f0057b2103c02fe24c78c5'] } }
+      ]
+    });
+
     logger.info(`Static protocols sync complete. Created: ${createdCount}, Updated: ${updatedCount}`);
   } catch (err) {
     logger.error('Failed to sync static protocols to DB', { error: err.message });
