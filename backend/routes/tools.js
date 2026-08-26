@@ -470,6 +470,39 @@ router.get('/trending', async (req, res) => {
   }
 });
 
+// @desc    Get live dApp notifications for Notification Center & Push Alerts
+// @route   GET /api/tools/recent-notifications
+// @access  Public
+router.get('/recent-notifications', async (req, res) => {
+  try {
+    const recentTools = await Tool.find({ status: 'active' })
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(10)
+      .lean();
+
+    const decorated = recentTools.map(decorateToolWithLogo);
+
+    const formattedNotifs = decorated.map((t) => ({
+      id: `notif-db-${t._id || t.id}`,
+      toolId: t.id,
+      title: `New dApp Added: ${t.name}`,
+      message: t.description || `Explore ${t.name} on Web3Central.`,
+      type: 'protocol',
+      category: t.category || 'Web3',
+      timestamp: t.createdAt ? new Date(t.createdAt).toLocaleDateString() : 'Recently added',
+      link: t.category ? `/apps/${t.category}` : '/apps',
+      createdAt: t.createdAt || new Date(),
+      logoUrl: t.logoUrl,
+      verified: t.verified
+    }));
+
+    res.json({ success: true, count: formattedNotifs.length, data: formattedNotifs });
+  } catch (err) {
+    console.error('Recent notifications error:', err);
+    res.status(500).json({ success: false, error: 'Failed to fetch recent notifications' });
+  }
+});
+
 // @desc    Developer claims ownership of a tool (pending admin approval)
 // @route   POST /api/tools/:id/claim
 // @access  Private

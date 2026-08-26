@@ -106,6 +106,54 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fetch live dApp notifications from backend API & trigger OS push alerts
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadLiveNotifs() {
+      try {
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+        const res = await fetch(`${API_BASE}/tools/recent-notifications`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!json.success || !Array.isArray(json.data)) return;
+
+        if (isMounted && json.data.length > 0) {
+          const liveItems = json.data;
+
+          setNotifications(prev => {
+            const existingIds = new Set(prev.map(n => n.id));
+            const newNotifs = liveItems.filter(item => !existingIds.has(item.id));
+
+            if (newNotifs.length > 0) {
+              // Trigger push notification for newly added dApp if permission granted
+              if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+                const latest = newNotifs[0];
+                triggerPushNotification({
+                  title: `🔔 ${latest.title}`,
+                  body: latest.message,
+                  url: latest.link || '/apps'
+                });
+              }
+
+              return [...newNotifs, ...prev];
+            }
+            return prev;
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to fetch live notifications:', err);
+      }
+    }
+
+    loadLiveNotifs();
+    const interval = setInterval(loadLiveNotifs, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   const handleEnablePush = async () => {
     const perm = await requestPushPermission();
     setPushPermission(perm);
