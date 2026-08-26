@@ -86,7 +86,7 @@ const scaleIn = {
 
 const CATEGORY_META = {
   // --- Live categories ---
-  trading:     { title: 'Trading & DEXs',          desc: 'Spot automated market makers, orderbook exchanges, and high-leverage perpetual futures protocols across major L1s and L2s.', color: 'purple',  comingSoon: false },
+  trading:     { title: 'Trading & Exchanges',      desc: 'Decentralized spot exchanges (DEXs), automated market makers (AMMs), and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
   bridges:     { title: 'Bridges & Interoperability', desc: 'Cross-chain bridging protocols, arbitrary messaging layers, and liquidity routers powering multi-chain asset transfers.', color: 'blue',    comingSoon: false },
   defi:        { title: 'Decentralized Finance (DeFi)', desc: 'Non-custodial lending markets, algorithmic money markets, yield optimizers, and decentralized stablecoin issuers.', color: 'emerald', comingSoon: false },
   rwa:         { title: 'Real World Assets (RWA)', desc: 'Tokenized US Treasury bills, institutional credit pools, real estate syndicates, and private equity protocol infrastructure.', color: 'amber',   comingSoon: false  },
@@ -107,12 +107,12 @@ const CATEGORY_META = {
   payments:    { title: 'Payments & Settlement',    desc: 'Crypto payroll, cross-border remittance, merchant payment gateways, and invoicing platforms.', color: 'emerald', comingSoon: true  },
   airdrops:    { title: 'Airdrops & Reward Hubs',   desc: 'Verified reward campaigns, testnet incentive programs, and active ecosystem points initiatives.', color: 'yellow', comingSoon: false },
   'bounty-hub': { title: 'Bounty Hub & Freelance',   desc: 'Developer bounties, security audit contests, design challenges, and freelance Web3 task marketplaces.', color: 'indigo',  comingSoon: false },
-  // --- Legacy & Alias support ---
-  dex:              { title: 'DEX',                    desc: 'Decentralized exchanges and automated market maker pools.', color: 'purple',  comingSoon: false },
-  perps:            { title: 'Perpetuals',             desc: 'Derivatives platforms and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
-  interoperability: { title: 'Interoperability',       desc: 'Cross-chain communication protocols and multi-chain bridges.', color: 'blue',    comingSoon: false },
+  // --- Alias support ---
+  dex:              { title: 'Trading & Exchanges',      desc: 'Decentralized spot exchanges (DEXs), automated market makers (AMMs), and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
+  perps:            { title: 'Trading & Exchanges',      desc: 'Decentralized spot exchanges (DEXs), automated market makers (AMMs), and decentralized perpetual futures trading.', color: 'purple',  comingSoon: false },
+  interoperability: { title: 'Bridges & Interoperability', desc: 'Cross-chain communication protocols and multi-chain bridges.', color: 'blue',    comingSoon: false },
   infofi:           { title: 'InfoFi',                 desc: 'On-chain research, sentiment analytics, and information markets.', color: 'purple',  comingSoon: false },
-  bountyHub:        { title: 'Bounty Hub',             desc: 'Earn rewards for Web3 development and security contributions.', color: 'amber',   comingSoon: false },
+  bountyHub:        { title: 'Bounty Hub & Freelance',   desc: 'Developer bounties, security audit contests, design challenges, and freelance Web3 task marketplaces.', color: 'indigo',  comingSoon: false },
   communityTools:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
   'onchain-tools':  { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
 };

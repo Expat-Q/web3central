@@ -619,8 +619,11 @@ router.get('/my-tools', protect, async (req, res) => {
 // If a key maps to an array, we query ALL of those DB categories
 const CATEGORY_ALIASES = {
   infofi:          ['infofi'],
-  trading:         ['dex', 'perps', 'trading'],
-  bridges:         ['interoperability', 'bridges'],
+  trading:         ['trading', 'dex', 'perps'],
+  dex:             ['trading', 'dex'],
+  perps:           ['trading', 'perps'],
+  bridges:         ['bridges', 'interoperability', 'bridge'],
+  interoperability:['bridges', 'interoperability', 'bridge'],
   defi:            ['defi'],
   staking:         ['staking'],
   security:        ['security'],
@@ -634,17 +637,13 @@ const CATEGORY_ALIASES = {
   community:       ['dao', 'community', 'governance'],
   dao:             ['dao', 'community', 'governance'],
   governance:      ['dao', 'community', 'governance'],
-  'bounty-hub':    ['bountyHub', 'bounty-hub'],
+  'bounty-hub':    ['bounty-hub', 'bountyHub'],
+  bountyHub:       ['bounty-hub', 'bountyHub'],
   'rwa':           ['rwa'],
   cex:             ['cex'],
-  // Legacy keys still work directly
-  dex:             ['dex'],
-  perps:           ['perps'],
-  interoperability:['interoperability'],
   communityTools:  ['communityTools', 'onchain-tools', 'onchainTools'],
   'onchain-tools': ['communityTools', 'onchain-tools', 'onchainTools'],
   onchainTools:    ['communityTools', 'onchain-tools', 'onchainTools'],
-  bountyHub:       ['bountyHub'],
 };
 
 // GET tools by category

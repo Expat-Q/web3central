@@ -275,7 +275,23 @@ async function syncStaticProtocolsToDb() {
       }
     }
 
-    // Final Audit Cleanup: purge deprecated categories and duplicate records permanently
+    // Final Audit Cleanup & Unification:
+    // 1. Interoperability -> bridges
+    await Tool.updateMany({ category: { $in: ['interoperability', 'bridge'] } }, { $set: { category: 'bridges' } });
+
+    // 2. DEX and Perps -> trading (with sub-type tags)
+    await Tool.updateMany({ category: 'dex' }, { $set: { category: 'trading' }, $addToSet: { tags: 'DEX' } });
+    await Tool.updateMany({ category: 'perps' }, { $set: { category: 'trading' }, $addToSet: { tags: 'Perpetuals' } });
+
+    // 3. bountyHub -> bounty-hub
+    await Tool.updateMany({ category: 'bountyHub' }, { $set: { category: 'bounty-hub' } });
+
+    // 4. Clean dirty protocol IDs
+    await Tool.updateOne({ id: 'nft-block_brats' }, { $set: { id: 'block-brats' } });
+    await Tool.updateOne({ id: 'nft-critters_club' }, { $set: { id: 'critters-club' } });
+    await Tool.updateOne({ id: 'nft-cutiesnft_' }, { $set: { id: 'cuties-nft' } });
+
+    // 5. Purge deprecated categories and duplicate records permanently
     await Tool.deleteMany({
       $or: [
         { category: { $in: ['onchainAutonomy', 'onchain-autonomy', 'vibecoding', 'vibe-coding', 'vibeCoding'] } },

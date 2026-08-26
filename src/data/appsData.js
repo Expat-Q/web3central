@@ -11,7 +11,7 @@ module.exports = {
     DAO: "Decentralized Autonomous Organization - An organization represented by rules encoded as a computer program that is transparent, controlled by organization members and not influenced by a central government.",
     NFT: "Non-Fungible Token - A unique digital asset that represents ownership of a specific item or piece of content, such as art, music, or videos."
   },
-  interoperability: [
+  bridges: [
     {
       id: "jumper",
       name: "Jumper",
