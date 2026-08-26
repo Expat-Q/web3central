@@ -470,33 +470,100 @@ router.get('/trending', async (req, res) => {
   }
 });
 
-// @desc    Get live dApp notifications for Notification Center & Push Alerts
+// @desc    Get live dApp, TVL, Price Action & Volume notifications for Notification Center & Push Alerts
 // @route   GET /api/tools/recent-notifications
 // @access  Public
 router.get('/recent-notifications', async (req, res) => {
   try {
-    const recentTools = await Tool.find({ status: 'active' })
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(10)
-      .lean();
+    const activeTools = await Tool.find({ status: 'active' }).lean();
+    const decorated = activeTools.map(decorateToolWithLogo);
 
-    const decorated = recentTools.map(decorateToolWithLogo);
+    const notificationsList = [];
 
-    const formattedNotifs = decorated.map((t) => ({
-      id: `notif-db-${t._id || t.id}`,
-      toolId: t.id,
-      title: `New dApp Added: ${t.name}`,
-      message: t.description || `Explore ${t.name} on Web3Central.`,
-      type: 'protocol',
-      category: t.category || 'Web3',
-      timestamp: t.createdAt ? new Date(t.createdAt).toLocaleDateString() : 'Recently added',
-      link: t.category ? `/apps/${t.category}` : '/apps',
-      createdAt: t.createdAt || new Date(),
-      logoUrl: t.logoUrl,
-      verified: t.verified
-    }));
+    // 1. New dApp Listings (sorted by creation/ID)
+    const sortedNew = [...decorated].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 5);
+    sortedNew.forEach(t => {
+      notificationsList.push({
+        id: `notif-new-${t._id || t.id}`,
+        toolId: t.id,
+        title: `🚀 New dApp Listed: ${t.name}`,
+        message: t.description || `Explore ${t.name} under ${t.category || 'Web3Central'}.`,
+        type: 'protocol',
+        category: 'New Listing',
+        timestamp: 'Just added',
+        link: t.category ? `/apps/${t.category}` : '/apps',
+        logoUrl: t.logoUrl,
+        verified: t.verified
+      });
+    });
 
-    res.json({ success: true, count: formattedNotifs.length, data: formattedNotifs });
+    // 2. TVL Surges & Decreases (onchain TVL alerts)
+    const tvlMovers = [...decorated]
+      .filter(t => t.metrics?.tvlChange24h !== undefined && t.metrics?.tvlChange24h !== null && Math.abs(t.metrics.tvlChange24h) >= 0.5)
+      .sort((a, b) => Math.abs(b.metrics.tvlChange24h) - Math.abs(a.metrics.tvlChange24h))
+      .slice(0, 5);
+
+    tvlMovers.forEach(t => {
+      const change = t.metrics.tvlChange24h;
+      const isPositive = change >= 0;
+      const formattedTvl = t.metrics.tvl ? `$${(t.metrics.tvl / 1e6).toFixed(1)}M` : '';
+      notificationsList.push({
+        id: `notif-tvl-${t._id || t.id}`,
+        toolId: t.id,
+        title: `${isPositive ? '📈 TVL Surge' : '📉 TVL Drop Alert'}: ${t.name}`,
+        message: `${t.name} 24h TVL shifted by ${isPositive ? '+' : ''}${change.toFixed(1)}% ${formattedTvl ? `(Total TVL: ${formattedTvl})` : ''}.`,
+        type: 'tvl',
+        category: 'TVL Alert',
+        timestamp: 'Live Onchain',
+        link: t.category ? `/apps/${t.category}` : '/apps',
+        logoUrl: t.logoUrl,
+        badge: `${isPositive ? '+' : ''}${change.toFixed(1)}% TVL`
+      });
+    });
+
+    // 3. Token Price Actions (onchain token price alerts)
+    const priceMovers = [...decorated]
+      .filter(t => t.metrics?.tokenPrice > 0)
+      .slice(0, 4);
+
+    priceMovers.forEach(t => {
+      const price = t.metrics.tokenPrice;
+      const symbol = t.metrics.tokenSymbol || t.name.toUpperCase();
+      notificationsList.push({
+        id: `notif-price-${t._id || t.id}`,
+        toolId: t.id,
+        title: `🔥 Token Price Update: ${t.name} (${symbol})`,
+        message: `${t.name} token is trading at $${price > 1 ? price.toFixed(2) : price.toFixed(4)}. View full analytics.`,
+        type: 'price',
+        category: 'Price Alert',
+        timestamp: 'Live Price',
+        link: t.category ? `/apps/${t.category}` : '/apps',
+        logoUrl: t.logoUrl
+      });
+    });
+
+    // 4. Volume Movers
+    const volumeMovers = [...decorated]
+      .filter(t => t.metrics?.volume24h > 100000)
+      .sort((a, b) => (b.metrics.volume24h || 0) - (a.metrics.volume24h || 0))
+      .slice(0, 3);
+
+    volumeMovers.forEach(t => {
+      const volM = (t.metrics.volume24h / 1e6).toFixed(1);
+      notificationsList.push({
+        id: `notif-vol-${t._id || t.id}`,
+        toolId: t.id,
+        title: `⚡ High Trading Volume: ${t.name}`,
+        message: `${t.name} processed $${volM}M in 24h volume across market pools.`,
+        type: 'volume',
+        category: 'Volume Spike',
+        timestamp: '24h High',
+        link: t.category ? `/apps/${t.category}` : '/apps',
+        logoUrl: t.logoUrl
+      });
+    });
+
+    res.json({ success: true, count: notificationsList.length, data: notificationsList });
   } catch (err) {
     console.error('Recent notifications error:', err);
     res.status(500).json({ success: false, error: 'Failed to fetch recent notifications' });

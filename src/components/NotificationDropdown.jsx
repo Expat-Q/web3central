@@ -198,8 +198,8 @@ export default function NotificationDropdown() {
   const filteredNotifications = notifications.filter(n => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'protocols') return n.type === 'protocol' || n.type === 'spotlight';
+    if (activeFilter === 'onchain') return n.type === 'tvl' || n.type === 'price' || n.type === 'volume' || n.type === 'metrics';
     if (activeFilter === 'news') return n.type === 'news';
-    if (activeFilter === 'metrics') return n.type === 'metrics';
     return true;
   });
 
@@ -207,6 +207,12 @@ export default function NotificationDropdown() {
     switch (type) {
       case 'protocol':
         return <Layers size={16} className="text-purple-600" />;
+      case 'tvl':
+        return <TrendingUp size={16} className="text-emerald-600" />;
+      case 'price':
+        return <Sparkles size={16} className="text-amber-500" />;
+      case 'volume':
+        return <Volume2 size={16} className="text-blue-600" />;
       case 'spotlight':
         return <Sparkles size={16} className="text-amber-500" />;
       case 'metrics':
@@ -291,17 +297,22 @@ export default function NotificationDropdown() {
 
           {/* Filter Tabs */}
           <div className="flex items-center gap-1 p-2 bg-gray-50 border-b border-gray-100 text-xs font-semibold overflow-x-auto">
-            {['all', 'protocols', 'metrics', 'news'].map(filter => (
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'protocols', label: 'dApps' },
+              { id: 'onchain', label: 'Onchain & TVL' },
+              { id: 'news', label: 'Academy' }
+            ].map(filter => (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={`px-3 py-1.5 rounded-xl capitalize transition-all shrink-0 text-[11px] font-bold ${
-                  activeFilter === filter
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-200/60'
+                key={filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`px-3 py-1.5 rounded-xl capitalize text-[11px] transition-all whitespace-nowrap ${
+                  activeFilter === filter.id
+                    ? 'bg-white text-purple-700 shadow-sm font-bold border border-purple-100'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                {filter}
+                {filter.label}
               </button>
             ))}
           </div>
