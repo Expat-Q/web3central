@@ -162,6 +162,7 @@ app.use('/api/developer', developerRouter);
 app.use('/api/quests', questRouter);
 app.use('/api/tts', ttsRouter);
 app.use('/api/airdrops', require('./routes/airdrops'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 
 app.get('/', (req, res) => {

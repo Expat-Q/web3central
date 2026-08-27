@@ -94,6 +94,7 @@ const ConditionalNavbar = ({ setSidebarOpen }) => {
 };
 
 import PushNotificationPrompt from "./components/PushNotificationPrompt";
+import FloatingNotificationToast from "./components/FloatingNotificationToast";
 
 const ConditionalBot = () => {
   const location = useLocation();
@@ -164,6 +165,7 @@ const AppLayout = () => {
 
       <ConditionalBot />
       <PushNotificationPrompt />
+      <FloatingNotificationToast />
     </div>
   );
 };

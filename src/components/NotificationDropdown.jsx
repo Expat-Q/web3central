@@ -163,14 +163,23 @@ export default function NotificationDropdown() {
     if (pushPermission !== 'granted') {
       const perm = await requestPushPermission();
       setPushPermission(perm);
-      if (perm !== 'granted') return;
     }
 
+    // 1. Trigger local floating toast & browser notification
     await triggerPushNotification({
       title: '🚀 Web3Central Live Test Alert',
-      body: 'Push notifications are working perfectly! You will receive live updates for new dApps, protocols, and market metrics.',
-      url: '/apps'
+      body: 'Notifications are working perfectly! Live updates for new dApps, TVL surges, and price action movers are active.',
+      url: '/apps',
+      type: 'protocol'
     });
+
+    // 2. Trigger backend WebPush server payload
+    try {
+      const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api';
+      await fetch(`${API_BASE}/notifications/send-test`, { method: 'POST' });
+    } catch (e) {
+      console.warn('Backend WebPush test trigger failed:', e);
+    }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;

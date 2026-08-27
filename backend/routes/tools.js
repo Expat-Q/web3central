@@ -60,7 +60,16 @@ router.put('/review/:id', protect, admin, async (req, res) => {
       { $set: { status: targetStatus } },
       { new: true }
     ).populate('submitter', 'name email');
-    if (!tool) return res.status(404).json({ success: false, error: 'Tool not found' });
+    if (targetStatus === 'active') {
+      try {
+        const { broadcastPushNotification } = require('../services/pushService');
+        broadcastPushNotification({
+          title: `🚀 New dApp Approved: ${tool.name}`,
+          body: tool.description || `Explore ${tool.name} live on Web3Central!`,
+          url: tool.category ? `/apps/${tool.category}` : '/apps'
+        }).catch(err => console.warn('Background WebPush broadcast warning:', err.message));
+      } catch (e) { /* silent */ }
+    }
 
     res.json({ success: true, tool });
   } catch (err) {

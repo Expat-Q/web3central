@@ -35,7 +35,8 @@
     "passport-discord": "^0.1.4",
     "passport-google-oauth20": "^2.0.0",
     "passport-twitter": "^1.0.4",
-    "viem": "^2.51.3"
+    "viem": "^2.51.3",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "jest": "^30.3.0",
