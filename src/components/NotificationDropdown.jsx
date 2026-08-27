@@ -358,11 +358,12 @@ export default function NotificationDropdown() {
 
                     {n.link && (
                       <Link
-                        to={n.link}
+                        to={n.toolId ? `${n.link}?openTool=${n.toolId}` : n.link}
+                        state={{ openToolId: n.toolId }}
                         onClick={() => setIsOpen(false)}
                         className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 hover:text-purple-700 mt-2 hover:underline"
                       >
-                        Explore <ExternalLink size={11} />
+                        Open Project Info <ExternalLink size={11} />
                       </Link>
                     )}
                   </div>

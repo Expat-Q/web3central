@@ -9,12 +9,13 @@ export default function FloatingNotificationToast() {
   useEffect(() => {
     // Listen for custom floating notification events dispatched across the app
     const handleFloatingAlert = (event) => {
-      const { title, body, url, type, logoUrl } = event.detail || {};
+      const { title, body, url, type, logoUrl, toolId } = event.detail || {};
       setToast({
         id: Date.now(),
         title: title || 'Web3Central Notification',
         body: body || 'New update available on Web3Central.',
         url: url || '/',
+        toolId: toolId || null,
         type: type || 'protocol',
         logoUrl: logoUrl || null
       });
@@ -64,11 +65,12 @@ export default function FloatingNotificationToast() {
             {/* Action Link */}
             {toast.url && (
               <Link
-                to={toast.url}
+                to={toast.toolId ? `${toast.url}?openTool=${toast.toolId}` : toast.url}
+                state={{ openToolId: toast.toolId }}
                 onClick={() => setToast(null)}
                 className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-bold text-purple-300 hover:text-white transition-colors"
               >
-                View Details <ExternalLink size={12} />
+                Open Project Info <ExternalLink size={12} />
               </Link>
             )}
           </div>

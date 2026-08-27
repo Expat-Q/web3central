@@ -203,25 +203,11 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
     if (categoryKey) fetchData();
   }, [categoryKey]);
 
+  // ── Auto-open MetricsPanel when navigated from Notifications or Home ──
   useEffect(() => {
-    const toolId = searchParams.get('id');
-    if (toolId && !loading && data.length > 0) {
-      setTimeout(() => {
-        const el = document.getElementById(`tool-${toolId}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-4', 'ring-purple-500/30', 'ring-offset-4', 'rounded-[2rem]');
-          setTimeout(() => el.classList.remove('ring-4', 'ring-purple-500/30', 'ring-offset-4', 'rounded-[2rem]'), 5000);
-        }
-      }, 800);
-    }
-  }, [searchParams, loading, data.length]);
-
-  // ── Auto-open MetricsPanel when navigated from Home ──
-  useEffect(() => {
-    const id = location.state?.openToolId;
+    const id = searchParams.get('openTool') || searchParams.get('tool') || searchParams.get('id') || location.state?.openToolId;
     if (id && !loading && data.length > 0) {
-      const match = data.find(t => (t.id || t._id) === id || String(t.id) === String(id) || String(t._id) === String(id));
+      const match = data.find(t => (t.id || t._id) === id || String(t.id) === String(id) || String(t._id) === String(id) || (t.name && t.name.toLowerCase() === String(id).toLowerCase()));
       if (match) {
         setSelectedMetricsProtocol({
           ...match,
@@ -229,11 +215,16 @@ export default function CategoryPage({ categoryKey: propCategoryKey, title: prop
           slug: match.llamaSlug || match.slug || match.id,
           rating: match.averageRating || match.rating,
         });
-        // Clear state so refresh doesn't re-open
-        window.history.replaceState({}, '');
+        // Highlight element
+        setTimeout(() => {
+          const el = document.getElementById(`tool-${match.id || match._id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
       }
     }
-  }, [location.state, loading, data]);
+  }, [searchParams, location.state, loading, data]);
 
   // ── App Store derived data ──
   const isFiltered = searchQuery || chainFilter !== 'all' || sortBy !== 'default' || tradingSubFilter !== 'all' || selectedChain !== 'All' || networkScope !== 'all';

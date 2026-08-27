@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchToolsData } from "../services/apiService";
 import { Star, ChevronRight, Rocket, Share2 } from "lucide-react";
@@ -137,6 +137,7 @@ export default function Apps() {
   const sectionRefs = useRef({});
 
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -144,10 +145,11 @@ export default function Apps() {
         const toolsData = await fetchToolsData();
         setAppsData(toolsData);
         
-        // Handle automatic open from navigation state
-        if (location.state?.openToolId) {
+        // Handle automatic open from query param or navigation state
+        const queryToolId = searchParams.get('openTool') || searchParams.get('tool') || searchParams.get('id') || location.state?.openToolId;
+        if (queryToolId) {
           const allTools = Object.values(toolsData).flat();
-          const target = allTools.find(t => (t._id || t.id) === location.state.openToolId);
+          const target = allTools.find(t => (t._id || t.id) === queryToolId || String(t.id) === String(queryToolId) || String(t._id) === String(queryToolId) || (t.name && t.name.toLowerCase() === String(queryToolId).toLowerCase()));
           if (target) {
             setSelectedMetricsProtocol({
               ...target,
@@ -164,7 +166,7 @@ export default function Apps() {
       }
     };
     fetchData();
-  }, [location.state]);
+  }, [location.state, searchParams]);
 
   const sectionToolsMap = useMemo(() => {
     if (!appsData) return {};
