@@ -97,11 +97,11 @@ const CATEGORY_META = {
   gaming:      { title: 'Web3 Gaming & GameFi',     desc: 'Play-and-earn games, metaverse virtual worlds, fully on-chain gaming engines, and gaming guild ecosystems.', color: 'green',   comingSoon: false },
   privacy:     { title: 'Privacy & Zero-Knowledge', desc: 'Zero-knowledge proof systems, confidential smart contracts, private transaction networks, and stealth address tools.', color: 'gray',    comingSoon: false  },
   predictions: { title: 'Prediction Markets & InfoFi', desc: 'Decentralized prediction markets, outcome betting pools, social attention indexes, and sentiment trading protocols.', color: 'orange',  comingSoon: false  },
-  community:   { title: 'DAO & Governance',         desc: 'Decentralized governance frameworks, multi-sig proposal voting portals, and treasury management platforms.', color: 'purple',  comingSoon: false },
+  community:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
   infra:       { title: 'Infra & Dev Tools',        desc: 'RPC infrastructure, node providers, indexers, and developer SDKs for Web3 applications.', color: 'slate',   comingSoon: true  },
   ai:          { title: 'AI & Autonomous Agents',   desc: 'Decentralized AI inference networks, autonomous AI agent frameworks, sentiment engines, and compute markets.', color: 'indigo', comingSoon: true  },
   social:      { title: 'Social & DeSoc',           desc: 'Decentralized social graphs, token-gated community hubs, Web3 messaging protocols, and identity systems.', color: 'blue',    comingSoon: true  },
-  dao:         { title: 'DAO & Governance',         desc: 'Decentralized governance frameworks, multi-sig proposal voting portals, and treasury management platforms.', color: 'purple',  comingSoon: false },
+  dao:         { title: 'DAO',                      desc: 'Decentralized governance frameworks, multi-sig proposal voting portals, and treasury management platforms.', color: 'purple',  comingSoon: false },
   depin:       { title: 'DePIN',                    desc: 'Decentralized Physical Infrastructure Networks including storage, wireless, and compute resources.', color: 'orange',  comingSoon: true  },
   staking:     { title: 'Staking & Liquid Staking', desc: 'Liquid staking tokens (LSTs), liquid restaking protocols (LRTs), validator pools, and yield strategies.', color: 'yellow',  comingSoon: true  },
   payments:    { title: 'Payments & Settlement',    desc: 'Crypto payroll, cross-border remittance, merchant payment gateways, and invoicing platforms.', color: 'emerald', comingSoon: true  },
@@ -115,6 +115,7 @@ const CATEGORY_META = {
   bountyHub:        { title: 'Bounty Hub & Freelance',   desc: 'Developer bounties, security audit contests, design challenges, and freelance Web3 task marketplaces.', color: 'indigo',  comingSoon: false },
   communityTools:   { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
   'onchain-tools':  { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
+  onchainTools:     { title: 'Onchain Tools & Utilities', desc: 'Web3 developer toolkits, contract safety engines, block explorers, and open-source infrastructure.', color: 'teal',    comingSoon: false },
 };
 
 const heroImages = {

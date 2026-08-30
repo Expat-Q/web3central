@@ -743,16 +743,16 @@ const CATEGORY_ALIASES = {
   gaming:          ['gaming'],
   privacy:         ['privacy'],
   predictions:     ['predictions'],
-  community:       ['dao', 'community', 'governance'],
-  dao:             ['dao', 'community', 'governance'],
-  governance:      ['dao', 'community', 'governance'],
+  community:       ['communityTools', 'onchain-tools', 'onchainTools', 'community'],
+  dao:             ['dao', 'governance'],
+  governance:      ['dao', 'governance'],
   'bounty-hub':    ['bounty-hub', 'bountyHub'],
   bountyHub:       ['bounty-hub', 'bountyHub'],
   'rwa':           ['rwa'],
   cex:             ['cex'],
-  communityTools:  ['communityTools', 'onchain-tools', 'onchainTools'],
-  'onchain-tools': ['communityTools', 'onchain-tools', 'onchainTools'],
-  onchainTools:    ['communityTools', 'onchain-tools', 'onchainTools'],
+  communityTools:  ['communityTools', 'onchain-tools', 'onchainTools', 'community'],
+  'onchain-tools': ['communityTools', 'onchain-tools', 'onchainTools', 'community'],
+  onchainTools:    ['communityTools', 'onchain-tools', 'onchainTools', 'community'],
 };
 
 // GET tools by category
