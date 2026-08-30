@@ -799,19 +799,29 @@ export default function Home() {
 
       {/*  Main content  */}
       <main className="px-4 sm:px-5 lg:px-7 pt-0 pb-8 space-y-4">
-        {/* Anti-Scam Verification Hook Banner */}
-        <div className="bg-gradient-to-br from-purple-500/5 to-indigo-500/5 border border-purple-100 rounded-[2rem] p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
-          <div className="space-y-1">
-            <h2 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight leading-tight">
-              Search any protocol to go straight to their website, avoiding scam results from Google.
+        {/* InfoFi & Contract Safety Wedge Hero Banner */}
+        <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-indigo-950 border border-purple-500/20 text-white rounded-[2rem] p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+          {/* Subtle Glow Background */}
+          <div className="absolute -top-24 -left-24 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="space-y-2 relative z-10 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[11px] font-bold rounded-full uppercase tracking-wider">
+              <Sparkles size={13} className="text-purple-300" />
+              Onchain InfoFi & Smart Contract Security Engine
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
+              Real-time Web3 Intelligence, Community Sentiment & Smart Contract Safety
             </h2>
-            <p className="text-xs sm:text-sm text-purple-700 font-bold">
-              Bookmark this page for better access and security.
+            <p className="text-xs sm:text-sm text-purple-200/90 font-medium leading-relaxed">
+              Track Bull/Bear community sentiment, prevent contract drain attacks, analyze live TVL shifts, and receive instant OS push notifications for new protocol opportunities.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 border border-purple-100 text-purple-700 text-xs font-black rounded-full uppercase tracking-wider shrink-0">
-            <ShieldCheck size={14} className="text-purple-600" />
-            Verified Directory
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 shrink-0 z-10">
+            <div className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold rounded-xl">
+              <ShieldCheck size={14} /> Anti-Drain Verified
+            </div>
+            <div className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold rounded-xl">
+              <Bell size={14} /> OS Push Alerts
+            </div>
           </div>
         </div>
 
