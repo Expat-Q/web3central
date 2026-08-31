@@ -8,7 +8,7 @@ import {
   TrendingUp, Sparkles, ArrowLeftRight, Landmark,
   Share2, Wallet, ShieldCheck, BarChart3, Users,
   Trophy, Gamepad2, Lock, Building, Coins, Activity,
-  Image, Target, Code2
+  Image, Target, Code2, Bell
 } from "lucide-react";
 import ToolLogo from "../components/ToolLogo";
 import NewsCard from "../components/NewsCard";
